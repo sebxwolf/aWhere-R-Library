@@ -1,7 +1,7 @@
-#' @title updatePlanting
+#' @title UpdatePlanting
 #'
 #' @description
-#' \code{updatePlanting} To update details of a particular planting
+#' \code{UpdatePlanting} To update details of a particular planting
 #'
 #' @details
 #' Occasionally you will need to update a planting, changing the projections
@@ -29,11 +29,11 @@
 #' @import RCurl
 #'
 #' @examples
-#' updateField("64322", "FieldA", "2016-02-01", "60", "Bushels")
+#' UpdateField("64322", "FieldA", "2016-02-01", "60", "Bushels")
 #'
 #' @export
 
-updatePlanting <- function(fieldId, plantingId = "", plantingDate = "", projectedYieldAmount = "", projectedYieldUnits = "",
+UpdatePlanting <- function(fieldId, plantingId = "", plantingDate = "", projectedYieldAmount = "", projectedYieldUnits = "",
                            projectedHarvestDate = "", yieldAmount = "", yieldUnits = "", harvestDate = "") {
 
   ## Error checking

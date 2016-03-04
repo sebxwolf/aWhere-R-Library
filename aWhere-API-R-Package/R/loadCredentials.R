@@ -1,7 +1,7 @@
-#' @title loadCredentials.
+#' @title LoadCredentials.
 #'
 #' @description
-#' \code{loadCredentials} loads credential information from text file to use in
+#' \code{LoadCredentials} loads credential information from text file to use in
 #'  calls to aWhere API
 #'
 #' @details
@@ -16,11 +16,11 @@
 #' @return vector with uid and secret in positions 1, 2
 #'
 #' @examples
-#' loadCredentials("C:/aWhere/credentials/credentials.txt")
+#' LoadCredentials("C:/aWhere/credentials/credentials.txt")
 #'
 #' @export
 
-loadCredentials <- function(pathToCredentials) {
+LoadCredentials <- function(pathToCredentials) {
   credentials <- readLines(pathToCredentials)
 
   uid <- credentials[1]

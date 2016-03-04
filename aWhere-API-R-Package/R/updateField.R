@@ -15,16 +15,16 @@
 #' Only the Farm ID and Field Name can be updated at this time.
 #' IMPORTANT - to look for a set of data points which need update, you can only update parameters
 #'             one at a time:
-#'                    - only fieldId
 #'                    - only farmId
 #'                    - only name
 #'
+#' @param - fieldId: the variable that will be used to search for the particular
 #' @param - variableToSearch: the variable that will be used to search for the particular
 #'                            locations that need information updated (character string).
-#'                            Either "id" or "farmId" or "name"
+#'                            Either "farmId" or "name"
 #' @param - valueToSearch: the value for the variableToSearch (character string)
 #' @param - variableToUpdate: the variable that needs to be updated (character string).
-#'                            Either "id" or "farmId" or "name"
+#'                            Either "farmId" or "name"
 #' @param - valueToUpdate: the new value that will be placed (character string)
 #'
 #' @return - A message confirming the changes have been made
@@ -36,18 +36,18 @@
 #' @import jsonlite
 #'
 #' @examples
-#' updateField( variableToSearch = 'farmId', valueToSearch = 'farmA',
+#' updateField( fieldId = 'field123', 
+#' 				variableToSearch = 'farmId', valueToSearch = 'farmA',
 #'              variableToChange = 'farmId', valueToChange = 'This is my territory')
-
 
 #' @export
 
-updateField <- function(variableToSearch, valueToSearch, variableToChange, valueToChange) {
+UpdateField <- function(fieldId, variableToSearch, valueToSearch, variableToChange, valueToChange) {
 
 
     ## Creating the request
 
-    url <- "https://api.awhere.com/v2/fields"
+    url <- paste0("https://api.awhere.com/v2/fields/",fieldId)
 
     postbody <- paste0('[{"op":"test","path":/', variableToSearch, '","value":"', valueToSearch, '"},
                          {"op":"replace","path":/', variableToChange, '","value":"', valueToChange, '"}]' )
