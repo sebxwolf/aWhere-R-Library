@@ -17,12 +17,14 @@ _Note: These functions will only return metric units_
 
     setwd("C:\Users\USERNAME\Desktop")
 
+
 4. Run the following set of commands to install and add the library to your environment:
 
 
     library(devtools)
     install("aWhere-API-R-Package")
-	library(aWhereAPI)
+    library(aWhereAPI)
+
 
 *Note: You will need to have the devtools library installed in R. Consult documentation if necessary.*
 
