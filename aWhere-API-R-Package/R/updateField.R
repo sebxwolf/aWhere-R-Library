@@ -61,7 +61,7 @@ UpdateField <- function(fieldId, variableToSearch, valueToSearch, variableToChan
       # Re formating the response recieved from API
       a <- content(request, as = "text")
 
-      #The JSONLITE Serializer propely handles the JSON conversion
+      #The JSONLITE Serializer properly handles the JSON conversion
 
       if (any(grepl('API Access Expired',a)) == TRUE) {
         GetAccessToken(awhereEnv75247$uid,awhereEnv75247$secret)

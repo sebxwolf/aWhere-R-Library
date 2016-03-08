@@ -1,7 +1,7 @@
 #' @title GetAgronomicNormsFields.
 #'
 #' @description
-#' \code{GetAgronomicNormsFields} calls Historic Agronomic Norms Endpoint of API using Field Names Constuct
+#' \code{GetAgronomicNormsFields} calls Historic Agronomic Norms Endpoint of API using Field Location Construct
 #'
 #' @details
 #' This is a flexible API that allows you to calculate the averages for agronomic values
@@ -78,38 +78,38 @@ GetAgronomicNormsFields <- function(fieldId, monthDayStart = '', monthDayEnd = '
     return()
   }
 
-  currentFields <- GetFields()
-  if ((fieldId %in% currentFields$fieldId) == FALSE) {
-    warning('The Provided field name is not a field currently associated with your account. \n
-             Please create the field before proceeding. \n')
-    return()
-  }
+  # currentFields <- GetFields()
+  # if ((fieldId %in% currentFields$fieldId) == FALSE) {
+  #   warning('The Provided field name is not a field currently associated with your account. \n
+  #            Please create the field before proceeding. \n')
+  #   return()
+  # }
 
   if (monthDayStart != '') {
     monthDayStartTest <- strsplit(monthDayStart,'-')
     for (z in 1:length(monthDayStartTest[[1]])) {
       if (nchar(monthDayStartTest[[1]][z]) != 2) {
-        warning('The paramter monthDayStart is not properly formatted.  Please correct. \n')
+        warning('The parameter monthDayStart is not properly formatted.  Please correct. \n')
         return()
       }
     }
     if ((as.integer(monthDayStartTest[[1]][1]) >= 1 & as.integer(monthDayStartTest[[1]][1]) <= 12) == FALSE) {
-      warning('The month paramater in monthDayStart is not a valid value.  Please correct. \n')
+      warning('The month parameter in monthDayStart is not a valid value.  Please correct. \n')
       return()
     }
     if (monthDayStartTest[[1]][1] %in% c('4','6','9','11')) {
       if ((as.integer(monthDayStartTest[[1]][2]) >= 1 & as.integer(monthDayStartTest[[1]][2]) <= 30) == FALSE) {
-        warning('The day paramater in monthDayStart is not a valid value.  Please correct. \n')
+        warning('The day parameter in monthDayStart is not a valid value.  Please correct. \n')
         return()
       }
     } else if (monthDayStartTest[[1]][1] %in% c('2')) {
       if ((as.integer(monthDayStartTest[[1]][2]) >= 1 & as.integer(monthDayStartTest[[1]][2]) <= 28) == FALSE) {
-        warning('The day paramater in monthDayStart is not a valid value.  Please correct. \n')
+        warning('The day parameter in monthDayStart is not a valid value.  Please correct. \n')
         return()
       }
     } else {
       if ((as.integer(monthDayStartTest[[1]][2]) >= 1 & as.integer(monthDayStartTest[[1]][2]) <= 31) == FALSE) {
-        warning('The day paramater in monthDayStart is not a valid value.  Please correct. \n')
+        warning('The day parameter in monthDayStart is not a valid value.  Please correct. \n')
         return()
       }
     }
@@ -117,33 +117,33 @@ GetAgronomicNormsFields <- function(fieldId, monthDayStart = '', monthDayEnd = '
 
   if (monthDayEnd != '') {
     if (monthDayStart == '') {
-      warning('If the paramter monthDayEnd is specified so must monthDayStart.  Please correct. \n')
+      warning('If the parameter monthDayEnd is specified so must monthDayStart.  Please correct. \n')
       return()
     }
     monthDayEndTest <- strsplit(monthDayEnd,'-')
     for (z in 1:length(monthDayEndTest[[1]])) {
       if (nchar(monthDayEndTest[[1]][z]) != 2) {
-        warning('The paramter monthDayEnd is not properly formatted.  Please correct. \n')
+        warning('The parameter monthDayEnd is not properly formatted.  Please correct. \n')
         return()
       }
     }
     if ((as.integer(monthDayEndTest[[1]][1]) >= 1 & as.integer(monthDayEndTest[[1]][1]) <= 12) == FALSE) {
-      warning('The month paramater in monthDayEnd is not a valid value.  Please correct. \n')
+      warning('The month parameter in monthDayEnd is not a valid value.  Please correct. \n')
       return()
     }
     if (monthDayEndTest[[1]][1] %in% c('4','6','9','11')) {
       if ((as.integer(monthDayEndTest[[1]][2]) >= 1 & as.integer(monthDayEndTest[[1]][2]) <= 30) == FALSE) {
-        warning('The day paramater in monthDayEnd is not a valid value.  Please correct. \n')
+        warning('The day parameter in monthDayEnd is not a valid value.  Please correct. \n')
         return()
       }
     } else if (monthDayEndTest[[1]][1] %in% c('2')) {
       if ((as.integer(monthDayEndTest[[1]][2]) >= 1 & as.integer(monthDayEndTest[[1]][2]) <= 28) == FALSE) {
-        warning('The day paramater in monthDayEnd is not a valid value.  Please correct. \n')
+        warning('The day parameter in monthDayEnd is not a valid value.  Please correct. \n')
         return()
       }
     } else {
       if ((as.integer(monthDayEndTest[[1]][2]) >= 1 & as.integer(monthDayEndTest[[1]][2]) <= 31) == FALSE) {
-        warning('The day paramater in monthDayEnd is not a valid value.  Please correct. \n')
+        warning('The day parameter in monthDayEnd is not a valid value.  Please correct. \n')
         return()
       }
     }
@@ -151,14 +151,14 @@ GetAgronomicNormsFields <- function(fieldId, monthDayStart = '', monthDayEnd = '
 
   if (yearStart != '') {
     if (as.integer(yearStart) < 1994 | as.integer(yearStart) > year(Sys.Date())) {
-      warning('The yearStart paramater must be between 1994 and the current year.  Please correct. \n')
+      warning('The yearStart parameter must be between 1994 and the current year.  Please correct. \n')
       return()
     }
   }
 
   if (yearEnd != '') {
     if (as.integer(yearEnd) < 1994 | as.integer(yearEnd) > year(Sys.Date())) {
-      warning('The yearEnd paramater must be between 1994 and the current year.  Please correct. \n')
+      warning('The yearEnd parameter must be between 1994 and the current year.  Please correct. \n')
       return()
     }
   }
@@ -207,33 +207,33 @@ GetAgronomicNormsFields <- function(fieldId, monthDayStart = '', monthDayEnd = '
     accumulationStartDateTest <- strsplit(accumulationStartDate,'-')
     for (z in 1:length(accumulationStartDateTest [[1]])) {
       if (nchar(accumulationStartDateTest[[1]][z]) != 2) {
-        warning('The paramter accumulationStartDate is not properly formatted.  Please correct. \n')
+        warning('The parameter accumulationStartDate is not properly formatted.  Please correct. \n')
         return()
       }
     }
     if ((as.integer(accumulationStartDateTest [[1]][1]) >= 1 & as.integer(accumulationStartDateTest [[1]][1]) <= 12) == FALSE) {
-      warning('The month paramater in accumulationStartDate is not a valid value.  Please correct. \n')
+      warning('The month parameter in accumulationStartDate is not a valid value.  Please correct. \n')
       return()
     }
     if (accumulationStartDateTest [[1]][1] %in% c('4','6','9','11')) {
       if ((as.integer(accumulationStartDateTest [[1]][2]) >= 1 & as.integer(accumulationStartDateTest[[1]][2]) <= 30) == FALSE) {
-        warning('The day paramater in accumulationStartDate is not a valid value.  Please correct. \n')
+        warning('The day parameter in accumulationStartDate is not a valid value.  Please correct. \n')
         return()
       }
     } else if (accumulationStartDateTest [[1]][1] %in% c('2')) {
       if ((as.integer(accumulationStartDateTest [[1]][2]) >= 1 & as.integer(accumulationStartDateTest [[1]][2]) <= 28) == FALSE) {
-        warning('The day paramater in accumulationStartDate is not a valid value.  Please correct. \n')
+        warning('The day parameter in accumulationStartDate is not a valid value.  Please correct. \n')
         return()
       }
     } else {
       if ((as.integer(accumulationStartDateTest [[1]][2]) >= 1 & as.integer(accumulationStartDateTest[[1]][2]) <= 31) == FALSE) {
-        warning('The day paramater in accumulationStartDate is not a valid value.  Please correct. \n')
+        warning('The day parameter in accumulationStartDate is not a valid value.  Please correct. \n')
         return()
       }
     }
     if (accumulationStartDateTest[[1]][1] == monthDayStartTest[[1]][1]) {
       if (accumulationStartDateTest[[1]][2] > monthDayStartTest[[1]][2]) {
-        warning('The accumulationStartDate paramater must come before the startDate parameter.  Please correct. \n')
+        warning('The accumulationStartDate parameter must come before the startDate parameter.  Please correct. \n')
         return()
       }
     }
@@ -311,7 +311,7 @@ GetAgronomicNormsFields <- function(fieldId, monthDayStart = '', monthDayEnd = '
 
     a <- content(request, as = "text")
 
-    #The JSONLITE Serializer propely handles the JSON conversion
+    #The JSONLITE Serializer properly handles the JSON conversion
 
     x <- jsonlite::fromJSON(a,flatten = TRUE)
 

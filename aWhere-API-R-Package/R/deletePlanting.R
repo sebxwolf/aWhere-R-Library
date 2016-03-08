@@ -33,7 +33,7 @@ DeletePlanting <- function(fieldId,plantingId) {
     a <- content(request, as = "text")
     parsedResponse <- unlist(strsplit(a,split = "\""))
 
-    #The JSONLITE Serializer propely handles the JSON conversion
+    #The JSONLITE Serializer properly handles the JSON conversion
 
     if (any(grepl('API Access Expired',a)) == TRUE) {
       GetAccessToken(awhereEnv75247$uid,awhereEnv75247$secret)

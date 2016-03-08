@@ -106,10 +106,10 @@ GetForecastsLatLon <- function(latitude, longitude, dayStart = Sys.Date(), dayEn
     return()
   }
 
-  if ((24 %% blockSize) == 0){
-    warning('The block size must divide evenly into 24. Please correct\n')
-    return()
-  }
+  # if ((24 %% blockSize) == 0){
+  #   warning('The block size must divide evenly into 24. Please correct\n')
+  #   return()
+  # }
 
 
   urlAddress <- "https://api.awhere.com/v2/weather"
@@ -135,7 +135,7 @@ GetForecastsLatLon <- function(latitude, longitude, dayStart = Sys.Date(), dayEn
 
     a <- content(request, as = "text")
 
-    #The JSONLITE Serializer propely handles the JSON conversion
+    #The JSONLITE Serializer properly handles the JSON conversion
 
     x <- jsonlite::fromJSON(a,flatten = TRUE)
 

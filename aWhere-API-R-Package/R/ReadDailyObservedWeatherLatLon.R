@@ -1,7 +1,7 @@
 #' @title GetDailyObservedWeatherLatLon.
 #'
 #' @description
-#' \code{GetDailyObservedWeatherLatLon} calls Daily Observed Weather by Geolocation Endpoint of API using Lat/Lon Constuct
+#' \code{GetDailyObservedWeatherLatLon} calls Daily Observed Weather by Geolocation Endpoint of API using Lat/Lon
 #'
 #' @details
 #' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain™ system,
@@ -14,7 +14,7 @@
 #' access of up to 30 months of data (beyond that, use the Norms API to get multi-year averages).
 #' This function assumes that the data to be requested is Min/Max Temperature, Precipitation,
 #' Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
-#' Morning Max Windspeed, and Average Windspeed.  Uses the lat/lon construct for requestion data.
+#' Morning Max Windspeed, and Average Windspeed.  Uses the lat/lon construct for requesting data.
 #' Uses default units returned by the API
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
@@ -175,7 +175,7 @@ GetDailyObservedWeatherLatLon <- function(latitude, longitude,
 
       a <- content(request, as = "text")
 
-      #The JSONLITE Serializer propely handles the JSON conversion
+      #The JSONLITE Serializer properly handles the JSON conversion
 
       x <- jsonlite::fromJSON(a,flatten = TRUE)
 

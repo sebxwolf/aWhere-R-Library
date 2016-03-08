@@ -39,7 +39,7 @@
 #' @param - yieldUnits: units of actual yield (string)
 #' @param - harvestDate: actual harvest date at end of season. Format as YYYY-MM-DD (string)
 #'
-#' @return - a print text that informs if the query succeded or not
+#' @return - a print text that informs if the query succeeded or not
 #'
 #' @references http://developer.awhere.com/api/reference/plantings/create
 #'

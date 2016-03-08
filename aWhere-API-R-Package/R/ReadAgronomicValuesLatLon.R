@@ -1,7 +1,7 @@
 #' @title GetAgronomicValuesLatLon.
 #'
 #' @description
-#' \code{GetAgronomicValuesLatLon} calls Agronomic Values and Accumulations by Geolocation Endpoint of API using Lat/Lon Constuct
+#' \code{GetAgronomicValuesLatLon} calls Agronomic Values and Accumulations by Geolocation Endpoint of API using Lat/Lon
 #'
 #' @details
 #' Agronomic Values are calculated numbers that can be used to show the agronomic status of a field or crop.
@@ -226,7 +226,7 @@ GetAgronomicValuesLatLon <- function(latitude, longitude,
 
       a <- content(request, as = "text")
 
-      #The JSONLITE Serializer propely handles the JSON conversion
+      #The JSONLITE Serializer properly handles the JSON conversion
 
       x <- jsonlite::fromJSON(a,flatten = TRUE)
 

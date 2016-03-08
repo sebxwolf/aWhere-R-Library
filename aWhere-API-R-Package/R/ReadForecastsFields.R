@@ -1,7 +1,7 @@
 #' @title GetForecastsFields.
 #'
 #' @description
-#' \code{GetForecastsFields} calls Forecast Weather Endpoint of API using Fields Name Constuct
+#' \code{GetForecastsFields} calls Forecast Weather Endpoint of API using Field Location Construct
 #'
 #' @details
 #' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain™ system,
@@ -20,7 +20,7 @@
 #'
 #' @param - fieldId: the fieldId having previously been created with the createField Function
 #' @param - dayStart: character string of start date in form: YYYY-MM-DD
-#'                    Defaults to system date ifleft blank
+#'                    Defaults to system date if left blank
 #' @param - dayEnd: character string of end date in form: YYYY-MM-DD
 #'                  Defaults to system date + 7 if left blank
 #' @param - blockSize: Integer value that corresponds to the number of hours to include in each time block.
@@ -58,12 +58,12 @@ GetForecastsFields <- function(fieldId, dayStart = '', dayEnd = '',
     return()
   }
 
-  currentFields <- GetFields()
-  if ((fieldId %in% currentFields$fieldId) == FALSE) {
-    warning('The Provided field name is not a field currently associated with your account. \n
-            Please create the field before proceeding. \n')
-    return()
-  }
+  # currentFields <- GetFields()
+  # if ((fieldId %in% currentFields$fieldId) == FALSE) {
+  #   warning('The Provided field name is not a field currently associated with your account. \n
+  #           Please create the field before proceeding. \n')
+  #   return()
+  # }
 
   if (dayStart != '') {
     if (suppressWarnings(is.na(ymd(dayStart))) == TRUE) {
@@ -100,10 +100,10 @@ GetForecastsFields <- function(fieldId, dayStart = '', dayEnd = '',
     }
   }
 
-  if ((24 %% blockSize) == 0){
-    warning('The block size must divide evenly into 24. Please correct\n')
-    return()
-  }
+  # if ((24 %% blockSize) == 0){
+  #   warning('The block size must divide evenly into 24. Please correct\n')
+  #   return()
+  # }
 
   urlAddress <- "https://api.awhere.com/v2/weather"
 
@@ -135,7 +135,7 @@ GetForecastsFields <- function(fieldId, dayStart = '', dayEnd = '',
 
     a <- content(request, as = "text")
 
-    #The JSONLITE Serializer propely handles the JSON conversion
+    #The JSONLITE Serializer properly handles the JSON conversion
 
     x <- jsonlite::fromJSON(a,flatten = TRUE)
 

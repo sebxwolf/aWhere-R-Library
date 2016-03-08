@@ -47,12 +47,12 @@ GetCurrentConditionsFields <- function(fieldId,sources = 'all') {
     return()
   }
 
-  currentFields <- GetFields()
-  if ((fieldId %in% currentFields$fieldId) == FALSE) {
-    warning('The Provided field name is not a field currently associated with your account. \n
-            Please create the field before proceeding. \n')
-    return()
-  }
+  # currentFields <- GetFields()
+  # if ((fieldId %in% currentFields$fieldId) == FALSE) {
+  #   warning('The Provided field name is not a field currently associated with your account. \n
+  #           Please create the field before proceeding. \n')
+  #   return()
+  # }
 
   if ((sources %in% c('metar','mesonet','metar-mesonet','pws','all')) == FALSE) {
     warning('The specified source is not valid. Please correct. \n')
@@ -84,7 +84,7 @@ GetCurrentConditionsFields <- function(fieldId,sources = 'all') {
 
     a <- content(request, as = "text")
 
-    #The JSONLITE Serializer propely handles the JSON conversion
+    #The JSONLITE Serializer properly handles the JSON conversion
 
     x <- jsonlite::fromJSON(a,flatten = TRUE)
 

@@ -1,7 +1,7 @@
 #' @title GetDailyObservedWeatherFields.
 #'
 #' @description
-#' \code{GetDailyObservedWeatherFields} calls Daily Observed Weather Endpoint of API using Fields Name Constuct
+#' \code{GetDailyObservedWeatherFields} calls Daily Observed Weather Endpoint of API using Field Location Construct
 #'
 #' @details
 #' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain™ system,
@@ -14,7 +14,7 @@
 #' access of up to 30 months of data (beyond that, use the Norms API to get multi-year averages).
 #' This function assumes that the data to be requested is Min/Max Temperature, Precipitation,
 #' Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
-#' Morning Max Windspeed, and Average Windspeed.  Uses the Fields Name construct for requestion data.
+#' Morning Max Windspeed, and Average Windspeed.  Uses the Fields Name construct for requesting data.
 #' Uses default units returned by the API
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations
@@ -58,12 +58,12 @@ GetDailyObservedWeatherFields <- function(fieldId,
     return()
   }
 
-  currentFields <- GetFields()
-  if ((fieldId %in% currentFields$fieldId) == FALSE) {
-    warning('The Provided field name is not a field currently associated with your account. \n
-            Please create the field before proceeding. \n')
-    return()
-  }
+  # currentFields <- GetFields()
+  # if ((fieldId %in% currentFields$fieldId) == FALSE) {
+  #   warning('The Provided field name is not a field currently associated with your account. \n
+  #           Please create the field before proceeding. \n')
+  #   return()
+  # }
 
   if (dayStart != '') {
     if (suppressWarnings(is.na(ymd(dayStart))) == TRUE) {
@@ -181,7 +181,7 @@ GetDailyObservedWeatherFields <- function(fieldId,
 
       a <- content(request, as = "text")
 
-      #The JSONLITE Serializer propely handles the JSON conversion
+      #The JSONLITE Serializer properly handles the JSON conversion
 
       x <- jsonlite::fromJSON(a,flatten = TRUE)
 

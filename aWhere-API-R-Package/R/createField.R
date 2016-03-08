@@ -24,7 +24,7 @@
 #' @param - fieldName: a name of the location (optional -string)
 #' @param - acres: the acres of the field (optional -string)
 #'
-#' @return - printed text that informs if the query succeded or not
+#' @return - printed text that informs if the query succeeded or not
 #'
 #' @references http://developer.awhere.com/api/reference/fields/create-field
 #'
@@ -83,7 +83,7 @@ CreateField <- function(fieldId, latitude, longitude, farmId, fieldName = "", ac
 
   fieldId <- gsub(' ','_',fieldId)
   farmId <- gsub(' ','_',farmId)
-  fieldName <- gsub(' ','_',fieldName)
+  # fieldName <- gsub(' ','_',fieldName)
 
   ## Create Request
 
@@ -109,7 +109,7 @@ CreateField <- function(fieldId, latitude, longitude, farmId, fieldName = "", ac
 
     a <- content(request, as = "text")
 
-    #The JSONLITE Serializer propely handles the JSON conversion
+    #The JSONLITE Serializer properly handles the JSON conversion
 
     x <- jsonlite::fromJSON(a,flatten = TRUE)
 

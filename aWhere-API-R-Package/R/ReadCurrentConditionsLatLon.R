@@ -1,7 +1,7 @@
 #' @title GetCurrentConditionsLatLon.
 #'
 #' @description
-#' \code{GetCurrentConditionsLatLon} calls Current Weather Conditions Endpoint of API using Lat/Lon Constuct
+#' \code{GetCurrentConditionsLatLon} calls Current Weather Conditions Endpoint of API using Lat/Lon
 #'
 #' @details
 #' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain™ system,
@@ -13,7 +13,7 @@
 #' can change quickly. At that point, having a more recent reading of the area's weather is key
 #' for making decisions in the middle of the day. The Current Weather Conditions, or Nowcast,
 #' API provides the current conditions. This API uses the data from the nearest weather station
-#' that is capable of hourly updates.  Uses the Lat/Lon construct for requestion data.
+#' that is capable of hourly updates.  Uses the Lat/Lon construct for requesting data.
 #' Uses default units returned by the API
 #'
 #' @references http://developer.awhere.com/api/reference/weather/current
@@ -99,7 +99,7 @@ GetCurrentConditionsLatLon <- function(latitude,longitude,sources = 'all') {
 
     a <- content(request, as = "text")
 
-    #The JSONLITE Serializer propely handles the JSON conversion
+    #The JSONLITE Serializer properly handles the JSON conversion
 
     x <- jsonlite::fromJSON(a,flatten = TRUE)
 
