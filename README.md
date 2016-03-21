@@ -23,17 +23,17 @@ _Note: These functions will only return metric units_
 *Note: You will need to have the devtools library installed in R. Consult documentation if necessary.*
 
 
-## Documentation
+## Documentation	
 
 Because customers using R have many different use cases, we've organized the documentation accordingly in order to present only the most useful set of functions for your work. You will find all the documentation in the `documentation` folder. 
 
-**complete-documentation.md**
+[complete-documentation.md](https://github.com/aWhereAPI/aWhere-R-Library/blob/master/documentation/complete-documentation.md)
 * This file includes every function.
 
-**geolocation-usage.md**
+[geolocation-usage.md](https://github.com/aWhereAPI/aWhere-R-Library/blob/master/documentation/geolocation-usage.md)
 * Some customers will prefer to use latitude and longitude for selecting weather data. This is generally only appropriate and allowed when doing large regional work or for discrete point-by-point data needs. 
 * This approach is *not* appropriate when tracking data for a field or if not explicitly allowed by your agreement with aWhere. 
 
-**field-based-usage.md**
+[field-based-usage.md](https://github.com/aWhereAPI/aWhere-R-Library/blob/master/documentation/field-based-usage.md)
 * This is the primary method for accessing the aWhere platform, and with this approach you register Field Locations with the platform and can add planting data to each field to more easily monitor agronomics and track models. 
 * If your work is aware of specific field locations and tracking specific growing seasons, this is the appropriate approach to use. 
