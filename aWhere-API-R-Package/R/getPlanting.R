@@ -62,7 +62,7 @@ GetPlanting <- function(fieldId = "", plantingId = "", current = F) {
                    add_headers(Authorization =
                                  paste0("Bearer ", awhereEnv75247$token)))
 
-    a <- content(request)
+    a <- suppressMessages(content(request))
 
     if (any(grepl('API Access Expired',a))) {
       GetAccessToken(awhereEnv75247$uid,awhereEnv75247$secret)
@@ -109,7 +109,7 @@ GetPlanting <- function(fieldId = "", plantingId = "", current = F) {
   if(!is.null(a$statusCode)) {
     stop(a$detailedMessage)
   } else {
-    return(as.data.table(data))
+    return(as.data.frame(data))
   }
 
 }

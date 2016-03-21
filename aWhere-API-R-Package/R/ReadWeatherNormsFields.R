@@ -56,12 +56,12 @@ GetWeatherNormsFields <- function(fieldId, monthDayStart = '', monthDayEnd = '',
     return()
   }
 
-  # currentFields <- GetFields()
-  # if ((fieldId %in% currentFields$fieldId) == FALSE) {
-  #   warning('The Provided field name is not a field currently associated with your account. \n
-  #            Please create the field before proceeding. \n')
-  #   return()
-  # }
+  currentFields <- GetFields(fieldId)
+  if ((fieldId %in% currentFields$fieldId) == FALSE) {
+    warning('The Provided field name is not a field currently associated with your account. \n
+             Please create the field before proceeding. \n')
+    return()
+  }
 
   if (monthDayStart != '') {
     monthDayStartTest <- strsplit(monthDayStart,'-')
@@ -221,7 +221,7 @@ GetWeatherNormsFields <- function(fieldId, monthDayStart = '', monthDayEnd = '',
     # Make request
     eval(parse(text = requestString))
 
-    a <- content(request, as = "text")
+    a <- suppressMessages(content(request, as = "text"))
 
     #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -234,7 +234,7 @@ GetWeatherNormsFields <- function(fieldId, monthDayStart = '', monthDayEnd = '',
     }
   }
 
-  data <- as.data.table(x[[3]])
+  data <- as.data.table(x$norms)
 
   varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object
@@ -244,5 +244,5 @@ GetWeatherNormsFields <- function(fieldId, monthDayStart = '', monthDayEnd = '',
   setnames(data,varNames)
   setkey(data,day)
 
-  return(data)
+  return(as.data.frame(data))
 }

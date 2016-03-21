@@ -49,7 +49,7 @@ GetFields <- function(fieldId = "") {
                    add_headers(Authorization =
                                  paste0("Bearer ", awhereEnv75247$token)))
 
-    a <- content(request)
+    a <- suppressMessages(content(request))
 
     #The JSONLITE Serializer propely handles the JSON conversion
 
@@ -84,7 +84,7 @@ GetFields <- function(fieldId = "") {
   if(nrow(data) == 0) {
     stop(a$simpleMessage)
   } else {
-    return(as.data.table(data))
+    return(as.data.frame(data))
   }
 
 }

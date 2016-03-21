@@ -49,8 +49,8 @@ UpdateField <- function(fieldId, variableToSearch, valueToSearch, variableToChan
 
     url <- paste0("https://api.awhere.com/v2/fields/",fieldId)
 
-    postbody <- paste0('[{"op":"test","path":/', variableToSearch, '","value":"', valueToSearch, '"},
-                         {"op":"replace","path":/', variableToChange, '","value":"', valueToChange, '"}]' )
+    postbody <- paste0('[{"op":"test","path":"/', variableToSearch, '","value":"', valueToSearch, '"},
+                         {"op":"replace","path":"/', variableToChange, '","value":"', valueToChange, '"}]' )
 
     doWeatherGet <- TRUE
     while (doWeatherGet == TRUE) {

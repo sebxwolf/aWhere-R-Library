@@ -53,68 +53,85 @@
 #' @export
 
 CreatePlanting <- function(fieldId, crop, plantingDate = "", projectedYieldAmount = "", projectedYieldUnits = "", projectedHarvestDate = "",
-                        yieldAmount = "", yieldUnits = "", harvestDate = "") {
-
+                           yieldAmount = "", yieldUnits = "", harvestDate = "") {
+  
   ## Error checking for valid entries
   if(missing(fieldId)) {
     stop("Field ID is required")
   }
-
+  
   if(missing(crop)) {
     stop("Crop is required")
   }
-
+  
   if((projectedYieldAmount != "" & projectedYieldUnits == "") || (projectedYieldAmount == "" & projectedYieldUnits != "")) {
     stop("Must either have both projected yield amount and projected units, or neither")
   }
-
+  
   if((yieldAmount != "" & yieldUnits == "") | (yieldAmount == "" & yieldUnits != "")) {
     stop("Must either have both yield amount and yield units, or neither")
   }
-
-
+  
+  if(plantingDate == "") {
+    plantingDate <- as.character(Sys.Date())
+  }
+  
   url <- paste0("https://api.awhere.com/v2/agronomics/fields/", fieldId, "/plantings")
-
+  
+  
   postbody <- paste0('{',
                      '"crop":"', crop, '",',
-                     '"plantingDate":"', plantingDate, '",',
-                     '"projections":{',
-                            '"yield":{',
-                                '"amount":', projectedYieldAmount,',',
-                                '"units":"', projectedYieldUnits, '"',
-                            '},',
-                            '"harvestDate":"', projectedHarvestDate, '"',
-                     '},',
-                     '"yield":{',
-                            '"amount":', yieldAmount, ',',
-                            '"units":"', yieldUnits, '"',
-                     '},',
-                     '"harvestDate":"', harvestDate, '"',
-                     '}')
-
-
+                     '"plantingDate":"', plantingDate, '"')
+  if(projectedYieldAmount != "" | projectedHarvestDate != "") {
+    postbody <- paste0(postbody, ',"projections":{')
+    if(projectedYieldAmount != "") {
+      postbody <- paste0(postbody, '"yield":{',
+                         '"amount":', projectedYieldAmount,',',
+                         '"units":"', projectedYieldUnits, '"}')
+      if(projectedHarvestDate != "") {
+        postbody <- paste0(postbody, ",")
+      }
+    }
+    if(projectedHarvestDate != "") {
+      postbody <- paste0(postbody, '"harvestDate":"', projectedHarvestDate, '"',
+                         '}')
+    }
+  }
+  if(yieldAmount != "") {
+    postbody <- paste0(postbody, ',"yield":{',
+                       '"amount":', yieldAmount, ',',
+                       '"units":"', yieldUnits, '"',
+                       '}')
+  }
+  if(harvestDate != "") {
+    postbody <- paste0(postbody, '"harvestDate":"', harvestDate, '"')
+  }
+  
+  postbody <- paste0(postbody, '}')
+  
+  
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
     request <- POST(url, body=postbody, content_type('application/json'),
                     add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
-
-    a <- content(request, as = "text")
-
+    
+    a <- content(request)
+    
     if (any(grepl('API Access Expired',a))) {
       GetAccessToken(awhereEnv75247$uid,awhereEnv75247$secret)
     } else {
       doWeatherGet <- FALSE
     }
   }
-
-  parsedResponse <- unlist(strsplit(a,split = "\""))
-
-  if (request$status_code %in% c(200,201,204) == FALSE) { # status code = 200 means that the query worked
+  
+  # parsedResponse <- unlist(strsplit(a,split = "\""))
+  
+  
+  if (!is.null(a$statusCode)) { # status code = 200 means that the query worked
     warning('WARNING: Problem with Query')
-    cat(paste0(parsedResponse))
-    return()
+    cat(paste0(a$detailedMessage))
   } else {
-    cat(paste0('Operation Complete \n'))
+    cat(paste0('Operation Complete \n Planting ID: ', a$id))
   }
-
+  
 }

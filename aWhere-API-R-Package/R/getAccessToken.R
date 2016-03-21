@@ -27,7 +27,7 @@ GetAccessToken <- function(uid,secret) {
                   add_headers(Authorization =
                                 paste0('Basic ',base64(paste0(uid,':',secret)))))
 
-  a <- content(request, as = "text")
+  a <- suppressMessages(content(request, as = "text"))
 
   if (grepl('\"statusCode\": 401',a)) {
     warning('The UID/Secret combination is incorrect. \n')

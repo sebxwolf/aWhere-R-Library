@@ -312,7 +312,7 @@ GetAgronomicNormsLatLon <- function(latitude, longitude, monthDayStart, monthDay
     # Make request
     eval(parse(text = requestString))
 
-    a <- content(request, as = "text")
+    a <- suppressMessages(content(request, as = "text"))
 
     #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -384,5 +384,5 @@ GetAgronomicNormsLatLon <- function(latitude, longitude, monthDayStart, monthDay
   setnames(data,varNames)
   setkey(data,day)
 
-  return(data)
+  return(as.data.frame(data))
 }

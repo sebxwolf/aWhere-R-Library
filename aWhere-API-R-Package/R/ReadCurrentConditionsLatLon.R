@@ -97,7 +97,7 @@ GetCurrentConditionsLatLon <- function(latitude,longitude,sources = 'all') {
 
     eval(parse(text = requestString))
 
-    a <- content(request, as = "text")
+    a <- suppressMessages(content(request, as = "text"))
 
     #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -120,5 +120,5 @@ GetCurrentConditionsLatLon <- function(latitude,longitude,sources = 'all') {
   data[,grep('_links',varNames) := NULL, with = FALSE]
   data[,grep('.units',varNames) := NULL, with = FALSE]
 
-  return(data)
+  return(as.data.frame(data))
 }

@@ -70,12 +70,12 @@ GetAgronomicValuesFields <- function(fieldId,
     return()
   }
 
-  # currentFields <- GetFields()
-  # if ((fieldId %in% currentFields$fieldId) == FALSE) {
-  #   warning('The Provided field name is not a field currently associated with your account. \n
-  #           Please create the field before proceeding. \n')
-  #   return()
-  # }
+  currentFields <- GetFields(fieldId)
+  if ((fieldId %in% currentFields$fieldId) == FALSE) {
+    warning('The Provided field name is not a field currently associated with your account. \n
+            Please create the field before proceeding. \n')
+    return()
+  }
 
   if (dayStart == '' & dayEnd != '') {
     warning('The dayEnd is specified so must dayStart. Please correct\n')
@@ -250,7 +250,7 @@ GetAgronomicValuesFields <- function(fieldId,
 
       eval(parse(text = requestString))
 
-      a <- content(request, as = "text")
+      a <- suppressMessages(content(request, as = "text"))
 
       #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -312,5 +312,5 @@ GetAgronomicValuesFields <- function(fieldId,
   allWeath <- rbindlist(dataList)
   setkey(allWeath,date)
 
-  return(allWeath)
+  return(as.data.frame(allWeath))
 }

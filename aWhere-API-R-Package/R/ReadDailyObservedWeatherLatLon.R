@@ -173,7 +173,7 @@ GetDailyObservedWeatherLatLon <- function(latitude, longitude,
 
       eval(parse(text = requestString))
 
-      a <- content(request, as = "text")
+      a <- suppressMessages(content(request, as = "text"))
 
       #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -235,5 +235,5 @@ GetDailyObservedWeatherLatLon <- function(latitude, longitude,
   allWeath <- rbindlist(dataList)
   setkey(allWeath,date)
 
-  return(allWeath)
+  return(as.data.frame(allWeath))
 }

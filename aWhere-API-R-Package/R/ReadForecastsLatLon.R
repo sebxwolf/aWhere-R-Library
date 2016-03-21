@@ -106,10 +106,10 @@ GetForecastsLatLon <- function(latitude, longitude, dayStart = Sys.Date(), dayEn
     return()
   }
 
-  # if ((24 %% blockSize) == 0){
-  #   warning('The block size must divide evenly into 24. Please correct\n')
-  #   return()
-  # }
+  if ((24 %% blockSize) != 0){
+    warning('The block size must divide evenly into 24. Please correct\n')
+    return()
+  }
 
 
   urlAddress <- "https://api.awhere.com/v2/weather"
@@ -133,7 +133,7 @@ GetForecastsLatLon <- function(latitude, longitude, dayStart = Sys.Date(), dayEn
 
     eval(parse(text = requestString))
 
-    a <- content(request, as = "text")
+    a <- suppressMessages(content(request, as = "text"))
 
     #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -146,7 +146,7 @@ GetForecastsLatLon <- function(latitude, longitude, dayStart = Sys.Date(), dayEn
     }
   }
   dataTemp <- as.data.table(x[[1]])
-  data <- as.data.table(rbindlist(dataTemp$forecast))
+  data <- as.data.table(x$forecast)
   varNames <- colnames(data)
 
   #This removes the non-data info returned with the JSON object
@@ -182,6 +182,5 @@ GetForecastsLatLon <- function(latitude, longitude, dayStart = Sys.Date(), dayEn
 #
 #   setnames(data,varNames)
 
-
-  return(data)
+  return(as.data.frame(data))
 }

@@ -58,12 +58,12 @@ GetForecastsFields <- function(fieldId, dayStart = '', dayEnd = '',
     return()
   }
 
-  # currentFields <- GetFields()
-  # if ((fieldId %in% currentFields$fieldId) == FALSE) {
-  #   warning('The Provided field name is not a field currently associated with your account. \n
-  #           Please create the field before proceeding. \n')
-  #   return()
-  # }
+  currentFields <- GetFields(fieldId)
+  if ((fieldId %in% currentFields$fieldId) == FALSE) {
+    warning('The Provided field name is not a field currently associated with your account. \n
+            Please create the field before proceeding. \n')
+    return()
+  }
 
   if (dayStart != '') {
     if (suppressWarnings(is.na(ymd(dayStart))) == TRUE) {
@@ -100,10 +100,10 @@ GetForecastsFields <- function(fieldId, dayStart = '', dayEnd = '',
     }
   }
 
-  # if ((24 %% blockSize) == 0){
-  #   warning('The block size must divide evenly into 24. Please correct\n')
-  #   return()
-  # }
+  if ((24 %% blockSize) != 0){
+    warning('The block size must divide evenly into 24. Please correct\n')
+    return()
+  }
 
   urlAddress <- "https://api.awhere.com/v2/weather"
 
@@ -133,7 +133,7 @@ GetForecastsFields <- function(fieldId, dayStart = '', dayEnd = '',
 
     eval(parse(text = requestString))
 
-    a <- content(request, as = "text")
+    a <- suppressMessages(content(request, as = "text"))
 
     #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -183,5 +183,5 @@ GetForecastsFields <- function(fieldId, dayStart = '', dayEnd = '',
 #   setnames(data,varNames)
 
 
-  return(data)
+  return(as.data.frame(data))
 }
