@@ -69,11 +69,11 @@ GetDailyObservedWeatherFields <- function(fieldId,
     if (suppressWarnings(is.na(ymd(dayStart))) == TRUE) {
       warning('The Start Date is Not Properly Formatted.  Please change to proper format. \n')
       return()
-    } else if (ymd(dayStart) <= ymd(Sys.Date())-months(30)) {
-      warning('By default, the aWhere APIs only allow daily data from the previous 30 months. \n
-             Use the Norms API for long-term averages or speak to your account manager for longer access.\n')
-      return()
-    }
+    } #else if (ymd(dayStart) <= ymd(Sys.Date())-months(30)) {
+      #warning('By default, the aWhere APIs only allow daily data from the previous 30 months. \n
+      #       Use the Norms API for long-term averages or speak to your account manager for longer access.\n')
+      #return()
+    # }
   }
 
   if ((dayEnd != '') == TRUE) {

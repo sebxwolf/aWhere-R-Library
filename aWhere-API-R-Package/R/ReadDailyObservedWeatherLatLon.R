@@ -96,11 +96,11 @@ GetDailyObservedWeatherLatLon <- function(latitude, longitude,
     }
   }
 
-  if (ymd(dayStart) <= ymd(Sys.Date())-months(30)) {
-    warning('By default, the aWhere APIs only allow daily data from the previous 30 months. \n
-             Use the Norms API for long-term averages or speak to your account manager for longer access.\n')
-    return()
-  }
+#  if (ymd(dayStart) <= ymd(Sys.Date())-months(30)) {
+#    warning('By default, the aWhere APIs only allow daily data from the previous 30 months. \n
+#             Use the Norms API for long-term averages or speak to your account manager for longer access.\n')
+#    return()
+#  }
 
   ## Create Request
   #Calculate number of loops needed if requesting more than 50 days

@@ -90,11 +90,11 @@ GetAgronomicValuesFields <- function(fieldId,
       warning('By default, this function can only be used to access data up until yesterday. \n
               Use the GetForecast function to request data from today onward.\n')
       return()
-    } else if (ymd(dayStart) <= ymd(Sys.Date())-months(30)) {
-      warning('By default, the aWhere APIs only allow daily data from the previous 30 months. \n
-             Use the Norms API for long-term averages or speak to your account manager for longer access.\n')
-      return()
-    }
+    }# else if (ymd(dayStart) <= ymd(Sys.Date())-months(30)) {
+     # warning('By default, the aWhere APIs only allow daily data from the previous 30 months. \n
+     #        Use the Norms API for long-term averages or speak to your account manager for longer access.\n')
+     # return()
+    #}
   }
 
   if ((dayEnd != '') == TRUE) {
@@ -105,11 +105,11 @@ GetAgronomicValuesFields <- function(fieldId,
       warning('By default, this function can only be used to access data up until yesterday. \n
               Use the GetForecast function to request data from today onward.\n')
       return()
-    } else if (ymd(dayEnd) <= ymd(Sys.Date())-months(30)) {
-      warning('By default, the aWhere APIs only allow daily data from the previous 30 months. \n
-             Use the Norms API for long-term averages or speak to your account manager for longer access.\n')
-      return()
-    }
+    }# else if (ymd(dayEnd) <= ymd(Sys.Date())-months(30)) {
+     # warning('By default, the aWhere APIs only allow daily data from the previous 30 months. \n
+     #        Use the Norms API for long-term averages or speak to your account manager for longer access.\n')
+     # return()
+    #}
 
     if ((dayStart != '') == TRUE) {
       if ((ymd(dayStart) > ymd(dayEnd)) == TRUE) {
