@@ -58,7 +58,7 @@ daily_observed_fields <- function(field_id,
     return()
   }
 
-  currentFields <- GetFields(field_id)
+  currentFields <- get_fields(field_id)
   if ((field_id %in% currentFields$field_id) == FALSE) {
     warning('The Provided field name is not a field currently associated with your account. \n
             Please create the field before proceeding. \n')
