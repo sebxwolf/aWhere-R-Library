@@ -16,23 +16,23 @@ To get API keys, follow these instructions at the [aWhere Developer Community](h
 
 ### Using Credentials Directly
 
-Prior to using of the any other functions, you'll need to use `GetAccessToken()` function to generate a token. Pass the API Key and API Secret from aWhere as the two parameters to this function. For example: 
+Prior to using of the any other functions, you'll need to use `get_token()` function to generate a token. Pass the API Key and API Secret from aWhere as the two parameters to this function. For example: 
 
-    GetAccessToken("JFKL24JF290FJSKAFDF","jf0afsd9af0a"); 
+    get_token("JFKL24JF290FJSKAFDF","jf0afsd9af0a"); 
 
 You could also save the key and secret as variables. This function saves the token to a direct child of the base environment for use by any other aWhere function. 
 
 ### Loading Credentials from a Saved File
 
-An alternative approach is to save your credentials to an external text file and use the `loadCredentials()` function to load them into the environment and generate a token. 
+An alternative approach is to save your credentials to an external text file and use the `load_credentials()` function to load them into the environment and generate a token. 
 
 First, create a text file on your computer. Enter your API Key on the first line, and your Secret on the second. Save the file and note the complete path to it. For example, this might be `C:\Users\USERNAME\Desktop\credentials.txt`. 
 
 In R, supply the path to the credentials file to the function: 
 
-    loadCredentials("C:\Users\USERNAME\Desktop\credentials.txt")
+    load_credentials("C:\Users\USERNAME\Desktop\credentials.txt")
 
-This function invokes `GetAccessToken()` so no further work is needed to generate an Access Token.
+This function invokes `get_token()` so no further work is needed to generate an Access Token.
 
 
 
@@ -72,7 +72,7 @@ This function uses the Observations API to retrieve observed weather data for an
 
 ##### Function Signatures
 
-    GetDailyObservedWeatherLatLon(latitude, longitude, dayStart, dayEnd)
+    daily_observed_latlng(latitude, longitude, day_start, day_end)
 
 
 ##### Parameters
@@ -80,21 +80,21 @@ This function uses the Observations API to retrieve observed weather data for an
 * `latitude` and `longitude` _(numerics)_
 	* The geolocation for which you want weather data
 	* Required 
-* `dayStart` _(character)_
+* `day_start` _(character)_
 	* The starting date of a range of dates for which you want weather data 
 	* Alternatively, if you only want data for a single date, enter that date here 
 	* If not supplied, the API defaults to returning the last week of data
 	* Format is YYYY-MM-DD and the date must fall before today
 	* Optional
-* `dayEnd` _(character)_
+* `day_end` _(character)_
 	* The ending date of a range of dates for which you want weather data. 
-	* If not supplied, but a `dayStart` is, then the API returns data only for a single day
-	* Format is YYYY-MM-DD and the date must fall before today and after `dayStart`
+	* If not supplied, but a `day_start` is, then the API returns data only for a single day
+	* Format is YYYY-MM-DD and the date must fall before today and after `day_start`
 	* Optional
 	
 ##### Examples
 
-    GetDailyObservedWeatherLatLon('39.8282', '-98.5795', '2015-07-01','2015-07-14')
+    daily_observed_latlng('39.8282', '-98.5795', '2015-07-01','2015-07-14')
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -105,25 +105,25 @@ Retrieve the forecast for today plus up to the next 8 days with this function. T
 
 ##### Function Signatures
 
-    GetForecastsLatLon(latitude, longitude, dayStart, dayEnd, blockSize)
+    forecasts_latlng(latitude, longitude, day_start, day_end, block_size)
 
 ##### Parameters
 
 * `latitude` and `longitude` _(numerics)_
 	* The geolocation for which you want weather data
 	* Required 
-* `dayStart` _(character)_
+* `day_start` _(character)_
 	* The starting date of a range of dates for which you want forecast data 
 	* Alternatively, if you only want data for a single date, enter that date here 
 	* If not supplied, the API defaults to today and the next seven days of data
 	* Format is YYYY-MM-DD and the date must be equal to today or any of the next seven days
 	* Optional
-* `dayEnd` _(character)_
+* `day_end` _(character)_
 	* The ending date of a range of dates for which you want weather data. 
-	* If not supplied, but a `dayStart` is, then the API returns data only for a single day
-	* Format is YYYY-MM-DD and the date must fall after today and after `dayStart`
+	* If not supplied, but a `day_start` is, then the API returns data only for a single day
+	* Format is YYYY-MM-DD and the date must fall after today and after `day_start`
 	* Optional
-* `blockSize` _(numeric)_
+* `block_size` _(numeric)_
 	* The number of forecast hours to roll into a single forecast block 
 	* Options are 1, 2, 3, 4, 6, 8, 12, and 24
 	* Default is 1 (hourly forecast)
@@ -132,7 +132,7 @@ Retrieve the forecast for today plus up to the next 8 days with this function. T
 
 ##### Examples
 
-    GetForecastsLatLon('39.8282', '-98.5795', '2016-02-29','2016-03-02', 24)
+    forecasts_latlng('39.8282', '-98.5795', '2016-02-29','2016-03-02', 24)
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -143,36 +143,36 @@ The Weather Norms API allows you to offload the calculation of multi-year averag
 
 ##### Function Signatures 
 
-    GetWeatherNormsLatLon(latitude, longitude, monthDayStart, monthDayEnd, yearStart, yearEnd, excludeYears)
+    weather_norms_latlng(latitude, longitude, monthday_start, monthday_end, year_start, year_end, exclude_years)
 
 ##### Parameters
 
 * `latitude` and `longitude` _(numerics)_
 	* The geolocation for which you want weather data
 	* Required 
-* `monthDayStart` _(character)_
+* `monthday_start` _(character)_
 	* The month and day of the first day in a range for which you want norms.
 	* Alternatively, if you only want data for a single date, enter that date here 
 	* Format is MM-DD
 	* Required
-* `monthDayEnd` _(character)_
+* `monthday_end` _(character)_
 	* The month and day of the last day in the range.
-	* If not supplied, but a `monthDayStart` is, then the API returns data only for a single day
+	* If not supplied, but a `monthday_start` is, then the API returns data only for a single day
 	* Format is MM-DD
 	* Optional
-* `yearStart` _(character)_
+* `year_start` _(character)_
 	* The first of a range of years over which to calculate norms (inclusive)
 	* Note: a minimum of three years is required
 	* Use a four-digit year (YYYY)
 	* Optional; if not used, the API defaults to a 10-year norm
-* `yearEnd` _(character)_
+* `year_end` _(character)_
 	* The last of a range of years over which to calculate norms (inclusive)
 	* Note: a minimum of three years is required
 	* Use a four-digit year (YYYY)
 	* Optional:
-		* If `yearStart` is used then this is required
+		* If `year_start` is used then this is required
 		* if not used, the API defaults to a 10-year norm
-* `excludeYears` _(character)_
+* `exclude_years` _(character)_
 	* A comma-separated list of years that you don't want included in the average
 	* Note: a minimum of three years is required even after years are excluded
 	* Use four-digit years (YYYY)
@@ -181,7 +181,7 @@ The Weather Norms API allows you to offload the calculation of multi-year averag
 
 ##### Example
 
-    GetWeatherNormsLatLon('39.8282', '-98.5795','07-01','07-31','2010','2015')
+    weather_norms_latlng('39.8282', '-98.5795','07-01','07-31','2010','2015')
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -192,7 +192,7 @@ The Current Conditions API returns a snapshot of area weather for a location usi
 
 ##### Function Signatures 
 
-    GetCurrentConditionsLatLon(latitude, longitude, sources)
+    current_conditions_latlng(latitude, longitude, sources)
 
 ##### Parameters
 
@@ -214,7 +214,7 @@ The Current Conditions API returns a snapshot of area weather for a location usi
 
 This example excludes personal weather stations and returns the data from nearest METAR or MESONET station:
 
-    GetCurrentConditionsLatLon('39.8282', '-98.5795', 'metar-mesonet')
+    current_conditions_latlng('39.8282', '-98.5795', 'metar-mesonet')
 
 
 
@@ -240,49 +240,49 @@ Agronomic Values are calculated numbers that can be used to show the agronomic s
 
 ##### Function Signatures 
 
-    GetAgronomicValuesLatLon(fieldId, dayStart, dayEnd, accumulationStartDate, gddMethod, gddBaseTemp, gddMinBoundary, gddMaxBoundary) 
+    agronomic_values_latlng(field_id, day_start, day_end, accumulation_start_date, gdd_method, gdd_base_temp, gdd_min_boundary, gdd_max_boundary) 
 
 ##### Parameters 
 
 * `latitude` and `longitude` _(numerics)_
 	* The geolocation for which you want weather data
 	* Required 
-* `dayStart` _(character)_
+* `day_start` _(character)_
 	* The starting date of a range of dates for which you want agronomic values 
 	* Alternatively, if you only want data for a single date, enter that date here 
 	* If not supplied, the API defaults to returning the last week of data
 	* Format is YYYY-MM-DD and the date must fall before today
 	* Optional
-* `dayEnd` _(character)_
+* `day_end` _(character)_
 	* The ending date of a range of dates for which you want data. 
-	* If not supplied, but a `dayStart` is, then the API returns data only for a single day
-	* Format is YYYY-MM-DD and the date must fall before today and after `dayStart`
+	* If not supplied, but a `day_start` is, then the API returns data only for a single day
+	* Format is YYYY-MM-DD and the date must fall before today and after `day_start`
 	* Optional
-* `accumulationStartDate` _(character)_
-	* If you want the accumulations to start counting from a date before `dayStart` enter that date here
-	* Format is YYYY-MM-DD and the date must fall before today and before `dayStart`
+* `accumulation_start_date` _(character)_
+	* If you want the accumulations to start counting from a date before `day_start` enter that date here
+	* Format is YYYY-MM-DD and the date must fall before today and before `day_start`
 	* Optional
-* `gddMethod` _(character)_
+* `gdd_method` _(character)_
 	* Which GDD equation to use 
 	* Options are standard, modifiedstandard, min-temp-cap, min-temp-constant
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
-* `gddBaseTemp` _(numeric)_
+* `gdd_base_temp` _(numeric)_
 	* The base temp to use with the GDD equation
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
-* `gddMinBoundary` _(numeric)_
+* `gdd_min_boundary` _(numeric)_
 	* The lower boundary value for the GDD equation (if used)
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
-* `gddMaxBoundary` _(numeric)_
+* `gdd_max_boundary` _(numeric)_
 	* The upper boundary value for the GDD equation (if used)
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
 
 ##### Example
 
-    GetAgronomicValuesLatLon('39.8282', '-98.5795','2015-07-01','2015-07-31','2015-06-01','modifiedstandard','10','10','30')
+    agronomic_values_latlng('39.8282', '-98.5795','2015-07-01','2015-07-31','2015-06-01','modifiedstandard','10','10','30')
 
 
 
@@ -294,54 +294,54 @@ The Agronomic Norms API returns the long-term normals for the agronomic values o
 
 ##### Function Signatures 
 
-    GetAgronomicNormsLatLon(latitude, longitude, monthDayStart, monthDayEnd, yearStart, yearEnd, excludeYears, accumulationStartDate, gddMethod, gddBaseTemp, gddMinBoundary, gddMaxBoundary)
+    agronomic_norms_latlng(latitude, longitude, monthday_start, monthday_end, year_start, year_end, exclude_years, accumulation_start_date, gdd_method, gdd_base_temp, gdd_min_boundary, gdd_max_boundary)
 
 ##### Parameters
 
 * `latitude` and `longitude` _(numerics)_
 	* The geolocation for which you want weather data
 	* Required 
-* `monthDayStart` _(character)_
+* `monthday_start` _(character)_
 	* The month and day of the first day in a range for which you want norms.
 	* Alternatively, if you only want data for a single date, enter that date here 
 	* Format is MM-DD
 	* Required
-* `monthDayEnd` _(character)_
+* `monthday_end` _(character)_
 	* The month and day of the last day in the range.
-	* If not supplied, but a `monthDayStart` is, then the API returns data only for a single day
+	* If not supplied, but a `monthday_start` is, then the API returns data only for a single day
 	* Format is MM-DD
 	* Optional
-* `yearStart` _(character)_
+* `year_start` _(character)_
 	* The first of a range of years over which to calculate norms (inclusive)
 	* Note: a minimum of three years is required
 	* Use a four-digit year (YYYY)
 	* Optional; if not used, the API defaults to a 10-year norm
-* `yearEnd` _(character)_
+* `year_end` _(character)_
 	* The last of a range of years over which to calculate norms (inclusive)
 	* Note: a minimum of three years is required
 	* Use a four-digit year (YYYY)
 	* Optional:
-		* If `yearStart` is used then this is required
+		* If `year_start` is used then this is required
 		* if not used, the API defaults to a 10-year norm
-* `excludeYears` _(character)_
+* `exclude_years` _(character)_
 	* A comma-separated list of years that you don't want included in the average
 	* Note: a minimum of three years is required even after years are excluded
 	* Use four-digit years (YYYY)
 	* Optional
-* `gddMethod` _(character)_
+* `gdd_method` _(character)_
 	* Which GDD equation to use 
 	* Options are standard, modifiedstandard, min-temp-cap, min-temp-constant
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
-* `gddBaseTemp` _(numeric)_
+* `gdd_base_temp` _(numeric)_
 	* The base temp to use with the GDD equation
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
-* `gddMinBoundary` _(numeric)_
+* `gdd_min_boundary` _(numeric)_
 	* The lower boundary value for the GDD equation (if used)
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
-* `gddMaxBoundary` _(numeric)_
+* `gdd_max_boundary` _(numeric)_
 	* The upper boundary value for the GDD equation (if used)
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
@@ -349,4 +349,4 @@ The Agronomic Norms API returns the long-term normals for the agronomic values o
 
 ##### Example
 
-    GetAgronomicNormsLatLon('39.8282', '-98.5795','07-01','07-31','2010','2015')
+    agronomic_norms_latlng('39.8282', '-98.5795','07-01','07-31','2010','2015')

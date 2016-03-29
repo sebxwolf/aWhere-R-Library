@@ -2,7 +2,7 @@
 
 This is the primary method for accessing the aWhere platform, and with this approach you register Field Locations with the platform and can add planting data to each field to more easily monitor agronomics and track models. If your work is aware of specific field locations and tracking specific growing seasons, this is the appropriate approach to use. 
 
-In the aWhere platform you will register Field Locations with the `createField()` function. You'll give each location a unique ID of your choosing and then use that ID to reference the location in other API calls. 
+In the aWhere platform you will register Field Locations with the `create_field()` function. You'll give each location a unique ID of your choosing and then use that ID to reference the location in other API calls. 
 
 Optionally, you can also create Plantings which carry the crop and growing season information, and that data is used to more easily calculate seasonal derived data such as accumulations for a growing season. Other APIs, such as models (for which we don't yet have R functions), require the use of Planting records. 
 
@@ -18,23 +18,23 @@ To get API keys, follow these instructions at the [aWhere Developer Community](h
 
 ### Using Credentials Directly
 
-Prior to using of the any other functions, you'll need to use `GetAccessToken()` function to generate a token. Pass the API Key and API Secret from aWhere as the two parameters to this function. For example: 
+Prior to using of the any other functions, you'll need to use `get_token()` function to generate a token. Pass the API Key and API Secret from aWhere as the two parameters to this function. For example: 
 
-    GetAccessToken("JFKL24JF290FJSKAFDF","jf0afsd9af0a"); 
+    get_token("JFKL24JF290FJSKAFDF","jf0afsd9af0a"); 
 
 You could also save the key and secret as variables. This function saves the token to a direct child of the base environment for use by any other aWhere function. 
 
 ### Loading Credentials from a Saved File
 
-An alternative approach is to save your credentials to an external text file and use the `loadCredentials()` function to load them into the environment and generate a token. 
+An alternative approach is to save your credentials to an external text file and use the `load_credentials()` function to load them into the environment and generate a token. 
 
 First, create a text file on your computer. Enter your API Key on the first line, and your Secret on the second. Save the file and note the complete path to it. For example, this might be `C:\Users\USERNAME\Desktop\credentials.txt`. 
 
 In R, supply the path to the credentials file to the function: 
 
-    loadCredentials("C:\Users\USERNAME\Desktop\credentials.txt")
+    load_credentials("C:\Users\USERNAME\Desktop\credentials.txt")
 
-This function invokes `GetAccessToken()` so no further work is needed to generate an Access Token.
+This function invokes `get_token()` so no further work is needed to generate an Access Token.
 
 
 
@@ -79,11 +79,11 @@ Use this function to create a Field Location in the aWhere Platform. You'll use 
 
 ##### Function Signature
 
-    CreateField(fieldID, latitude, longitude, farmID, fieldName, acres)
+    create_field(field_id, latitude, longitude, farm_id, field_name, acres)
 
 ##### Parameters
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* An ID you use to reference the field location in all other functions.
 	* Can be any combination of letters, numbers, dashes, and underscores up to 50 characters
 	* Required
@@ -93,11 +93,11 @@ Use this function to create a Field Location in the aWhere Platform. You'll use 
 * `longitude` _(numeric)_
 	* The longitude of the location's centroid, in decimal notation
 	* Required
-* `farmID` _(character)_ 
+* `farm_id` _(character)_ 
 	* An ID that references the farm or entity that owns or runs the field location.
 	* Can be any combination of letters, numbers, dashes, and underscores up to 50 characters
 	* Required
-* `fieldName` _(character)_
+* `field_name` _(character)_
 	* A name for the field 
 	* Can be any combination of letters, numbers, dashes, underscores, and spaces
 	* Optional 
@@ -107,7 +107,7 @@ Use this function to create a Field Location in the aWhere Platform. You'll use 
 
 ##### Example
 
-    CreateField("field456","40.8282","-100.5795","farmA","Some Field Location","100")
+    create_field("field456","40.8282","-100.5795","farmA","Some Field Location","100")
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -117,17 +117,17 @@ This function will return the field information saved in the aWhere Platform. [A
 
 ##### Function Signature
 
-    GetFields(fieldID)
+    get_fields(field_id)
 
 ##### Parameters
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* The ID you used when creating the field location.
 	* Required
 
 ##### Example
 
-    GetFields('field123')
+    get_fields('field123')
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -137,35 +137,35 @@ If you want to change certain properties about the Field Location, use this func
 
 ##### Function Signature
 
-    updateField(fieldID, variableToSearch, valueToSearch, variableToChange, valueToChange)
+    update_field(field_id, variable_search, value_search, variable_change, value_change)
 
 ##### Parameters
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* The ID you used when creating the field location.
 	* Required
-* `variableToSearch` _(character)_
-	* Acceptable values are "name" or "farmId"
+* `variable_search` _(character)_
+	* Acceptable values are "name" or "farm_id"
 	* Required
-* `valueToSearch` _(character)_
-	* If the `variableToSearch` matches this value, then the next property will be changed. Otherwise no update will happen.
+* `value_search` _(character)_
+	* If the `variable_search` matches this value, then the next property will be changed. Otherwise no update will happen.
 	* Required 
-* `variableToChange` _(character)_
-	* Acceptable values are "name" or "farmId"
-	* Practically, this will usually match `variableToSearch`, but you could opt to change one property only if the other matches `valueToSearch`
+* `variable_change` _(character)_
+	* Acceptable values are "name" or "farm_id"
+	* Practically, this will usually match `variable_search`, but you could opt to change one property only if the other matches `value_search`
 	* Required
-* `valueToChange` _(character)_
-	* The value to use for `variableToChange`
+* `value_change` _(character)_
+	* The value to use for `variable_change`
 
 ##### Examples
 
-This example will change the farmId to "TestFarmA" only if it current matches "ABC":
+This example will change the farm_id to "TestFarmA" only if it current matches "ABC":
 
-    updateField('farmId', 'ABC', 'farmId', 'TestFarmA')
+    update_field('farm_id', 'ABC', 'farm_id', 'TestFarmA')
 
 This example will change the name of the field only if the farm ID matches "TestFarmA":
 
-    updateField('farmId', 'TestFarmA', 'name', 'Primary Test Farm')
+    update_field('farm_id', 'TestFarmA', 'name', 'Primary Test Farm')
 
 
 
@@ -185,12 +185,12 @@ Use this function to create a Planting for a Field Location. [API Documentation]
 
 ##### Function Signature 
 
-    CreatePlanting(fieldID, crop, plantingDate, projectedYieldAmount, projectedYieldUnits, projectedHarvestDate, yieldAmount, yieldUnits, harvestDate) 
+    create_planting(field_id, crop, planting_date, proj_yield_amount, proj_yield_units, proj_harvest_date, yield_amount, yield_units, harvest_date) 
 
 
 ##### Parameters 
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* The ID you used when creating the field location.
 	* Required
 * `crop` _(character)_
@@ -199,34 +199,34 @@ Use this function to create a Planting for a Field Location. [API Documentation]
 	* Short-hand code would be the generic name of the crop. Current options include:
 		* corn | wheat | barley | canola | cotton | sugarbeet | sunflower
 	* Required
-* `plantingDate` _(character)_ 
+* `planting_date` _(character)_ 
 	* The date the crop was planted in the field
 	* Format is YYYY-MM-DD
 	* Required 
-* `projectedYieldAmount` _(numeric)_
+* `proj_yield_amount` _(numeric)_
 	* A number representing the expected yield.
 	* Optional
-* `projectedYieldUnits` _(character)_
-	* The units associated with `projectedYieldAmount` such as "bushels"
-	* Optional, unless `projectedYieldAmount` is supplied.
-* `projectedHarvestDate` _(character)_
+* `proj_yield_units` _(character)_
+	* The units associated with `proj_yield_amount` such as "bushels"
+	* Optional, unless `proj_yield_amount` is supplied.
+* `proj_harvest_date` _(character)_
 	* The date the crop is expected to be harvested
 	* Format is YYYY-MM-DD
 	* Optional
-* `yieldAmount`
+* `yield_amount`
 	* A number representing the actual yield
 	* Optional
-* `yieldUnits`
-	* The units associated with `yieldAmount`, such as "bushels"
-	* Optional, unless `yieldAmount` is supplied
-* `harvestDate`
+* `yield_units`
+	* The units associated with `yield_amount`, such as "bushels"
+	* Optional, unless `yield_amount` is supplied
+* `harvest_date`
 	* The date the field was actually harvested
 	* Format is YYYY-MM-DD
 	* Optional
 
 ##### Example
 
-    CreatePlanting('field123', 'corn', '2015-07-01')
+    create_planting('field123', 'corn', '2015-07-01')
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -237,16 +237,16 @@ Use this function to retrieve information about the planting. [API Documentation
 
 ##### Function Signature
 
-    GetPlanting(fieldID, plantingId, current)
+    get_planting(field_id, planting_id, current)
 
 ##### Parameters
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* The ID you used when creating the field location.
 	* Optional: If not supplied then all plantings in the account are returned.
-* `plantingID` _(numeric)_
+* `planting_id` _(numeric)_
 	* The Planting ID as set by the aWhere platform
-	* Optional: If not supplied but a fieldID is, then all plantings for that fieldID are returned
+	* Optional: If not supplied but a field_id is, then all plantings for that field_id are returned
 * `current` _(boolean)_
 	* Whether to return only the current (most recent) planting 
 	* Optional 
@@ -255,7 +255,7 @@ Use this function to retrieve information about the planting. [API Documentation
 
 This example returns the most current (most recent) planting for field123: 
 
-    GetPlanting('field123','',T)
+    get_planting('field123','',T)
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -266,38 +266,38 @@ Use this function to update the details about a Planting record. Note that once 
 
 ##### Function Signature 
 
-    UpdatePlanting(fieldID, plantingID, plantingDate, projectedYieldAmount, projectedYieldUnits, projectedHarvestDate, yieldAmount, yieldUnits, harvestDate)
+    update_planting(field_id, planting_id, planting_date, proj_yield_amount, proj_yield_units, proj_harvest_date, yield_amount, yield_units, harvest_date)
 
 ##### Parameters
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* The ID you used when creating the field location.
 	* Required
-* `plantingID` _(numeric)_
+* `planting_id` _(numeric)_
 	* The Planting ID provided by the aWhere platform
 	* This cannot be changed
 	* Required 
-* `plantingDate` _(character)_ 
+* `planting_date` _(character)_ 
 	* The date the crop was planted in the field
 	* Format is YYYY-MM-DD
 	* Required 
-* `projectedYieldAmount` _(numeric)_
+* `proj_yield_amount` _(numeric)_
 	* A number representing the expected yield.
 	* Optional
-* `projectedYieldUnits` _(character)_
-	* The units associated with `projectedYieldAmount` such as "bushels"
-	* Optional, unless `projectedYieldAmount` is supplied.
-* `projectedHarvestDate` _(character)_
+* `proj_yield_units` _(character)_
+	* The units associated with `proj_yield_amount` such as "bushels"
+	* Optional, unless `proj_yield_amount` is supplied.
+* `proj_harvest_date` _(character)_
 	* The date the crop is expected to be harvested
 	* Format is YYYY-MM-DD
 	* Optional
-* `yieldAmount`
+* `yield_amount`
 	* A number representing the actual yield
 	* Optional
-* `yieldUnits`
-	* The units associated with `yieldAmount`, such as "bushels"
-	* Optional, unless `yieldAmount` is supplied
-* `harvestDate`
+* `yield_units`
+	* The units associated with `yield_amount`, such as "bushels"
+	* Optional, unless `yield_amount` is supplied
+* `harvest_date`
 	* The date the field was actually harvested
 	* Format is YYYY-MM-DD
 	* Optional
@@ -311,20 +311,20 @@ If you want to keep your planting records clean for reporting and historical tra
 
 ##### Function Signature 
 
-    DeletePlanting(fieldID, plantingId)
+    delete_planting(field_id, planting_id)
 
 ##### Parameters
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* The ID you used when creating the field location.
 	* Required
-* `plantingID` _(numeric)_
+* `planting_id` _(numeric)_
 	* The Planting ID provided by the aWhere platform
 	* Required 
 
 ##### Example 
 
-    DeletePlanting("field123", 32481941)
+    delete_planting("field123", 32481941)
 
 
 
@@ -350,29 +350,29 @@ This function uses the Observations API to retrieve observed weather data for an
 
 ##### Function Signatures
 
-    GetDailyObservedWeatherFields(fieldID, dayStart, dayEnd)
+    daily_observed_fields(field_id, day_start, day_end)
 
 
 ##### Parameters
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* The ID you used when creating the field location.
 	* Required
-* `dayStart` _(character)_
+* `day_start` _(character)_
 	* The starting date of a range of dates for which you want weather data 
 	* Alternatively, if you only want data for a single date, enter that date here 
 	* If not supplied, the API defaults to returning the last week of data
 	* Format is YYYY-MM-DD and the date must fall before today
 	* Optional
-* `dayEnd` _(character)_
+* `day_end` _(character)_
 	* The ending date of a range of dates for which you want weather data. 
-	* If not supplied, but a `dayStart` is, then the API returns data only for a single day
-	* Format is YYYY-MM-DD and the date must fall before today and after `dayStart`
+	* If not supplied, but a `day_start` is, then the API returns data only for a single day
+	* Format is YYYY-MM-DD and the date must fall before today and after `day_start`
 	* Optional
 	
 ##### Examples
 
-    GetDailyObservedWeatherFields("field123", "2015-07-01")
+    daily_observed_fields("field123", "2015-07-01")
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -383,26 +383,26 @@ Retrieve the forecast for today plus up to the next 8 days with this function. T
 
 ##### Function Signatures
 
-    GetForecastsFields(fieldID, dayStart, dayEnd, blockSize)
+    forecasts_fields(field_id, day_start, day_end, block_size)
 
 
 ##### Parameters
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* The ID you used when creating the field location.
 	* Required 
-* `dayStart` _(character)_
+* `day_start` _(character)_
 	* The starting date of a range of dates for which you want forecast data 
 	* Alternatively, if you only want data for a single date, enter that date here 
 	* If not supplied, the API defaults to today and the next seven days of data
 	* Format is YYYY-MM-DD and the date must be equal to today or any of the next seven days
 	* Optional
-* `dayEnd` _(character)_
+* `day_end` _(character)_
 	* The ending date of a range of dates for which you want weather data. 
-	* If not supplied, but a `dayStart` is, then the API returns data only for a single day
-	* Format is YYYY-MM-DD and the date must fall after today and after `dayStart`
+	* If not supplied, but a `day_start` is, then the API returns data only for a single day
+	* Format is YYYY-MM-DD and the date must fall after today and after `day_start`
 	* Optional
-* `blockSize` _(numeric)_
+* `block_size` _(numeric)_
 	* The number of forecast hours to roll into a single forecast block 
 	* Options are 1, 2, 3, 4, 6, 8, 12, and 24
 	* Default is 1 (hourly forecast)
@@ -411,7 +411,7 @@ Retrieve the forecast for today plus up to the next 8 days with this function. T
 
 ##### Examples
 
-    GetForecastsFields("field123", "2016-02-29")
+    forecasts_fields("field123", "2016-02-29")
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -422,36 +422,36 @@ The Weather Norms API allows you to offload the calculation of multi-year averag
 
 ##### Function Signatures 
 
-    GetWeatherNormsFields(fieldId, monthDayStart, monthDayEnd, yearStart, yearEnd, excludeYears) 
+    weather_norms_fields(field_id, monthday_start, monthday_end, year_start, year_end, exclude_years) 
 
 ##### Parameters
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* The ID you used when creating the field location.
 	* Required 
-* `monthDayStart` _(character)_
+* `monthday_start` _(character)_
 	* The month and day of the first day in a range for which you want norms.
 	* Alternatively, if you only want data for a single date, enter that date here 
 	* Format is MM-DD
 	* Required
-* `monthDayEnd` _(character)_
+* `monthday_end` _(character)_
 	* The month and day of the last day in the range.
-	* If not supplied, but a `monthDayStart` is, then the API returns data only for a single day
+	* If not supplied, but a `monthday_start` is, then the API returns data only for a single day
 	* Format is MM-DD
 	* Optional
-* `yearStart` _(character)_
+* `year_start` _(character)_
 	* The first of a range of years over which to calculate norms (inclusive)
 	* Note: a minimum of three years is required
 	* Use a four-digit year (YYYY)
 	* Optional; if not used, the API defaults to a 10-year norm
-* `yearEnd` _(character)_
+* `year_end` _(character)_
 	* The last of a range of years over which to calculate norms (inclusive)
 	* Note: a minimum of three years is required
 	* Use a four-digit year (YYYY)
 	* Optional:
-		* If `yearStart` is used then this is required
+		* If `year_start` is used then this is required
 		* if not used, the API defaults to a 10-year norm
-* `excludeYears` _(character)_
+* `exclude_years` _(character)_
 	* A comma-separated list of years that you don't want included in the average
 	* Note: a minimum of three years is required even after years are excluded
 	* Use four-digit years (YYYY)
@@ -460,7 +460,7 @@ The Weather Norms API allows you to offload the calculation of multi-year averag
 
 ##### Example
 
-    GetWeatherNormsFields('field123','07-01','07-31','2010','2015')
+    weather_norms_fields('field123','07-01','07-31','2010','2015')
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -471,11 +471,11 @@ The Current Conditions API returns a snapshot of area weather for a location usi
 
 ##### Function Signatures 
 
-    GetCurrentConditionsFields(fieldID, sources)
+    current_conditions_fields(field_id, sources)
 
 ##### Parameters
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* The ID you used when creating the field location.
 	* Required
 * `sources` _(character)_
@@ -493,7 +493,7 @@ The Current Conditions API returns a snapshot of area weather for a location usi
 
 This example excludes personal weather stations and returns the data from nearest METAR or MESONET station:
 
-    GetCurrentConditionsFields('field123', 'metar-mesonet')
+    current_conditions_fields('field123', 'metar-mesonet')
 
 
 
@@ -519,50 +519,50 @@ Agronomic Values are calculated numbers that can be used to show the agronomic s
 
 ##### Function Signatures 
 
-    GetAgronomicValuesFields(fieldId, dayStart, dayEnd, accumulationStartDate, gddMethod, gddBaseTemp, gddMinBoundary, gddMaxBoundary) 
+    agronomic_values_fields(field_id, day_start, day_end, accumulation_start_date, gdd_method, gdd_base_temp, gdd_min_boundary, gdd_max_boundary) 
 
 
 ##### Parameters 
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* The ID you used when creating the field location.
 	* Required
-* `dayStart` _(character)_
+* `day_start` _(character)_
 	* The starting date of a range of dates for which you want agronomic values 
 	* Alternatively, if you only want data for a single date, enter that date here 
 	* If not supplied, the API defaults to returning the last week of data
 	* Format is YYYY-MM-DD and the date must fall before today
 	* Optional
-* `dayEnd` _(character)_
+* `day_end` _(character)_
 	* The ending date of a range of dates for which you want data. 
-	* If not supplied, but a `dayStart` is, then the API returns data only for a single day
-	* Format is YYYY-MM-DD and the date must fall before today and after `dayStart`
+	* If not supplied, but a `day_start` is, then the API returns data only for a single day
+	* Format is YYYY-MM-DD and the date must fall before today and after `day_start`
 	* Optional
-* `accumulationStartDate` _(character)_
-	* If you want the accumulations to start counting from a date before `dayStart` enter that date here
-	* Format is YYYY-MM-DD and the date must fall before today and before `dayStart`
+* `accumulation_start_date` _(character)_
+	* If you want the accumulations to start counting from a date before `day_start` enter that date here
+	* Format is YYYY-MM-DD and the date must fall before today and before `day_start`
 	* Optional
-* `gddMethod` _(character)_
+* `gdd_method` _(character)_
 	* Which GDD equation to use 
 	* Options are standard, modifiedstandard, min-temp-cap, min-temp-constant
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
-* `gddBaseTemp` _(numeric)_
+* `gdd_base_temp` _(numeric)_
 	* The base temp to use with the GDD equation
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
-* `gddMinBoundary` _(numeric)_
+* `gdd_min_boundary` _(numeric)_
 	* The lower boundary value for the GDD equation (if used)
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
-* `gddMaxBoundary` _(numeric)_
+* `gdd_max_boundary` _(numeric)_
 	* The upper boundary value for the GDD equation (if used)
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
 
 ##### Example
 
-    GetAgronomicValuesFields('field123','2015-07-01','2015-07-31','2015-06-01','modifiedstandard','10','10','30')
+    agronomic_values_fields('field123','2015-07-01','2015-07-31','2015-06-01','modifiedstandard','10','10','30')
 
 
 
@@ -574,54 +574,54 @@ The Agronomic Norms API returns the long-term normals for the agronomic values o
 
 ##### Function Signatures 
 
-    GetAgronomicNormsFields(fieldId, monthDayStart, monthDayEnd, yearStart, yearEnd, excludeYears, accumulationStartDate, gddMethod, gddBaseTemp, gddMinBoundary, gddMaxBoundary) 
+    agronomic_norms_fields(field_id, monthday_start, monthday_end, year_start, year_end, exclude_years, accumulation_start_date, gdd_method, gdd_base_temp, gdd_min_boundary, gdd_max_boundary) 
 
 ##### Parameters
 
-* `fieldID` _(character)_
+* `field_id` _(character)_
 	* The ID you used when creating the field location.
 	* Required 
-* `monthDayStart` _(character)_
+* `monthday_start` _(character)_
 	* The month and day of the first day in a range for which you want norms.
 	* Alternatively, if you only want data for a single date, enter that date here 
 	* Format is MM-DD
 	* Required
-* `monthDayEnd` _(character)_
+* `monthday_end` _(character)_
 	* The month and day of the last day in the range.
-	* If not supplied, but a `monthDayStart` is, then the API returns data only for a single day
+	* If not supplied, but a `monthday_start` is, then the API returns data only for a single day
 	* Format is MM-DD
 	* Optional
-* `yearStart` _(character)_
+* `year_start` _(character)_
 	* The first of a range of years over which to calculate norms (inclusive)
 	* Note: a minimum of three years is required
 	* Use a four-digit year (YYYY)
 	* Optional; if not used, the API defaults to a 10-year norm
-* `yearEnd` _(character)_
+* `year_end` _(character)_
 	* The last of a range of years over which to calculate norms (inclusive)
 	* Note: a minimum of three years is required
 	* Use a four-digit year (YYYY)
 	* Optional:
-		* If `yearStart` is used then this is required
+		* If `year_start` is used then this is required
 		* if not used, the API defaults to a 10-year norm
-* `excludeYears` _(character)_
+* `exclude_years` _(character)_
 	* A comma-separated list of years that you don't want included in the average
 	* Note: a minimum of three years is required even after years are excluded
 	* Use four-digit years (YYYY)
 	* Optional
-* `gddMethod` _(character)_
+* `gdd_method` _(character)_
 	* Which GDD equation to use 
 	* Options are standard, modifiedstandard, min-temp-cap, min-temp-constant
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
-* `gddBaseTemp` _(numeric)_
+* `gdd_base_temp` _(numeric)_
 	* The base temp to use with the GDD equation
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
-* `gddMinBoundary` _(numeric)_
+* `gdd_min_boundary` _(numeric)_
 	* The lower boundary value for the GDD equation (if used)
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
-* `gddMaxBoundary` _(numeric)_
+* `gdd_max_boundary` _(numeric)_
 	* The upper boundary value for the GDD equation (if used)
 	* See [documentation on selecting and configuring a GDD equation](http://developer.awhere.com/api/reference/agronomics/values#about-gdds-equations-and-default-values)
 	* Optional
@@ -629,4 +629,4 @@ The Agronomic Norms API returns the long-term normals for the agronomic values o
 
 ##### Example
 
-    GetAgronomicNormsFields('field123','07-01','07-31','2010','2015')
+    agronomic_norms_fields('field123','07-01','07-31','2010','2015')
