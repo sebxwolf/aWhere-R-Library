@@ -213,12 +213,12 @@ agronomic_values_fields <- function(field_id,
       strDates <- ''
     }
 
-    gdd_methodString      <- paste0('&gdd_method=',gdd_method)
-    gdd_base_tempString    <- paste0('&gdd_base_temp=',gdd_base_temp)
-    gdd_min_boundaryString <- paste0('&gdd_min_boundary=',gdd_min_boundary)
-    gdd_max_boundaryString <- paste0('&gdd_min_boundary=',gdd_max_boundary)
+    gdd_methodString      <- paste0('&gddMethod=',gdd_method)
+    gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
+    gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
+    gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
 
-    accumulation_start_dateString = paste0('&accumulation_start_date=',accumulation_start_date)
+    accumulation_start_dateString = paste0('&accumulationStartDate=',accumulation_start_date)
 
     if(paste(allDates,sep = '',collapse ='') != '') {
       returnedAmount <- as.integer(difftime(ymd(day_end),ymd(day_start),units = 'days')) + 1L
@@ -509,12 +509,12 @@ agronomic_values_latlng <- function(latitude, longitude,
     strType <- paste0('/agronomicvalues')
     strDates <- paste0('/',day_start,',',day_end)
 
-    gdd_methodString      <- paste0('&gdd_method=',gdd_method)
-    gdd_base_tempString    <- paste0('&gdd_base_temp=',gdd_base_temp)
-    gdd_min_boundaryString <- paste0('&gdd_min_boundary=',gdd_min_boundary)
-    gdd_max_boundaryString <- paste0('&gdd_min_boundary=',gdd_max_boundary)
+    gdd_methodString      <- paste0('&gddMethod=',gdd_method)
+    gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
+    gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
+    gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
 
-    accumulation_start_dateString = paste0('&accumulation_start_date=',accumulation_start_date)
+    accumulation_start_dateString = paste0('&accumulationStartDate=',accumulation_start_date)
 
     returnedAmount <- as.integer(difftime(ymd(day_end),ymd(day_start),units = 'days')) + 1L
     if (returnedAmount > numObsReturned) {

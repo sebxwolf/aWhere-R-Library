@@ -119,7 +119,7 @@ forecasts_fields <- function(field_id, day_start = '', day_end = '',
     strDates <- ''
   }
 
-  blockString <- paste0('?block_size=',block_size)
+  blockString <- paste0('?blockSize=',block_size)
 
   address <- paste0(urlAddress, strBeg, strCoord, strType, strDates,blockString)
 
@@ -306,7 +306,7 @@ forecasts_latlng <- function(latitude, longitude, day_start = Sys.Date(), day_en
   strCoord <- paste0('/',latitude,',',longitude)
   strType <- paste0('/forecasts')
   strDates <- paste0('/',day_start,',',day_end)
-  blockString <- paste0('?block_size=',block_size)
+  blockString <- paste0('?blockSize=',block_size)
 
 
   address <- paste0(urlAddress, strBeg, strCoord, strType, strDates,blockString)
