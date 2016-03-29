@@ -213,7 +213,7 @@ agronomic_values_fields <- function(field_id,
       strDates <- ''
     }
 
-    gdd_methodString      <- paste0('&gddMethod=',gdd_method)
+    gdd_methodString      <- paste0('?gddMethod=',gdd_method)
     gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
     gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
     gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
@@ -509,7 +509,7 @@ agronomic_values_latlng <- function(latitude, longitude,
     strType <- paste0('/agronomicvalues')
     strDates <- paste0('/',day_start,',',day_end)
 
-    gdd_methodString      <- paste0('&gddMethod=',gdd_method)
+    gdd_methodString      <- paste0('?gddMethod=',gdd_method)
     gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
     gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
     gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
