@@ -679,7 +679,7 @@ agronomic_norms_latlng <- function(latitude, longitude, month_day_start, month_d
   gdd_methodString      <- paste0('?gddMethod=',gdd_method)
   gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
   gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
-  gdd_max_boundaryString <- paste0('&gddMinBoundary=',gdd_max_boundary)
+  gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
 
   if (year_start != '' & yearEnd != '') {
     strYearsType <- paste0('/years')
