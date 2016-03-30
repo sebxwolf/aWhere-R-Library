@@ -282,15 +282,15 @@ agronomic_norms_fields <- function(field_id, month_day_start = '', month_day_end
   }
 
   if (exclude_years != '') {
-    strexclude_years <- paste0('&exclude_years=',exclude_years)
+    strexclude_years <- paste0('&excludeYears=',exclude_years)
   } else {
     strexclude_years <- ''
   }
 
-  gdd_methodString      <- paste0('?gdd_method=',gdd_method)
-  gdd_base_tempString    <- paste0('&gdd_base_temp=',gdd_base_temp)
-  gdd_min_boundaryString <- paste0('&gdd_min_boundary=',gdd_min_boundary)
-  gdd_max_boundaryString <- paste0('&gdd_min_boundary=',gdd_max_boundary)
+  gdd_methodString      <- paste0('?gddMethod=',gdd_method)
+  gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
+  gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
+  gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
 
   if (year_start != '' & year_end != '') {
     strYearsType <- paste0('/years')
@@ -671,15 +671,15 @@ agronomic_norms_latlng <- function(latitude, longitude, month_day_start, month_d
   }
 
   if (exclude_years != '') {
-    strexclude_years <- paste0('&exclude_years=',exclude_years)
+    strexclude_years <- paste0('&excludeYears=',exclude_years)
   } else {
     strexclude_years <- ''
   }
 
-  gdd_methodString      <- paste0('?gdd_method=',gdd_method)
-  gdd_base_tempString    <- paste0('&gdd_base_temp=',gdd_base_temp)
-  gdd_min_boundaryString <- paste0('&gdd_min_boundary=',gdd_min_boundary)
-  gdd_max_boundaryString <- paste0('&gdd_min_boundary=',gdd_max_boundary)
+  gdd_methodString      <- paste0('?gddMethod=',gdd_method)
+  gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
+  gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
+  gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
 
   if (year_start != '' & yearEnd != '') {
     strYearsType <- paste0('/years')

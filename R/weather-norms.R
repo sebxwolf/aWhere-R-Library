@@ -201,7 +201,7 @@ weather_norms_fields <- function(field_id, monthday_start = '', monthday_end = '
   }
 
   if (exclude_years != '') {
-    strexclude_years <- paste0('?exclude_years=',exclude_years)
+    strexclude_years <- paste0('?excludeYears=',exclude_years)
   } else {
     strexclude_years <- ''
   }
@@ -455,7 +455,7 @@ weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_e
   }
 
   if (exclude_years != '') {
-    strexclude_years <- paste0('?exclude_years=',exclude_years)
+    strexclude_years <- paste0('?excludeYears=',exclude_years)
   } else {
     strexclude_years <- ''
   }
