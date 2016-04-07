@@ -86,13 +86,11 @@ create_field <- function(field_id, latitude, longitude, farm_id, field_name = ""
   # field_name <- gsub(' ','_',field_name)
 
   ## Create Request
-
-
   url <- "https://api.awhere.com/v2/fields"
 
   postbody <- paste0('{"id":"', field_id, '",',
                      '"centerPoint":{"latitude":', latitude, ',"longitude":', longitude, '}',
-                     ',"farm_id":"', farm_id, '"')
+                     ',"farmId":"', farm_id, '"')
   if(field_name != "") {
     postbody <- paste0(postbody, ',"name":"', field_name, '"')
   }
