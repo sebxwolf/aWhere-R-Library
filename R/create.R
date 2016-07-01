@@ -245,8 +245,6 @@ create_planting <- function(field_id, crop, planting_date = "", proj_yield_amoun
 
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
-    print(url)
-    print(postbody)
     request <- POST(url, body=postbody, content_type('application/json'),
                     add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
 
