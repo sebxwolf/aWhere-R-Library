@@ -182,9 +182,10 @@ get_planting <- function(field_id = "", planting_id = "", current = F, offset=""
     if(planting_id == "") {
       data <- as.data.frame(do.call(rbind, lapply(a$plantings, rbind)))
       # case if field has no plantings
-      if (ncol(data) < 7) {
-        stop(a$detailedMessage)
+      if (nrow(data) == 0) {
+        stop(paste("field_id:", field_id, "has no planting.", a$detailedMessage))
       }
+      print(head(data))
       data <- data[, c(1:7)]
       data <- cbind(data, do.call(rbind, lapply(data$yield, rbind)))
       data$yield <- NULL
