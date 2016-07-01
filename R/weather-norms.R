@@ -489,7 +489,7 @@ weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_e
     }
   }
 
-  data <- as.data.table(x[[3]])
+  data <- as.data.table(x[[1]])
 
   varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object

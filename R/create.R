@@ -172,7 +172,7 @@ create_field <- function(field_id, latitude, longitude, farm_id, field_name = ""
 #' @param - yield_units: units of actual yield (string)
 #' @param - harvest_date: actual harvest date at end of season. Format as YYYY-MM-DD (string)
 #'
-#' @return - a print text that informs if the query succeeded or not
+#' @return - system generated planting id along with a print text that informs if the query succeeded or not 
 #'
 #' @references http://developer.awhere.com/api/reference/plantings/create
 #'
@@ -265,6 +265,7 @@ create_planting <- function(field_id, crop, planting_date = "", proj_yield_amoun
     cat(paste0(a$detailedMessage))
   } else {
     cat(paste0('Operation Complete \n Planting ID: ', a$id))
+    a$id
   }
 
 }
