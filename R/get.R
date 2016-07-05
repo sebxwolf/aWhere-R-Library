@@ -113,6 +113,8 @@ get_fields <- function(field_id = "") {
 #' @param - planting_id: a planting ID to look for (string)
 #' @param - current: whether to just get current plantings(T) or include historical plantings(F).
 #'                   To get most recent planting record for a field, set current to TRUE and do not pass in a planting_id (boolean)
+#' @param - offset: The number of objects to skip before returning objects. Used in conjunction with offset to paginate.
+#' @param - limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate. 
 #'
 #' @return - data: data.table containing information about requested field(s)
 #'
@@ -127,7 +129,7 @@ get_fields <- function(field_id = "") {
 
 #' @export
 
-get_planting <- function(field_id = "", planting_id = "", current = F) {
+get_planting <- function(field_id = "", planting_id = "", current = F, offset="", limit="") {
 
 
   ## Create Request
@@ -145,6 +147,16 @@ get_planting <- function(field_id = "", planting_id = "", current = F) {
 
   if(current) {
     url <- paste0(url, "current")
+  }
+
+  if(offset != "" || limit != "") {
+    url <- paste0(url, "?")
+    if(offset != "") {
+      url <- paste0(url, "offset=", offset)
+    }
+    if(limit != "") {
+      url <- paste0(url, "limit=", limit)
+    }
   }
 
   doWeatherGet <- TRUE
@@ -168,7 +180,13 @@ get_planting <- function(field_id = "", planting_id = "", current = F) {
   ## Create & fill data frame
   if(is.null(a$statusCode)) {
     if(planting_id == "") {
-      data <- as.data.frame(do.call(rbind, lapply(a$plantings, rbind)))[, c(1:7)]
+      data <- as.data.frame(do.call(rbind, lapply(a$plantings, rbind)))
+      # case if field has no plantings
+      if (nrow(data) == 0) {
+        stop(paste("field_id:", field_id, "has no planting.", a$detailedMessage))
+      }
+      print(head(data))
+      data <- data[, c(1:7)]
       data <- cbind(data, do.call(rbind, lapply(data$yield, rbind)))
       data$yield <- NULL
       data <- cbind(data, do.call(rbind, lapply(data$projections, rbind)))
