@@ -269,3 +269,80 @@ create_planting <- function(field_id, crop, planting_date = "", proj_yield_amoun
   }
 
 }
+
+#' @title Create Job
+#'
+#' @description
+#' \code{create_job} This API will register a batch job in the aWhere platform.
+#'
+#' @details
+#'Batch jobs allow you to execute many API calls in a single batch, which is much more efficient and faster than making hundreds or thousands of individual requests. When you create a batch, you define each endpoint you want to call, and then aWhere's platform steps through each internally and provides all the results at once.
+#'
+#'Any GET request from any of our Version-2 APIs can be included in a batch. The batch job system treats each API request individually, which means you can easily identify which API request produced which results. It is also fault-tolerant, so that if one request resulted in an error, all the others will execute normally. Note that if you request a set of paged results, only the first page of results will be returned; be sure to use the limit and offset parameters of that API to get all the results you need.
+#'
+#'Batch jobs are queued and executed in the order they are created, from across all customers using aWhere APIs. While many jobs can run concurrently, the rest are inserted into a queue and executed quite quickly. Use the Status and Results endpoint to monitor your job status and retrieve the results when complete.
+#'
+#'Important: This API will return a job ID which you must retain; there is not currently an API to list all jobs that you've created.
+#'
+#'Important: There is a limit of 10,000 requests per batch job.
+#'
+#'Note: The current conditions API cannot be included in batch jobs.
+#'
+#' @param - api_requests: a list of "verb endpoint" strings. This is the actual API request you're asking the Batch Jobs system to call. It must be a valid aWhere endpoint and is expressed as the HTTP verb, a space, and the relative URI. For example: "GET /v2/weather/fields/1234/observations"
+#' @param - titles: a vector of names for each individual request in api, which can aid in identifying each set of results within a batch. This need not be unique between all the jobs.
+#' @param - job_title: A name for the job, which can aid you in identifying the result set.
+#' @param - job_type: The type of job. Currently this system only supports the type "batch."
+#' @return - job_id: The Job ID. You will need this to retrieve the job status and results.
+#'
+#' @references https://developer.awhere.com/api/reference/batch/create
+#'
+#' @examples
+#' create_job(c("farmA", "farmB"), c("GET /v2/weather/fields/farmA/observations", "GET /v2/weather/fields/farmB/observations"))
+
+#' @export
+create_job <- function(api_requests, request_titles, job_title, job_type="batch") {
+
+  #############################################################
+  #Checking Input Parameters
+  if (exists('awhereEnv75247') == FALSE) {
+    warning('Please Run the Command \'get_token()\' and then retry running command. \n')
+    return()
+  }
+
+  if (exists('uid', envir = awhereEnv75247) == FALSE |
+      exists('secret', envir = awhereEnv75247) == FALSE |
+      exists('token', envir = awhereEnv75247) == FALSE) {
+    warning('Please Run the Command \'get_token()\' and then retry running command. \n')
+    return()
+  }
+
+  job_title <- gsub(' ','_', job_title)
+
+  ## Create Request
+  url <- "https://api.awhere.com/v2/jobs"
+
+  requests <- data.frame(title=request_titles, api=api_requests)
+  postbody <- jsonlite::toJSON(list(title=job_title, type=job_type,
+                               requests=requests), auto_unbox=T)
+  doWeatherGet <- TRUE
+  while (doWeatherGet == TRUE) {
+    request <- POST(url, body=postbody, content_type('application/json'),
+                    add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+
+    a <- content(request)
+
+    if (any(grepl('API Access Expired',a))) {
+      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+    } else {
+      doWeatherGet <- FALSE
+    }
+  }
+
+  if ((request$status_code %in% c(201)) == FALSE) { # status code = 200 means that the query worked
+    warning('WARNING: Problem with Query')
+    stop(paste0(a))
+  } else {
+    cat(paste0('Operation Complete \n'))
+    return(a)
+  }
+}
