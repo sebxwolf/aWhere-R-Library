@@ -125,7 +125,7 @@ get_fields <- function(field_id = "") {
 #' @import jsonlite
 #'
 #' @examples
-#' GetField(1234)
+#' get_planting(field_id='1234')
 
 #' @export
 
@@ -138,27 +138,26 @@ get_planting <- function(field_id = "", planting_id = "", current = F, offset=""
   if(field_id != "") {
     url <- paste0(url, "fields/", field_id, "/plantings")
   } else {
-    url <- paste0(url, "plantings/")
+    url <- paste0(url, "plantings")
   }
 
   if(planting_id != "") {
-    url <- paste0(url, planting_id)
+    url <- paste0(url, "/", planting_id)
   }
 
   if(current) {
-    url <- paste0(url, "current")
+    url <- paste0(url, "/current")
   }
 
   if(offset != "" || limit != "") {
     url <- paste0(url, "?")
     if(offset != "") {
-      url <- paste0(url, "offset=", offset)
+      url <- paste0(url, "&offset=", offset)
     }
     if(limit != "") {
-      url <- paste0(url, "limit=", limit)
+      url <- paste0(url, "&limit=", limit)
     }
   }
-
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
     request <- GET(url,
@@ -185,7 +184,6 @@ get_planting <- function(field_id = "", planting_id = "", current = F, offset=""
       if (nrow(data) == 0) {
         stop(paste("field_id:", field_id, "has no planting.", a$detailedMessage))
       }
-      print(head(data))
       data <- data[, c(1:7)]
       data <- cbind(data, do.call(rbind, lapply(data$yield, rbind)))
       data$yield <- NULL
@@ -224,3 +222,60 @@ get_planting <- function(field_id = "", planting_id = "", current = F, offset=""
 
 }
 
+#' @title Get Job
+#'
+#' @description
+#' \code{get_planting} Gets a job's results when complete.
+#'
+#' @details
+#' Once a batch job is queued you can check on its status with this API. If the job is complete and results are available, they will be included in the response body.
+#'
+#' @param - job_id: a job ID assigned by an aWhere create job.
+#' @param - wait: wait for job to complete before returning
+#'
+#' @return - data: data.table containing the requested payload(s).
+#'
+#' @references https://developer.awhere.com/api/reference/batch/status-results
+#'
+#' @import httr
+#' @import RCurl
+#' @import jsonlite
+#'
+#' @examples
+#' get_job(job_id='1234')
+
+#' @export
+
+get_job <- function(job_id, wait=T, retry_secs=60, num_retries=60) {
+  ## Create Request
+  url <- "https://api.awhere.com/v2/jobs/"
+
+  if(is.na(job_id)) {
+    stop("must specify job_id") 
+  }
+  url <- paste0(url, job_id)
+
+  doWeatherGet <- TRUE
+  retries <- 0
+  while (doWeatherGet == TRUE) {
+    request <- GET(url,
+                   content_type('application/json'),
+                   add_headers(Authorization =
+                                 paste0("Bearer ", awhereEnv75247$token)))
+
+    a <- suppressMessages(content(request))
+
+    if (any(grepl('API Access Expired', a))) {
+      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+    } else if (a$jobStatus == "Done") {
+      doWeatherGet <- FALSE
+    } else if (retries >= num_retries) {
+      stop(paste("Get job for jobId:", job_id, "timed out after", num_retries, "retries"))
+    } else {
+      print(sprintf("job %s status: %s, retrying...", job_id, a$jobStatus))
+      Sys.sleep(retry_secs)
+      retries <- retries + 1
+    }
+  }
+  return(a)
+}
