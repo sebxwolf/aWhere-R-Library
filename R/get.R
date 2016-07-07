@@ -246,7 +246,7 @@ get_planting <- function(field_id = "", planting_id = "", current = F, offset=""
 
 #' @export
 
-get_job <- function(job_id, wait=T, retry_secs=60, num_retries=15) {
+get_job <- function(job_id, wait=T, retry_secs=60, num_retries=60) {
   ## Create Request
   url <- "https://api.awhere.com/v2/jobs/"
 
@@ -272,7 +272,7 @@ get_job <- function(job_id, wait=T, retry_secs=60, num_retries=15) {
     } else if (retries >= num_retries) {
       stop(paste("Get job for jobId:", job_id, "timed out after", num_retries, "retries"))
     } else {
-      print("job incomplete, retrying...")
+      print(sprintf("job %s status: %s, retrying...", job_id, a$jobStatus))
       Sys.sleep(retry_secs)
       retries <- retries + 1
     }

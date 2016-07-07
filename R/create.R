@@ -343,6 +343,6 @@ create_job <- function(api_requests, request_titles, job_title, job_type="batch"
     stop(paste0(a))
   } else {
     cat(paste0('Operation Complete \n'))
-    return(a)
+    return(a$jobId)
   }
 }

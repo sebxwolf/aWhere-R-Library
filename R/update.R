@@ -109,8 +109,6 @@ update_field <- function(field_id, variable_search, value_search, variable_updat
 #' @return - A message confirming the changes have been made
 #'
 #' @import httr
-#' @import rjson
-#' @import RJSONIO
 #' @import RCurl
 #'
 #' @examples
