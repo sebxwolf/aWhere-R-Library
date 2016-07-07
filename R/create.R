@@ -297,7 +297,7 @@ create_planting <- function(field_id, crop, planting_date = "", proj_yield_amoun
 #' @references https://developer.awhere.com/api/reference/batch/create
 #'
 #' @examples
-#' create_job(c("farmA", "farmB"), c("GET /v2/weather/fields/farmA/observations", "GET /v2/weather/fields/farmB/observations"))
+#' create_job(c("GET /v2/weather/fields/farmA/observations", "GET /v2/weather/fields/farmB/observations"), c("farmA", "farmB"), "job_1")
 
 #' @export
 create_job <- function(api_requests, request_titles, job_title, job_type="batch") {
