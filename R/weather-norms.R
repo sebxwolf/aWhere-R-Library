@@ -209,9 +209,9 @@ weather_norms_fields <- function(field_id, monthday_start = '', monthday_end = '
   if (year_start != '' & year_end != '') {
     strYearsType <- paste0('/years')
     strYears <- paste0('/',year_start,',',year_end)
-    address <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,strYears,exclude_years)
+    address <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,strYears,strexclude_years)
   } else {
-    address <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays,exclude_years)
+    address <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays,strexclude_years)
   }
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
@@ -464,9 +464,9 @@ weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_e
   if (year_start != '' & year_end != '') {
     strYearsType <- paste0('/years')
     strYears <- paste0('/',year_start,',',year_end)
-    address <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,strYears,exclude_years)
+    address <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,strYears,strexclude_years)
   } else {
-    address <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays,exclude_years)
+    address <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strexclude_years)
   }
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
