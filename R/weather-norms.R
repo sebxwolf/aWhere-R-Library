@@ -21,10 +21,6 @@
 #'                     you're calculating norms, as a string, e.g., '2008'
 #' @param - year_start: the end year (inclusive) of the range of years for which you're
 #'                     calculating norms, as a string, e.g., '2015'
-#' @param - exclude_years: You can opt to exclude one or more years from the range, and
-#'                        it's values will not be included in the averages. To exclude
-#'                        multiple years, separate them with a comma. Note: You must always have
-#'                        at least three years of data to average
 #'
 #' @return data.table of requested data for dates requested
 #'
@@ -34,13 +30,18 @@
 #' @import jsonlite
 #'
 #' @examples
-#' weather_norms_fields('field123','07-01', '07-10', '2008', '2015','2010,2011')
+#' weather_norms_fields('field123','07-01', '07-10', '2008', '2015')
 
 #' @export
 
+# @param - exclude_years: You can opt to exclude one or more years from the range, and
+#                        it's values will not be included in the averages. To exclude
+#                        multiple years, separate them with a comma. Note: You must always have
+#                        at least three years of data to average
+
 
 weather_norms_fields <- function(field_id, monthday_start = '', monthday_end = '',
-                            year_start = '', year_end = '',exclude_years = '') {
+                            year_start = '', year_end = '') {
 
   #############################################################
   #Checking Input Parameters
@@ -271,10 +272,6 @@ weather_norms_fields <- function(field_id, monthday_start = '', monthday_end = '
 #'                     you're calculating norms, as a string, e.g., '2008'
 #' @param - year_end: the end year (inclusive) of the range of years for which you're
 #'                     calculating norms, as a string, e.g., '2015'
-#' @param - exclude_years: You can opt to exclude one or more years from the range, and
-#'                        it's values will not be included in the averages. To exclude
-#'                        multiple years, separate them with a comma. Note: You must always have
-#'                        at least three years of data to average
 #'
 #' @return data.table of requested data for dates requested
 #'
@@ -288,8 +285,12 @@ weather_norms_fields <- function(field_id, monthday_start = '', monthday_end = '
 
 #' @export
 
+# @param - exclude_years: You can opt to exclude one or more years from the range, and
+#                        it's values will not be included in the averages. To exclude
+#                        multiple years, separate them with a comma. Note: You must always have
+#                        at least three years of data to average
 
-weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_end = '', year_start, year_end, exclude_years = '') {
+weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_end = '', year_start, year_end) {
 
   #############################################################
   #Checking Input Parameters
