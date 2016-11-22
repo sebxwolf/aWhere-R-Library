@@ -41,7 +41,7 @@
 
 
 weather_norms_fields <- function(field_id, monthday_start = '', monthday_end = '',
-                            year_start = '', year_end = '') {
+                            year_start = '', year_end = '', exclude_years = '') {
 
   #############################################################
   #Checking Input Parameters
