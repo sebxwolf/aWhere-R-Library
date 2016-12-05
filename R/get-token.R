@@ -11,25 +11,23 @@
 #'
 #' @return None
 #'
-#' @import httr
-#' @import RCurl
-#'
 #' @examples
-#' get_token(uid,secret)
-
+#' \dontrun{get_token(uid, secret)}
 #' @export
 
-get_token <- function(uid,secret) {
+get_token <- function(uid, secret) {
+
   url <- "https://api.awhere.com/oauth/token"
 
-  request <- POST(url, body='grant_type=client_credentials',
-                  content_type('application/x-www-form-urlencoded'),
-                  add_headers(Authorization =
-                                paste0('Basic ',base64(paste0(uid,':',secret)))))
+  authen_char <- charToRaw(paste0(uid,':',secret))
 
-  a <- suppressMessages(content(request, as = "text"))
+  request <- httr::POST(url, body='grant_type=client_credentials',
+                        httr::content_type('application/x-www-form-urlencoded'),
+                        httr::add_headers(Authorization = paste0('Basic ', base64enc::base64encode(authen_char))))
 
-  if (grepl('\"statusCode\": 401',a)) {
+  a <- suppressMessages(httr::content(request, as = "text"))
+
+  if (request$status_code != 200) {
     warning('The UID/Secret combination is incorrect. \n')
   }
 
@@ -87,7 +85,7 @@ get_token <- function(uid,secret) {
 #' @return vector with uid and secret in positions 1, 2
 #'
 #' @examples
-#' load_credentials("C:/aWhere/credentials/credentials.txt")
+#' \dontrun{load_credentials("C:/aWhere/credentials/credentials.txt")}
 #'
 #' @export
 
@@ -97,6 +95,6 @@ load_credentials <- function(path_to_credentials) {
   uid <- credentials[1]
   secret <- credentials[2]
 
-  get_token(uid,secret)
+  get_token(uid, secret)
 }
 

@@ -24,12 +24,8 @@
 #'
 #' @return - data: data.table containing information about requested field(s)
 #'
-#' @import httr
-#' @import RCurl
-#' @import jsonlite
-#'
 #' @examples
-#' get_fields('field123')
+#' \dontrun{get_fields('field1')}
 
 #' @export
 
@@ -44,14 +40,14 @@ get_fields <- function(field_id = "") {
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
     ## Get data
-    request <- GET(url,
-                   content_type('application/json'),
-                   add_headers(Authorization =
+    request <- httr::GET(url,
+                         httr::content_type('application/json'),
+                         httr::add_headers(Authorization =
                                  paste0("Bearer ", awhereEnv75247$token)))
 
-    a <- suppressMessages(content(request))
+    a <- suppressMessages(httr::content(request))
 
-    #The JSONLITE Serializer propely handles the JSON conversion
+    # The JSONLITE Serializer propely handles the JSON conversion
 
     if (any(grepl('API Access Expired',a)) == TRUE) {
       get_token(awhereEnv75247$uid,awhereEnv75247$secret)
@@ -66,7 +62,7 @@ get_fields <- function(field_id = "") {
     data <- as.data.frame(do.call(rbind, lapply(a$fields, rbind)))[, c(1:5)]
     data <- cbind(data, do.call(rbind, lapply(data$centerPoint, rbind)))
     data$centerPoint <- NULL
-    colnames(data) <- c("fieldName", "Acres", "farmId", "field_id", "Latitude", "Longitude")
+    colnames(data) <- c("fieldName", "Acres", "farmId", "fieldId", "Latitude", "Longitude")
 
     data <- as.matrix(data)
     data[sapply(data, is.null)] <- NA
@@ -86,7 +82,6 @@ get_fields <- function(field_id = "") {
   } else {
     return(as.data.frame(data))
   }
-
 }
 
 
@@ -114,19 +109,18 @@ get_fields <- function(field_id = "") {
 #' @param - current: whether to just get current plantings(T) or include historical plantings(F).
 #'                   To get most recent planting record for a field, set current to TRUE and do not pass in a planting_id (boolean)
 #' @param - offset: The number of objects to skip before returning objects. Used in conjunction with offset to paginate.
-#' @param - limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate. 
+#' @param - limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate.
 #'
 #' @return - data: data.table containing information about requested field(s)
 #'
 #' @references http://developer.awhere.com/api/reference/plantings/get-plantings
 #'
-#' @import httr
-#' @import RCurl
-#' @import jsonlite
 #'
 #' @examples
-#' get_planting(field_id='1234')
-
+#' \dontrun{get_planting(field_id='field1')
+#' get_planting(field_id = 'field1', planting_id = '73227')
+#' get_planting('field1', current = T)
+#' get_planting(field_id='field1', offset = '0', limit = '5')}
 #' @export
 
 get_planting <- function(field_id = "", planting_id = "", current = F, offset="", limit="") {
@@ -160,12 +154,12 @@ get_planting <- function(field_id = "", planting_id = "", current = F, offset=""
   }
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
-    request <- GET(url,
-                   content_type('application/json'),
-                   add_headers(Authorization =
+    request <- httr::GET(url,
+                         httr::content_type('application/json'),
+                         httr::add_headers(Authorization =
                                  paste0("Bearer ", awhereEnv75247$token)))
 
-    a <- suppressMessages(content(request))
+    a <- suppressMessages(httr::content(request))
 
     if (any(grepl('API Access Expired',a))) {
       get_token(awhereEnv75247$uid,awhereEnv75247$secret)
@@ -178,7 +172,7 @@ get_planting <- function(field_id = "", planting_id = "", current = F, offset=""
 
   ## Create & fill data frame
   if(is.null(a$statusCode)) {
-    if(planting_id == "") {
+    if(planting_id == "" & !current) {
       data <- as.data.frame(do.call(rbind, lapply(a$plantings, rbind)))
       # case if field has no plantings
       if (nrow(data) == 0) {
@@ -237,12 +231,8 @@ get_planting <- function(field_id = "", planting_id = "", current = F, offset=""
 #'
 #' @references https://developer.awhere.com/api/reference/batch/status-results
 #'
-#' @import httr
-#' @import RCurl
-#' @import jsonlite
-#'
 #' @examples
-#' get_job(job_id='1234')
+#' \dontrun{get_job(job_id='1234')}
 
 #' @export
 
@@ -251,19 +241,19 @@ get_job <- function(job_id, wait=T, retry_secs=60, num_retries=60) {
   url <- "https://api.awhere.com/v2/jobs/"
 
   if(is.na(job_id)) {
-    stop("must specify job_id") 
+    stop("must specify job_id")
   }
+
   url <- paste0(url, job_id)
 
   doWeatherGet <- TRUE
   retries <- 0
   while (doWeatherGet == TRUE) {
-    request <- GET(url,
-                   content_type('application/json'),
-                   add_headers(Authorization =
-                                 paste0("Bearer ", awhereEnv75247$token)))
+    request <- httr::GET(url,
+                         httr::content_type('application/json'),
+                         httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
 
-    a <- suppressMessages(content(request))
+    a <- suppressMessages(httr::content(request))
 
     if (any(grepl('API Access Expired', a))) {
       get_token(awhereEnv75247$uid,awhereEnv75247$secret)

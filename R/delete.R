@@ -12,16 +12,12 @@
 #' @param - field_id: an ID of your choosing (string)
 #'
 #' @return - a print text that informs if the query succeded or not
-#'
-#' @import httr
-#' @import RCurl
-#'
+#' @importFrom RCurl getCurlHandle
 #' @examples
-#' delete_field("field123")
+#' \dontrun{delete_field("field123")
 #' delete_field("field456")
-#'
+#' }
 #' @export
-
 
 delete_field <- function(field_id) {
 
@@ -32,10 +28,10 @@ delete_field <- function(field_id) {
   doWeatherGet = TRUE
   while (doWeatherGet == TRUE) {
     ## Get data
-    request <- DELETE(url, body=postbody, content_type('application/json'),
-                      add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)), curl = getCurlHandle())
+    request <- httr::DELETE(url, body=postbody, httr::content_type('application/json'),
+                            httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)), curl = getCurlHandle())
 
-    a <- content(request, as = "text")
+    a <- httr::content(request, as = "text")
     parsedResponse <- unlist(strsplit(a,split = "\""))
 
     #The JSONLITE Serializer propely handles the JSON conversion
@@ -72,11 +68,8 @@ delete_field <- function(field_id) {
 #'
 #' @return - a print text that informs if the query succeded or not
 #'
-#' @import httr
-#' @import RCurl
-#'
 #' @examples
-#' delete_planting("field123",'64921')
+#' \dontrun{delete_planting("field123",'133972')}
 
 #' @export
 
@@ -87,9 +80,9 @@ delete_planting <- function(field_id,planting_id) {
   doWeatherGet = TRUE
   while (doWeatherGet == TRUE) {
     ## Get data
-    request <- DELETE(url,add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+    request <- httr::DELETE(url, httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
 
-    a <- content(request, as = "text")
+    a <- httr::content(request, as = "text")
     parsedResponse <- unlist(strsplit(a,split = "\""))
 
     #The JSONLITE Serializer properly handles the JSON conversion

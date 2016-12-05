@@ -43,9 +43,9 @@ IMPORTANT - to look for a set of data points which need update, you can only upd
                    - only name
 }
 \examples{
-update_field( field_id = 'field123',
+\dontrun{update_field( field_id = 'field123',
 				variable_search = 'farmId', value_search = 'farmA',
-             variable_update = 'farmId', value_update = 'This is my territory')
+       variable_update = 'farmId', value_update = 'This is my territory')}
 }
 \references{
 http://developer.awhere.com/api/reference/fields/update-field

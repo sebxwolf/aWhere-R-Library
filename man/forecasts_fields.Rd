@@ -38,7 +38,7 @@ of Sky Covered by Clouds, and Percentage of Clear Sky.  Used the Fields Name con
 Uses default units returned by the API
 }
 \examples{
-forecasts_fields('field123','2016-01-19','2016-01-24',12)
+\dontrun{forecasts_fields('field123', block_size = 12)}
 }
 \references{
 http://developer.awhere.com/api/forecast-weather-api

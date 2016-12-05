@@ -21,6 +21,6 @@ None
 this script gets the aWHERE access token for the current session of the API
 }
 \examples{
-get_token(uid,secret)
+\dontrun{get_token(uid, secret)}
 }
 

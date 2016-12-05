@@ -23,12 +23,8 @@
 #'                    'metar', 'mesonet', 'metar-mesonet', 'pws', 'all'.  Default value is 'all'
 #' @return data.table of requested data for dates requested
 #'
-#' @import httr
-#' @import data.table
-#' @import jsonlite
-#'
 #' @examples
-#' current_conditions_fields('field123','all')
+#' \dontrun{current_conditions_fields('field123','all')}
 
 #' @export
 
@@ -74,15 +70,15 @@ current_conditions_fields <- function(field_id,sources = 'all') {
 
   while (doWeatherGet == TRUE) {
 
-    requestString <- paste0('request <- GET(address,
-	                                    add_headers(Authorization =
+    requestString <- paste0('request <- httr::GET(address,
+	                                    httr::add_headers(Authorization =
 	                                    paste0(\"Bearer \", awhereEnv75247$token)))')
 
     # Make request
 
     eval(parse(text = requestString))
 
-    a <- suppressMessages(content(request, as = "text"))
+    a <- suppressMessages(httr::content(request, as = "text"))
 
     #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -97,7 +93,7 @@ current_conditions_fields <- function(field_id,sources = 'all') {
     }
   }
 
-  data <- as.data.table(data.frame(as.list(unlist(x)),stringsAsFactors = FALSE))
+  data <- data.table::as.data.table(data.frame(as.list(unlist(x)),stringsAsFactors = FALSE))
 
   varNames <- colnames(data)
 
@@ -141,7 +137,7 @@ current_conditions_fields <- function(field_id,sources = 'all') {
 #' @import jsonlite
 #'
 #' @examples
-#' current_conditions_latlng('39.8282', '-98.5795','all')
+#' \dontrun{current_conditions_latlng('39.8282', '-98.5795','all')}
 
 #' @export
 
@@ -200,15 +196,15 @@ current_conditions_latlng <- function(latitude,longitude,sources = 'all') {
 
   while (doWeatherGet == TRUE) {
 
-    requestString <- paste0('request <- GET(address,
-                            add_headers(Authorization =
+    requestString <- paste0('request <- httr::GET(address,
+                            httr::add_headers(Authorization =
                             paste0(\"Bearer \", awhereEnv75247$token)))')
 
     # Make request
 
     eval(parse(text = requestString))
 
-    a <- suppressMessages(content(request, as = "text"))
+    a <- suppressMessages(httr::content(request, as = "text"))
 
     #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -223,7 +219,7 @@ current_conditions_latlng <- function(latitude,longitude,sources = 'all') {
     }
   }
 
-  data <- as.data.table(data.frame(as.list(unlist(x)),stringsAsFactors = FALSE))
+  data <- data.table::as.data.table(data.frame(as.list(unlist(x)),stringsAsFactors = FALSE))
 
   varNames <- colnames(data)
 

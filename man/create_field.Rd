@@ -24,7 +24,7 @@ create_field(field_id, latitude, longitude, farm_id, field_name = "",
 - printed text that informs if the query succeeded or not
 }
 \description{
-\code{Create_field} This API will register a field location in the aWhere platform. This is a one-time operation for each field.
+\code{create_field} This API will register a field location in the aWhere platform. This is a one-time operation for each field.
 }
 \details{
 Fields are how you manage the locations for which you're tracking weather, agronomics,
@@ -42,8 +42,10 @@ only need to create a field once, after which point you can reference it by the 
 All Spaces will be converted to underscores to conform with the requirements of the API
 }
 \examples{
+\dontrun{
 create_field("field123","39.8282","-98.5795","farmA","Some Field Location","100")
 create_field("field456","40.8282","-100.5795","farmA","Some Field Location","100")
+}
 }
 \references{
 http://developer.awhere.com/api/reference/fields/create-field

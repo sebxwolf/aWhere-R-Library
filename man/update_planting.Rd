@@ -42,7 +42,7 @@ were previously set, and now are not, will be null'd. The required properties mu
 also be set even if they are changed.
 }
 \examples{
-update_planting("64322", "FieldA", "2016-02-01", "60", "Bushels")
+\dontrun{update_planting("field123", "64322", harvest_date = "2016-02-01", yield_amount = "60", yield_units = "Bushels")}
 
 }
 

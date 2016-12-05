@@ -11,11 +11,9 @@ agronomic_values_fields(field_id, day_start = "", day_end = "",
 \arguments{
 \item{-}{field_id: the field_id having previously been created with the createField Function}
 
-\item{-}{day_start: character string of start date in form: YYYY-MM-DD
-Defaults to using the associated planting date if no date set}
+\item{-}{day_start: required, character string of start date in form: YYYY-MM-DD}
 
-\item{-}{day_end: character string of end date in form: YYYY-MM-DD
-If Not included will return data only for start date}
+\item{-}{day_end: required, character string of end date in form: YYYY-MM-DD}
 
 \item{-}{accumulation_start_date: If you want to start counting accumulations from
 before the specified start date (or before the
@@ -59,7 +57,8 @@ to get the most out of the aWhere platform.  This function returns GDDs, Pet, P/
 accumulated Precipitation, accumulated Pet, accumulated P/Pet.  Returns data in API default units (metric)
 }
 \examples{
-agronomic_values_fields('field123','2015-07-01','2015-07-31','','standard','10','10','30')
+\dontrun{agronomic_values_fields('field123','2015-07-01','2015-07-31','','standard','10','10','30')
+agronomic_values_fields("field123", day_start = "2016-07-01", day_end = "2016-07-31", accumulation_start_date = "2016-06-01", gdd_method = "modifiedstandard", gdd_base_temp = "10", gdd_min_boundary = "10", gdd_max_boundary = "30")}
 }
 \references{
 http://developer.awhere.com/api/reference/agronomics/values

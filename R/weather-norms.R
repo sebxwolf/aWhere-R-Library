@@ -13,35 +13,28 @@
 #' @references http://developer.awhere.com/api/reference/weather/norms
 #'
 #' @param - field_id: the field_id having previously been created with the createField Function
-#' @param - monthday_start: character string of the month and day for the start
+#' @param - monthday_start: required, character string of the month and day for the start
 #'                         of the range of days you are calculating norms for, e.g., '07-01' (July 1)
-#' @param - monthday_end: character string of the month and day for the end of the
+#' @param - monthday_end: required, character string of the month and day for the end of the
 #'                       range of days you are calculating norms for, e.g., '07-10' (July 10)
 #' @param - year_start: the starting year (inclusive) of the range of years for which
 #'                     you're calculating norms, as a string, e.g., '2008'
 #' @param - year_start: the end year (inclusive) of the range of years for which you're
 #'                     calculating norms, as a string, e.g., '2015'
+#' @param - exclude_year: You can opt to exclude one or more years from the range, and
+#'                         it's values will not be included in the averages. To exclude
+#'                        multiple years, separate them with a comma. Note: You must always have
+#'                       at least three years of data to average
 #'
 #' @return data.table of requested data for dates requested
 #'
-#' @import httr
-#' @import data.table
-#' @import lubridate
-#' @import jsonlite
-#'
 #' @examples
-#' weather_norms_fields('field123','07-01', '07-10', '2008', '2015')
-
+#' \dontrun{weather_norms_fields('field123', monthday_start = '07-01', monthday_end = '07-10',
+#' year_start = '2008', year_end = '2015', exclude_years = '2009,2013')}
 #' @export
-
-# @param - exclude_years: You can opt to exclude one or more years from the range, and
-#                        it's values will not be included in the averages. To exclude
-#                        multiple years, separate them with a comma. Note: You must always have
-#                        at least three years of data to average
-
-
+#'
 weather_norms_fields <- function(field_id, monthday_start = '', monthday_end = '',
-                            year_start = '', year_end = '', exclude_years = '') {
+                                 year_start = '', year_end = '', exclude_years = '') {
 
   #############################################################
   #Checking Input Parameters
@@ -216,13 +209,13 @@ weather_norms_fields <- function(field_id, monthday_start = '', monthday_end = '
   }
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
-    requestString <- 'request <- GET(address,
-  	                                    add_headers(Authorization =
+    requestString <- 'request <- httr::GET(address,
+  	                                    httr::add_headers(Authorization =
   	                                    paste0(\"Bearer \", awhereEnv75247$token)))'
     # Make request
     eval(parse(text = requestString))
 
-    a <- suppressMessages(content(request, as = "text"))
+    a <- suppressMessages(httr::content(request, as = "text"))
 
     #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -235,7 +228,7 @@ weather_norms_fields <- function(field_id, monthday_start = '', monthday_end = '
     }
   }
 
-  data <- as.data.table(x$norms)
+  data <- data.table::as.data.table(x$norms)
 
   varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object
@@ -272,25 +265,19 @@ weather_norms_fields <- function(field_id, monthday_start = '', monthday_end = '
 #'                     you're calculating norms, as a string, e.g., '2008'
 #' @param - year_end: the end year (inclusive) of the range of years for which you're
 #'                     calculating norms, as a string, e.g., '2015'
+#' @param - exclude_years: You can opt to exclude one or more years from the range, and
+#'                        it's values will not be included in the averages. To exclude
+#'                       multiple years, separate them with a comma. Note: You must always have
+#'                       at least three years of data to average
 #'
 #' @return data.table of requested data for dates requested
 #'
-#' @import httr
-#' @import data.table
-#' @import lubridate
-#' @import jsonlite
-#'
 #' @examples
-#' weather_norms_latlng('39.8282', '-98.5795', '07-01', '07-10', '2008', '2015','2010,2011')
-
+#' \dontrun{weather_norms_latlng('39.8282', '-98.5795', '07-01', '07-10', '2008', '2015','2010,2011')}
 #' @export
 
-# @param - exclude_years: You can opt to exclude one or more years from the range, and
-#                        it's values will not be included in the averages. To exclude
-#                        multiple years, separate them with a comma. Note: You must always have
-#                        at least three years of data to average
 
-weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_end = '', year_start, year_end) {
+weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_end = '', year_start = '', year_end = '', exclude_years = '') {
 
   #############################################################
   #Checking Input Parameters
@@ -425,7 +412,7 @@ weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_e
       }
       yearsToRequest <- yearsToRequest[yearsToRequest != as.integer(exclude_yearsTest[[1]][z])]
     }
-    }
+  }
 
   if (length(yearsToRequest) <= 3) {
     warning('At least three unique years must be used in this query. Please correct. \n')
@@ -471,13 +458,13 @@ weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_e
   }
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
-    requestString <- 'request <- GET(address,
-    add_headers(Authorization =
+    requestString <- 'request <- httr::GET(address,
+    httr::add_headers(Authorization =
     paste0(\"Bearer \", awhereEnv75247$token)))'
     # Make request
     eval(parse(text = requestString))
 
-    a <- suppressMessages(content(request, as = "text"))
+    a <- suppressMessages(httr::content(request, as = "text"))
 
     #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -490,7 +477,7 @@ weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_e
     }
   }
 
-  data <- as.data.table(x[[1]])
+  data <- data.table::as.data.table(x[[1]])
 
   varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object

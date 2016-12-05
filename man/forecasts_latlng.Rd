@@ -41,7 +41,7 @@ of Sky Covered by Clouds, and Percentage of Clear Sky.  Used the Lat/Lon constru
 Uses default units returned by the API
 }
 \examples{
-forecasts_latlng('39.8282', '-98.5795','2016-01-19','2016-01-24',12)
+\dontrun{forecasts_latlng('39.8282', '-98.5795','2016-01-19','2016-01-24',12)}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/forecasts/geolocation

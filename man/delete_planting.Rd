@@ -23,6 +23,6 @@ models, but if you want to keep your planting records clean for reporting and hi
 purposes you can delete errant or incorrect plantings.
 }
 \examples{
-delete_planting("field123",'64921')
+\dontrun{delete_planting("field123",'133972')}
 }
 

@@ -34,7 +34,7 @@ that is capable of hourly updates.  Uses the Lat/Lon construct for requesting da
 Uses default units returned by the API
 }
 \examples{
-current_conditions_latlng('39.8282', '-98.5795','all')
+\dontrun{current_conditions_latlng('39.8282', '-98.5795','all')}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/current

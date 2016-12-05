@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="aWhere Team" />
+
+
+<title>aWhere R Library</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">aWhere R Library</h1>
+<h4 class="author"><em>aWhere Team</em></h4>
+<h4 class="date"><em>December 2016</em></h4>
+
+
+
+<div id="awhere-api-package-vignette" class="section level2">
+<h2>aWhere API Package Vignette</h2>
+<p>For customers that use R in their statistical modeling work, the <code>aWhereAPI</code> R package helps get you up and running with minimal integration effort. This vignette demonstrates the basic use of the <code>aWhereAPI</code> functions, which simplify the authentication and query construction processes. This package is also particularly helpful for users with limited knowledge of APIs and HTTP syntax.</p>
+<p>For additional information or detail, please refer to the <a href="https://github.com/aWhereAPI">complete documentation</a>.</p>
+<p><strong>Note:</strong> <code>aWhereAPI</code> functions will only return metric units</p>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p><strong>Note:</strong> You will need to install R and have a working knowledge of its interface prior to installing and using this package.</p>
+<p><strong>Note:</strong> You will need to have the devtools library installed in R to install the package. Consult <code>devtools</code> <a href="https://github.com/hadley/devtools">documentation</a> if necessary.</p>
+<div id="automatically-install" class="section level3">
+<h3>Automatically Install</h3>
+<p>This package can be installed directly from GitHub with the following command:</p>
+<pre><code>devtools::install_github(&quot;aWhereAPI/aWhere-R-Library&quot;)</code></pre>
+</div>
+<div id="manually-install" class="section level3">
+<h3>Manually Install</h3>
+<ol style="list-style-type: decimal">
+<li><p>Download this <a href="https://github.com/aWhereAPI/aWhere-R-Library">Github repo</a> and keep the <code>aWhere-R-Library-master</code> folder somewhere useful on your computer, such as your Desktop or My Documents.</p></li>
+<li>Set the Working Path in R to the location that contains the <code>aWhere-R-Library-master</code> folder. If you placed it on your Desktop the working directory would be something like <code>C:\Users\USERNAME\Desktop</code>. In R, this command is:
+<ul>
+<li><code>setwd(&quot;C:\Users\USERNAME\Desktop&quot;)</code></li>
+</ul></li>
+<li><p>Run <code>library(devtools)</code> and <code>install(&quot;aWhere-R-Library-master&quot;)</code> to install and add the library to your environment.</p></li>
+</ol>
+</div>
+<div id="load-the-library" class="section level3">
+<h3>Load the library</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(aWhereAPI)</code></pre></div>
+</div>
+</div>
+<div id="api-credentials" class="section level2">
+<h2>API Credentials</h2>
+<p>To get aWhere API keys go to <a href="http://developer.awhere.com/start">aWhere Developer Community</a> or contact your aWhere Account Executive.</p>
+<div id="use-credentials-directly-for-token-generation" class="section level3">
+<h3>Use credentials directly for token generation</h3>
+<p>One-time generation of a token can be done with the <code>get_token()</code> function. The resulting token will be automatically stored in your environment for use in API calls (tokens are active for one hour).</p>
+<pre><code>get_token(&quot;JFKL24JF290FJSKAFDF&quot;,&quot;jf0afsd9af0a&quot;)</code></pre>
+</div>
+<div id="load-credentials-from-a-saved-file-for-automatic-token-generation" class="section level3">
+<h3>Load credentials from a saved file for automatic token generation</h3>
+<p>Alternatively, the <code>load_credentials()</code> function accesses a text file saved on your computer with your API Key on the first line, and your Secret on the second. This function invokes <code>get_token()</code> so no further work is needed to generate additional access tokens while making calls.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">load_credentials</span>(<span class="st">&quot;C:/Users/Hannacamp/Documents/R Working Directory/API/credentials.txt&quot;</span>)</code></pre></div>
+</div>
+</div>
+<div id="section" class="section level2">
+<h2>___________________________________________________________________________</h2>
+</div>
+<div id="api-functions" class="section level2">
+<h2>API Functions</h2>
+<div id="the-fields-plantings-api" class="section level3">
+<h3>The Fields &amp; Plantings API</h3>
+<p>This API provides an interface for customers to register their field locations and information about their plantings in the aWhere Platform. The ID for each field or planting can then be used for quick reference in other functions in the weather data APIs.</p>
+<hr />
+<div id="create_field" class="section level4">
+<h4>create_field()</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">create_field</span>(<span class="st">&quot;field_test&quot;</span>,<span class="st">&quot;40.828200&quot;</span>,<span class="st">&quot;-100.579500&quot;</span>,<span class="st">&quot;farmA&quot;</span>)</code></pre></div>
+<pre><code>## No encoding supplied: defaulting to UTF-8.</code></pre>
+<pre><code>## Operation Complete</code></pre>
+<hr />
+</div>
+<div id="get_fields" class="section level4">
+<h4>get_fields()</h4>
+<p>Running this function without any inputs will return a complete list of fields associated with your credentials. If a user wants information relating to a specific field only, they can pass the field ID to the function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">get_fields</span>(<span class="st">&quot;field_test&quot;</span>)</code></pre></div>
+<pre><code>##   fieldName acres latitude longitude farmId   field_id
+## 1        NA    NA  40.8282 -100.5795  farmA field_test</code></pre>
+<hr />
+</div>
+<div id="update_field" class="section level4">
+<h4>update_field()</h4>
+<p>At this time only the name or farm ID of a field can be changed after you have created the field. Field IDs and coordinates cannot be changed. This example will change the farm ID of field_test to “TestFarmA” only if the farm ID is currently “farmA”:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">update_field</span>(<span class="st">&quot;field_test&quot;</span>, <span class="st">&quot;farmId&quot;</span>, <span class="st">&quot;farmA&quot;</span>, <span class="st">&quot;farmId&quot;</span>, <span class="st">&quot;TestFarmA&quot;</span>)</code></pre></div>
+<pre><code>## No encoding supplied: defaulting to UTF-8.</code></pre>
+<pre><code>## Operation Complete</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">get_fields</span>(<span class="st">&quot;field_test&quot;</span>)</code></pre></div>
+<pre><code>##   fieldName acres latitude longitude    farmId   field_id
+## 1        NA    NA  40.8282 -100.5795 TestFarmA field_test</code></pre>
+<p>The function as constructed allows you to use the value of the first named variable (whether farm ID or field name) as the condition for replacing the second named variable.</p>
+<hr />
+</div>
+<div id="create_planting" class="section level4">
+<h4>create_planting()</h4>
+<p>Each field associated with your aWhere API account can be associated with multiple different planting records, specific to a crop and/or growing season. A planting record is only required when using the aWhere API to run models.</p>
+<p>Requires both a previously-created field ID and specific information relating to the planting that occurred on that field. This example shows the simplest possible way to create a planting, though a number of other optional parameters are allowed. When complete, the auto-generated planting ID is returned.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pid &lt;-<span class="st"> </span><span class="kw">create_planting</span>(<span class="st">&quot;field_test&quot;</span>, <span class="st">&quot;corn&quot;</span>, <span class="st">&quot;2015-07-01&quot;</span>)</code></pre></div>
+<pre><code>## Operation Complete
+##  Planting ID: 134620</code></pre>
+<hr />
+</div>
+<div id="get_planting" class="section level4">
+<h4>get_planting()</h4>
+<p>Similar to get_fields(), this function retrieves information about previously-created plantings. This example returns all plantings associated with field_test.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">get_planting</span>(<span class="st">&quot;field_test&quot;</span>)</code></pre></div>
+<pre><code>##   planting_id          crop   field_id plantingDate actualHarvestDate
+## 1      134620 corn-2500-gdd field_test   2015-07-01                NA
+##   yieldAmount yieldUnits projectedHarvestDate projectedYieldAmount
+## 1          NA         NA                   NA                   NA
+##   projectedYieldUnits
+## 1                  NA</code></pre>
+<hr />
+</div>
+<div id="delete_planting" class="section level4">
+<h4>delete_planting()</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">delete_planting</span>(<span class="st">&quot;field_test&quot;</span>, pid)</code></pre></div>
+<pre><code>## No encoding supplied: defaulting to UTF-8.</code></pre>
+<pre><code>## Operation Complete</code></pre>
+<hr />
+<p>The auto-generated planting ID must be supplied as well as the field ID.</p>
+</div>
+</div>
+</div>
+<div id="section-1" class="section level2">
+<h2>___________________________________________________________________________</h2>
+<div id="functions-relating-to-the-weather-apis" class="section level3">
+<h3>Functions relating to the Weather APIs</h3>
+<p>All weather data requests are requested point by point. The API does not yet have the capacity to download regional data in a single call. The <a href="http://developer.awhere.com/api/reference/batch">batch jobs system</a> is most useful for those wishing to request a large amount of data (e.g., many hundreds or thousands of points).</p>
+<hr />
+<div id="daily-observed-weather" class="section level4">
+<h4>Daily Observed Weather</h4>
+<p>By default, you can request up to 30 months of daily historical data, counting back from the present date. For data beyond that, use the Norms API or speak with your aWhere representative for access to more of the daily data archive. The function <code>daily_observed_fields</code> provides the simplest method for retrieving historical data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">daily_observed_fields</span>(<span class="st">&quot;field_test&quot;</span>, <span class="st">&quot;2015-07-01&quot;</span>)</code></pre></div>
+<pre><code>##         date location.latitude location.longitude location.fieldId
+## 1 2015-07-01           40.8282          -100.5795       field_test
+##   temperatures.max temperatures.min precipitation.amount solar.amount
+## 1            36.86               16            0.5655105      8657.12
+##   relativeHumidity.max relativeHumidity.min wind.morningMax wind.dayMax
+## 1                90.97                24.38         4.82388    6.244505
+##   wind.average
+## 1     6.081199</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">daily_observed_fields</span>(<span class="st">&quot;field_test&quot;</span>, <span class="dt">day_start =</span> <span class="st">&quot;2015-07-01&quot;</span>, <span class="dt">day_end =</span> <span class="st">&quot;2015-07-07&quot;</span>)</code></pre></div>
+<pre><code>##         date location.latitude location.longitude location.fieldId
+## 1 2015-07-01           40.8282          -100.5795       field_test
+## 2 2015-07-02           40.8282          -100.5795       field_test
+## 3 2015-07-03           40.8282          -100.5795       field_test
+## 4 2015-07-04           40.8282          -100.5795       field_test
+## 5 2015-07-05           40.8282          -100.5795       field_test
+## 6 2015-07-06           40.8282          -100.5795       field_test
+## 7 2015-07-07           40.8282          -100.5795       field_test
+##   temperatures.max temperatures.min precipitation.amount solar.amount
+## 1            36.86            16.00            0.5655105     8657.120
+## 2            34.35            17.26            9.5194263     8251.585
+## 3            30.17            15.07            0.1898308     7263.760
+## 4            28.90            15.11            0.0000000     6998.784
+## 5            33.21            16.58            0.0000000     8554.819
+## 6            37.20            18.76            2.9611981     8312.003
+## 7            25.50            11.48            0.3129492     4841.733
+##   relativeHumidity.max relativeHumidity.min wind.morningMax wind.dayMax
+## 1                90.97                24.38        4.823880    6.244505
+## 2                89.95                33.11        5.742877    8.367308
+## 3                94.26                37.85        7.318561    7.389255
+## 4                93.97                43.02        2.794628    4.337104
+## 5                87.85                36.41        6.823139    8.011163
+## 6                91.43                29.29        6.789571   10.287086
+## 7                93.56                42.83        9.605576   10.103153
+##   wind.average
+## 1     6.081199
+## 2     7.439168
+## 3     6.492589
+## 4     4.356102
+## 5    10.494117
+## 6    10.526313
+## 7    10.428255</code></pre>
+<p>Users also have the option of using the alternative function <code>daily_observed_latlng</code> to retrieve historical data for a given pair of coordinates.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">daily_observed_latlng</span>(<span class="dt">latitude =</span> <span class="st">&quot;39.8282&quot;</span>, <span class="dt">longitude =</span> <span class="st">&quot;-98.5795&quot;</span>, <span class="dt">day_start =</span> <span class="st">&quot;2015-07-01&quot;</span>, <span class="dt">day_end =</span> <span class="st">&quot;2015-07-07&quot;</span>)</code></pre></div>
+<pre><code>##         date location.latitude location.longitude temperatures.max
+## 1 2015-07-01           39.8282           -98.5795            37.50
+## 2 2015-07-02           39.8282           -98.5795            33.34
+## 3 2015-07-03           39.8282           -98.5795            30.11
+## 4 2015-07-04           39.8282           -98.5795            28.31
+## 5 2015-07-05           39.8282           -98.5795            32.15
+## 6 2015-07-06           39.8282           -98.5795            37.62
+## 7 2015-07-07           39.8282           -98.5795            25.80
+##   temperatures.min precipitation.amount solar.amount relativeHumidity.max
+## 1            18.87            0.0000000     8559.404                83.72
+## 2            20.22            0.7620000     8009.174                89.11
+## 3            17.25            6.2486649     5791.849                94.42
+## 4            15.47            0.0000000     5697.071                93.10
+## 5            18.12            0.9188476     8505.098                89.29
+## 6            20.99           15.0681686     8429.953                84.14
+## 7            13.40            5.1240582     4270.642                90.72
+##   relativeHumidity.min wind.morningMax wind.dayMax wind.average
+## 1                23.27        4.648066    7.736741     8.206068
+## 2                44.80        6.363251    6.492751     7.062099
+## 3                48.04        5.480535    6.095840     5.705566
+## 4                51.41        4.383630    4.625999     4.722021
+## 5                44.95        6.283910    7.391794     9.919721
+## 6                33.18        8.526328    9.690443    12.098856
+## 7                53.34        8.018396   10.612412    11.125872</code></pre>
+<hr />
+</div>
+<div id="forecast" class="section level4">
+<h4>Forecast</h4>
+<p>Forecasts are available from the current date plus up to the next 8 days, at multiple temporal resolutions - in 1, 2, 3, 4, 6, 8, 12, or 24-hour summary blocks.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">forecasts_fields</span>(<span class="st">&quot;field_test&quot;</span>, <span class="kw">as.character</span>(<span class="kw">Sys.Date</span>() +<span class="st"> </span><span class="dv">1</span>), <span class="dt">block_size =</span> <span class="dv">4</span>)</code></pre></div>
+<pre><code>##                   startTime                   endTime conditionsCode
+## 1 2016-12-03T00:00:00+00:00 2016-12-03T03:59:59+00:00            911
+## 2 2016-12-03T04:00:00+00:00 2016-12-03T07:59:59+00:00            D11
+## 3 2016-12-03T08:00:00+00:00 2016-12-03T11:59:59+00:00            311
+## 4 2016-12-03T12:00:00+00:00 2016-12-03T15:59:59+00:00            111
+## 5 2016-12-03T16:00:00+00:00 2016-12-03T19:59:59+00:00            B11
+## 6 2016-12-03T20:00:00+00:00 2016-12-03T23:59:59+00:00            611
+##                                  conditionsText temperatures.max
+## 1 Mostly Cloudy Night, No Rain, Light Wind/Calm         2.150000
+## 2       Partly Cloudy, No Rain, Light Wind/Calm         1.066667
+## 3    Partly Sunny Day, No Rain, Light Wind/Calm        -0.950000
+## 4           Sunny Day, No Rain, Light Wind/Calm         3.900000
+## 5               Clear, No Rain, Light Wind/Calm         6.450000
+## 6         Clear Night, No Rain, Light Wind/Calm         6.450000
+##   temperatures.min precipitation.chance precipitation.amount
+## 1        -1.500000            3.7500002                    0
+## 2        -1.816667           15.4166675                    0
+## 3        -2.350000            5.0000001                    0
+## 4        -2.550000            7.7083337                    0
+## 5        -1.300000            4.7916667                    0
+## 6         1.950000            0.8333333                    0
+##   sky.cloudCover sky.sunshine solar.amount relativeHumidity.average
+## 1          64.50        35.50            0                 58.59167
+## 2          60.50        39.50            0                 64.88333
+## 3          41.50        58.50            0                 60.40000
+## 4           2.00        98.00          400                 60.67500
+## 5           1.50        98.50         1520                 55.52500
+## 6           0.25        99.75          750                 62.05000
+##   relativeHumidity.max relativeHumidity.min wind.average wind.max wind.min
+## 1             61.86666             55.70000     2.324018 2.528735 2.150258
+## 2             67.00000             63.06667     2.293150 2.372867 2.234502
+## 3             61.10000             59.70000     3.058324 3.463250 2.671666
+## 4             61.70000             59.60000     4.120745 4.889740 3.594479
+## 5             57.50000             54.33333     6.105462 6.341545 5.615519
+## 6             70.30000             53.80000     4.916717 6.124590 3.748333
+##   dewPoint.amount
+## 1       -6.709606
+## 2       -6.785198
+## 3       -8.279859
+## 4       -7.294312
+## 5       -4.163717
+## 6       -2.383832</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">forecasts_fields</span>(<span class="st">&quot;field_test&quot;</span>, <span class="dt">day_start =</span> <span class="kw">as.character</span>(<span class="kw">Sys.Date</span>() +<span class="st"> </span><span class="dv">1</span>), <span class="dt">day_end =</span> <span class="kw">as.character</span>(<span class="kw">Sys.Date</span>() +<span class="st"> </span><span class="dv">3</span>), <span class="dt">block_size =</span> <span class="dv">12</span>)</code></pre></div>
+<pre><code>##                   startTime                   endTime conditionsCode
+## 1 2016-12-03T00:00:00+00:00 2016-12-03T11:59:59+00:00            D11
+## 2 2016-12-03T12:00:00+00:00 2016-12-03T23:59:59+00:00            B11
+## 3 2016-12-04T00:00:00+00:00 2016-12-04T11:59:59+00:00            C11
+## 4 2016-12-04T12:00:00+00:00 2016-12-04T23:59:59+00:00            B11
+## 5 2016-12-05T00:00:00+00:00 2016-12-05T11:59:59+00:00            C11
+## 6 2016-12-05T12:00:00+00:00 2016-12-05T23:59:59+00:00            E21
+##                               conditionsText temperatures.max
+## 1    Partly Cloudy, No Rain, Light Wind/Calm         2.150000
+## 2            Clear, No Rain, Light Wind/Calm         6.450000
+## 3     Mostly Clear, No Rain, Light Wind/Calm         3.366667
+## 4            Clear, No Rain, Light Wind/Calm         8.450000
+## 5     Mostly Clear, No Rain, Light Wind/Calm         4.533333
+## 6 Mostly Cloudy, Light Rain, Light Wind/Calm         9.100000
+##   temperatures.min precipitation.chance precipitation.amount
+## 1            -2.35             8.055556                  0.0
+## 2            -2.55             4.444445                  0.0
+## 3            -1.25             2.500000                  0.0
+## 4            -1.55             0.000000                  0.0
+## 5             0.70            12.430556                  0.0
+## 6             0.90            38.958333                  0.3
+##   sky.cloudCover sky.sunshine solar.amount relativeHumidity.average
+## 1          55.50        44.50            0                 61.29167
+## 2           1.25        98.75         2670                 59.41667
+## 3          32.50        67.50            0                 60.10833
+## 4           0.00       100.00         2682                 41.73333
+## 5          34.00        66.00            0                 42.70000
+## 6          82.00        18.00         1830                 46.76667
+##   relativeHumidity.max relativeHumidity.min wind.average wind.max wind.min
+## 1             67.00000                 55.7     2.558497 3.463250 2.150258
+## 2             70.30000                 53.8     5.047641 6.341545 3.594479
+## 3             75.40000                 41.2     3.925764 4.831977 2.552256
+## 4             58.66667                 28.7     4.182210 4.511873 3.762685
+## 5             50.90000                 40.5     5.338642 6.307654 4.407289
+## 6             63.00000                 37.9     4.142698 8.953776 1.809202
+##   dewPoint.amount
+## 1       -7.258221
+## 2       -4.613954
+## 3       -6.278039
+## 4       -8.348303
+## 5       -8.853909
+## 6       -5.768121</code></pre>
+<p>As with daily observed historical data, forecast data can also be called based on latitude, longitude pairs.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">forecasts_latlng</span>(<span class="dt">latitude =</span> <span class="st">&quot;39.8282&quot;</span>, <span class="dt">longitude =</span> <span class="st">&quot;-98.5795&quot;</span>, <span class="dt">day_start =</span> <span class="kw">as.character</span>(<span class="kw">Sys.Date</span>() +<span class="st"> </span><span class="dv">1</span>), <span class="dt">block_size =</span> <span class="dv">24</span>)</code></pre></div>
+<pre><code>##                   startTime                   endTime conditionsCode
+## 1 2016-12-03T00:00:00+00:00 2016-12-03T23:59:59+00:00            E21
+##                               conditionsText temperatures.max
+## 1 Mostly Cloudy, Light Rain, Light Wind/Calm              3.4
+##   temperatures.min precipitation.chance precipitation.amount
+## 1     5.684342e-14             74.40972                    2
+##   sky.cloudCover sky.sunshine solar.amount relativeHumidity.average
+## 1           85.5         14.5          630                 73.75417
+##   relativeHumidity.max relativeHumidity.min wind.average wind.max wind.min
+## 1                   96             64.73333     2.645123  2.92638 2.145973
+##   dewPoint.amount
+## 1       -2.726418</code></pre>
+<hr />
+</div>
+<div id="long-term-norms" class="section level4">
+<h4>Long Term Norms</h4>
+<p>The weather norms API allows you to offload the calculation of multi-year averages (minimum 3 years). This eliminates much of the need to download years and years of daily data just to calculate averages. The results also include the standard deviation for each average.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">weather_norms_fields</span>(<span class="dt">field_id =</span> <span class="st">&quot;field_test&quot;</span>, <span class="dt">monthday_start =</span> <span class="st">&quot;07-01&quot;</span>, <span class="dt">monthday_end =</span> <span class="st">&quot;07-07&quot;</span>, <span class="dt">year_start =</span> <span class="st">&quot;2010&quot;</span>, <span class="dt">year_end =</span> <span class="st">&quot;2015&quot;</span>)</code></pre></div>
+<pre><code>##     day location.latitude location.longitude location.fieldId
+## 1 07-01           40.8282          -100.5795       field_test
+## 2 07-02           40.8282          -100.5795       field_test
+## 3 07-03           40.8282          -100.5795       field_test
+## 4 07-04           40.8282          -100.5795       field_test
+## 5 07-05           40.8282          -100.5795       field_test
+## 6 07-06           40.8282          -100.5795       field_test
+## 7 07-07           40.8282          -100.5795       field_test
+##   meanTemp.average meanTemp.stdDev maxTemp.average maxTemp.stdDev
+## 1         23.86667        3.337058        33.03167       4.331330
+## 2         22.60417        3.905485        30.92333       3.922120
+## 3         22.33583        3.917378        30.02333       4.726588
+## 4         23.49083        2.948741        31.53667       3.689156
+## 5         24.93083        3.150656        32.87000       4.539357
+## 6         25.79583        2.632344        34.00833       3.583470
+## 7         24.16083        3.902099        32.45833       5.299028
+##   minTemp.average minTemp.stdDev precipitation.average
+## 1        14.70167       2.595453            0.09425174
+## 2        14.28500       4.082371            1.71068939
+## 3        14.64833       4.152452            2.58222187
+## 4        15.44500       2.880456            2.13316881
+## 5        16.99167       2.145325            8.02345625
+## 6        17.58333       1.803759            6.71753375
+## 7        15.86333       2.699368            7.36524153
+##   precipitation.stdDev solar.average solar.stdDev minHumidity.average
+## 1            0.2308687      8260.827     508.1701            30.48667
+## 2            3.8298348      8403.210     217.0169            32.15333
+## 3            5.0363250      7822.865     683.2174            37.65667
+## 4            5.0531063      7511.117    1255.5535            37.37000
+## 5           17.5516238      7383.106    1758.6458            37.32333
+## 6            8.8997836      8312.062     251.7344            33.87167
+## 7           11.6793717      7773.104    1489.6224            36.03667
+##   minHumidity.stdDev maxHumidity.average maxHumidity.stdDev
+## 1           4.651493            87.13000           5.363618
+## 2           3.325529            88.25500           4.814498
+## 3          14.964949            88.49000           7.152968
+## 4          14.285295            87.87167           9.673722
+## 5          16.075929            84.44833          12.865676
+## 6           8.163782            87.06500          12.501118
+## 7          12.256606            91.28833           5.356859
+##   dailyMaxWind.average dailyMaxWind.stdDev averageWind.average
+## 1             8.019975            1.677946            7.641812
+## 2             8.058405            2.035759            8.155408
+## 3             7.392340            2.636899            7.764974
+## 4             6.938014            2.029319            7.840990
+## 5             8.496324            1.349030            9.156588
+## 6             7.546286            2.148520            7.491474
+## 7             8.629609            1.494639            7.620748
+##   averageWind.stdDev
+## 1           1.983485
+## 2           3.403714
+## 3           3.882432
+## 4           2.831754
+## 5           1.687310
+## 6           3.132761
+## 7           2.477468</code></pre>
+<hr />
+</div>
+<div id="current-conditions" class="section level4">
+<h4>Current Conditions</h4>
+<p>The Current Conditions API returns a snapshot of the weather at a geographic point using the nearest available station. While the data is QA’d before delivery, this service does not do the same advanced processing or interpolation as Daily Observed data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">current_conditions_fields</span>(<span class="st">&quot;field_test&quot;</span>, <span class="st">&quot;metar-mesonet&quot;</span>)</code></pre></div>
+<pre><code>##                    dateTime location.latitude location.longitude
+## 1 2016-12-02T14:22:00-06:00           40.8282          -100.5795
+##   location.fieldId location.nearestStation.distance
+## 1       field_test                           15.314
+##   location.nearestStation.bearing conditionsCode      conditionsText
+## 1                             230            X11 No Rain, Light Wind
+##   temperature.amount precipitation.amount relativeHumidity.amount
+## 1                  6                    0                      37
+##   wind.amount wind.bearing wind.direction
+## 1    1.111112           90              E</code></pre>
+</div>
+</div>
+</div>
+<div id="section-2" class="section level2">
+<h2>___________________________________________________________________________</h2>
+<div id="agronomic-data" class="section level3">
+<h3>Agronomic Data</h3>
+<p>Agronomic data can enrich your analysis by providing insight into the agronomic status of a field or crop. aWhere provides derived values like GDD (using a variety of different equations) PET (using the Penman-Monteith Equation), P/PET, and accumulated precipitation, accumulated GDD, accumulated PET, and P/PET over a range of days. The long-term norms for each value can also be queried.</p>
+<hr />
+<div id="agronomic-values" class="section level4">
+<h4>Agronomic Values</h4>
+<p>Calculations can be customized in a number of different ways, consult the <a href="http://developer.awhere.com/api/reference/agronomics/values">API Documentation</a> for more information.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">agronomic_values_fields</span>(<span class="st">&quot;field_test&quot;</span>, <span class="dt">day_start =</span> <span class="st">&quot;2016-07-01&quot;</span>, <span class="dt">day_end =</span> <span class="st">&quot;2016-07-07&quot;</span>, <span class="dt">accumulation_start_date =</span> <span class="st">&quot;2016-06-01&quot;</span>, <span class="dt">gdd_method =</span> <span class="st">&quot;modifiedstandard&quot;</span>, <span class="dt">gdd_base_temp =</span> <span class="st">&quot;10&quot;</span>, <span class="dt">gdd_min_boundary =</span> <span class="st">&quot;10&quot;</span>, <span class="dt">gdd_max_boundary =</span> <span class="st">&quot;30&quot;</span>)</code></pre></div>
+<pre><code>##         date    gdd        ppet accumulatedGdd accumulatedPpet pet.amount
+## 1 2016-07-01 12.150 0.018353187        395.000        21.34264   6.861229
+## 2 2016-07-02  7.955 2.978817330        402.955        24.32146   3.034805
+## 3 2016-07-03  6.915 0.254471320        409.870        24.57593   1.866330
+## 4 2016-07-04  9.660 0.000000000        419.530        24.57593   3.295864
+## 5 2016-07-05 15.435 0.006605337        434.965        24.58253   7.065135
+## 6 2016-07-06 15.340 0.204267242        450.305        24.78680   8.455317
+## 7 2016-07-07 14.785 3.508553169        465.090        28.29535   8.518622
+##   accumulatedPrecipitation.amount accumulatedPet.amount
+## 1                        172.4513              254.7080
+## 2                        181.4914              257.7428
+## 3                        181.9664              259.6092
+## 4                        181.9664              262.9050
+## 5                        182.0130              269.9702
+## 6                        183.7402              278.4255
+## 7                        213.6282              286.9441</code></pre>
+<hr />
+</div>
+<div id="agronomic-norms" class="section level4">
+<h4>Agronomic Norms</h4>
+<p>The Agronomic Norms API returns the long-term normals for the agronomic values on any given set of days across any range of years for which we have data. The same customizable parameters for changing the calculation of agronomic values are also available in the norms.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">agronomic_norms_fields</span>(<span class="st">&quot;field_test&quot;</span>, <span class="dt">month_day_start =</span> <span class="st">&quot;07-01&quot;</span>, <span class="dt">month_day_end =</span> <span class="st">&quot;07-07&quot;</span>, <span class="dt">year_start =</span> <span class="st">&quot;2010&quot;</span>, <span class="dt">year_end =</span> <span class="st">&quot;2015&quot;</span>, <span class="dt">gdd_method =</span> <span class="st">&quot;modifiedstandard&quot;</span>)</code></pre></div>
+<pre><code>##     day gdd.average gdd.stdDev pet.average pet.stdDev ppet.average
+## 1 07-01    12.01250   1.778147    8.904563   1.436879  0.009659395
+## 2 07-02    11.66500   2.771826    8.370393   1.360272  0.192740030
+## 3 07-03    11.53667   2.660099    7.600039   2.247927  0.478210380
+## 4 07-04    12.46500   1.602389    7.856498   1.935990  0.306925899
+## 5 07-05    13.17583   1.571103    8.833260   3.129965  1.903333709
+## 6 07-06    13.60250   1.274201    9.152030   2.333732  0.880129959
+## 7 07-07    12.40833   2.153784    8.382523   2.629678  1.087776393
+##   ppet.stdDev accumulatedGdd.average accumulatedGdd.stdDev
+## 1  0.02366059               12.01250              1.778147
+## 2  0.42531267               23.67750              4.525838
+## 3  1.01829622               35.21417              6.775334
+## 4  0.72717527               47.67917              8.199421
+## 5  4.47133387               60.85500              8.464544
+## 6  1.20362939               74.45750              8.734274
+## 7  1.66713813               86.86583              8.504444
+##   accumulatedPrecipitation.average accumulatedPrecipitation.stdDev
+## 1                       0.09425174                       0.2308687
+## 2                       1.80494113                       4.0604562
+## 3                       4.38716300                       5.7756064
+## 4                       6.52033181                       7.1375690
+## 5                      14.54378806                      22.3188180
+## 6                      21.26132180                      26.4261849
+## 7                      28.62656333                      37.9211601
+##   accumulatedPet.average accumulatedPet.stdDev accumulatedPpet.average
+## 1               8.904563              1.436879             0.009659395
+## 2              17.274956              2.731938             0.202399425
+## 3              24.874995              4.303975             0.680609805
+## 4              32.731493              5.306954             0.987535704
+## 5              41.564752              7.100892             2.890869413
+## 6              50.716783              8.494107             3.770999371
+## 7              59.099306             10.442290             4.858775765
+##   accumulatedPpet.stdDev
+## 1             0.02366059
+## 2             0.44893817
+## 3             1.03195870
+## 4             1.15822407
+## 5             5.10366707
+## 6             5.71634022
+## 7             7.24579886</code></pre>
+<p>Questions, comments, or requests about this vignette should be directed to <a href="mailto:beawhere@awhere.com">beawhere@awhere.com</a></p>
+</div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

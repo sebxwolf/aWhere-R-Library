@@ -48,21 +48,15 @@
 #'
 #' @return data.table of requested data for dates requested
 #'
-#' @import httr
-#' @import data.table
-#' @import lubridate
-#' @import jsonlite
-#'
 #' @examples
-#' agronomic_norms_fields('field123','07-01', '07-10', '2008', '2015','2010,2011','','standard','10','10','30')
+#' \dontrun{agronomic_norms_fields(field_id = 'field123', '07-01', '07-10', '2008', '2016', '2010,2011','','standard','10','10','30')}
 
 #' @export
 
 
 agronomic_norms_fields <- function(field_id, month_day_start = '', month_day_end = '',
-                            year_start = '', year_end = '',exclude_years = '',
-                            accumulation_start_date = '',gdd_method = 'standard',gdd_base_temp = '10',
-                            gdd_min_boundary = '10', gdd_max_boundary = '30') {
+                                   year_start = '', year_end = '', exclude_years = '',
+                                   accumulation_start_date = '', gdd_method = 'standard', gdd_base_temp = '10', gdd_min_boundary = '10', gdd_max_boundary = '30') {
 
   #############################################################
   #Checking Input Parameters
@@ -296,20 +290,20 @@ agronomic_norms_fields <- function(field_id, month_day_start = '', month_day_end
     strYearsType <- paste0('/years')
     strYears <- paste0('/',year_start,',',year_end)
     address <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,
-                      strYears,gdd_methodString,gdd_base_tempString,gdd_min_boundaryString,gdd_max_boundaryString,exclude_years)
+                      strYears,gdd_methodString,gdd_base_tempString,gdd_min_boundaryString,gdd_max_boundaryString,strexclude_years)
   } else {
     address <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays,gdd_methodString,
-                      gdd_base_tempString,gdd_min_boundaryString,gdd_max_boundaryString,exclude_years)
+                      gdd_base_tempString,gdd_min_boundaryString,gdd_max_boundaryString,strexclude_years)
   }
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
-    requestString <- 'request <- GET(address,
-  	                                    add_headers(Authorization =
+    requestString <- 'request <- httr::GET(address,
+  	                                    httr::add_headers(Authorization =
   	                                    paste0(\"Bearer \", awhereEnv75247$token)))'
     # Make request
     eval(parse(text = requestString))
 
-    a <- suppressMessages(content(request, as = "text"))
+    a <- suppressMessages(httr::content(request, as = "text"))
 
     #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -322,64 +316,15 @@ agronomic_norms_fields <- function(field_id, month_day_start = '', month_day_end
     }
   }
 
-  data <- as.data.table(x[[3]])
+  data <- data.table::as.data.table(x[[3]])
 
   varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object
   data[,grep('_links',varNames) := NULL, with = FALSE]
   data[,grep('.units',varNames) := NULL, with = FALSE]
 
-#   varNames <- colnames(data)
-#
-#   for (x in 1:length(varNames)) {
-#
-#     if (varNames[x] == 'day'){
-#       varNames[x] <- 'monthDay'
-#     } else if (varNames[x] == 'location.latitude'){
-#       varNames[x] <- 'latitude'
-#     } else if (varNames[x] == 'location.longitude'){
-#       varNames[x] <- 'longitude'
-#     } else if (varNames[x] == 'meanTemp.average'){
-#       varNames[x] <- 'avgMeanTemperature'
-#     } else if (varNames[x] == 'meanTemp.stdDev'){
-#       varNames[x] <- 'avgMeanTemperatureStdDev'
-#     } else if (varNames[x] == 'minTemp.average'){
-#       varNames[x] <- 'avgMinTemperature'
-#     } else if (varNames[x] == 'minTemp.stdDev'){
-#       varNames[x] <- 'avgMinTemperatureStdDev'
-#     } else if (varNames[x] == 'maxTemp.average'){
-#       varNames[x] <- 'avgMaxTemperature'
-#     } else if (varNames[x] == 'maxTemp.stdDev'){
-#       varNames[x] <- 'avgMaxTemperatureStdDev'
-#     } else if (varNames[x] == 'precipitation.average'){
-#       varNames[x] <- 'avgPrecipitation'
-#     } else if (varNames[x] == 'precipitation.stdDev'){
-#       varNames[x] <- 'avgPrecipitationStdDev'
-#     } else if (varNames[x] == 'solar.average'){
-#       varNames[x] <- 'avgSolarEnergy'
-#     } else if (varNames[x] == 'solar.stdDev'){
-#       varNames[x] <- 'avgSolarEnergyStdDev'
-#     } else if (varNames[x] == 'minHumidity.average'){
-#       varNames[x] <- 'avgMinHumidity'
-#     } else if (varNames[x] == 'minHumidity.stdDev'){
-#       varNames[x] <- 'avgMinHumidityStdDev'
-#     } else if (varNames[x] == 'maxHumidity.average'){
-#       varNames[x] <- 'avgMaxHumidity'
-#     } else if (varNames[x] == 'maxHumidity.stdDev'){
-#       varNames[x] <- 'avgMaxHumidityStdDev'
-#     } else if (varNames[x] == 'dailyMaxWind.average'){
-#       varNames[x] <- 'avgDailyMaxWind'
-#     } else if (varNames[x] == 'dailyMaxWind.stdDev'){
-#       varNames[x] <- 'avgDailyMaxWindStdDev'
-#     } else if (varNames[x] == 'averageWind.average'){
-#       varNames[x] <- 'avgWind'
-#     } else if (varNames[x] == 'averageWind.stdDev'){
-#       varNames[x] <- 'avgWindStdDev'
-#     }
-#
-
   setnames(data,varNames)
-  setkey(data,day)
+  #setkey(data,day)
 
   return(as.data.frame(data))
 }
@@ -435,13 +380,8 @@ agronomic_norms_fields <- function(field_id, month_day_start = '', month_day_end
 #'
 #' @return data.table of requested data for dates requested
 #'
-#' @import httr
-#' @import data.table
-#' @import lubridate
-#' @import jsonlite
-#'
 #' @examples
-#' agronomic_norms_latlng('39.8282', '-98.5795', '07-01', '07-10', '2008', '2015','2010,2011','','standard','10','10','30')
+#' \dontrun{gronomic_norms_latlng('39.8282', '-98.5795', '07-01', '07-10', '2008', '2015','2010,2011','','standard','10','10','30')}
 
 #' @export
 
@@ -583,7 +523,7 @@ agronomic_norms_latlng <- function(latitude, longitude, month_day_start, month_d
       }
       yearsToRequest <- yearsToRequest[yearsToRequest != as.integer(exclude_yearsTest[[1]][z])]
     }
-    }
+  }
 
   if (length(yearsToRequest) <= 3) {
     warning('At least three unique years must be used in this query. Please correct. \n')
@@ -685,15 +625,15 @@ agronomic_norms_latlng <- function(latitude, longitude, month_day_start, month_d
     strYearsType <- paste0('/years')
     strYears <- paste0('/',year_start,',',yearEnd)
     address <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,
-                      strYears,gdd_methodString,gdd_base_tempString,gdd_min_boundaryString,gdd_max_boundaryString,exclude_years)
+                      strYears,gdd_methodString,gdd_base_tempString,gdd_min_boundaryString,gdd_max_boundaryString,strexclude_years)
   } else {
     address <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays,gdd_methodString,
-                      gdd_base_tempString,gdd_min_boundaryString,gdd_max_boundaryString,exclude_years)
+                      gdd_base_tempString,gdd_min_boundaryString,gdd_max_boundaryString,strexclude_years)
   }
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
-    requestString <- 'request <- GET(address,
-    add_headers(Authorization =
+    requestString <- 'request <- httr::GET(address,
+    httr::add_headers(Authorization =
     paste0(\"Bearer \", awhereEnv75247$token)))'
     # Make request
     eval(parse(text = requestString))
@@ -711,61 +651,12 @@ agronomic_norms_latlng <- function(latitude, longitude, month_day_start, month_d
     }
   }
 
-  data <- as.data.table(x[[3]])
+  data <- data.table::as.data.table(x[[3]])
 
   varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object
   data[,grep('_links',varNames) := NULL, with = FALSE]
   data[,grep('.units',varNames) := NULL, with = FALSE]
-
-  #   varNames <- colnames(data)
-  #
-  #   for (x in 1:length(varNames)) {
-  #
-  #     if (varNames[x] == 'day'){
-  #       varNames[x] <- 'monthDay'
-  #     } else if (varNames[x] == 'location.latitude'){
-  #       varNames[x] <- 'latitude'
-  #     } else if (varNames[x] == 'location.longitude'){
-  #       varNames[x] <- 'longitude'
-  #     } else if (varNames[x] == 'meanTemp.average'){
-  #       varNames[x] <- 'avgMeanTemperature'
-  #     } else if (varNames[x] == 'meanTemp.stdDev'){
-  #       varNames[x] <- 'avgMeanTemperatureStdDev'
-  #     } else if (varNames[x] == 'minTemp.average'){
-  #       varNames[x] <- 'avgMinTemperature'
-  #     } else if (varNames[x] == 'minTemp.stdDev'){
-  #       varNames[x] <- 'avgMinTemperatureStdDev'
-  #     } else if (varNames[x] == 'maxTemp.average'){
-  #       varNames[x] <- 'avgMaxTemperature'
-  #     } else if (varNames[x] == 'maxTemp.stdDev'){
-  #       varNames[x] <- 'avgMaxTemperatureStdDev'
-  #     } else if (varNames[x] == 'precipitation.average'){
-  #       varNames[x] <- 'avgPrecipitation'
-  #     } else if (varNames[x] == 'precipitation.stdDev'){
-  #       varNames[x] <- 'avgPrecipitationStdDev'
-  #     } else if (varNames[x] == 'solar.average'){
-  #       varNames[x] <- 'avgSolarEnergy'
-  #     } else if (varNames[x] == 'solar.stdDev'){
-  #       varNames[x] <- 'avgSolarEnergyStdDev'
-  #     } else if (varNames[x] == 'minHumidity.average'){
-  #       varNames[x] <- 'avgMinHumidity'
-  #     } else if (varNames[x] == 'minHumidity.stdDev'){
-  #       varNames[x] <- 'avgMinHumidityStdDev'
-  #     } else if (varNames[x] == 'maxHumidity.average'){
-  #       varNames[x] <- 'avgMaxHumidity'
-  #     } else if (varNames[x] == 'maxHumidity.stdDev'){
-  #       varNames[x] <- 'avgMaxHumidityStdDev'
-  #     } else if (varNames[x] == 'dailyMaxWind.average'){
-  #       varNames[x] <- 'avgDailyMaxWind'
-  #     } else if (varNames[x] == 'dailyMaxWind.stdDev'){
-  #       varNames[x] <- 'avgDailyMaxWindStdDev'
-  #     } else if (varNames[x] == 'averageWind.average'){
-  #       varNames[x] <- 'avgWind'
-  #     } else if (varNames[x] == 'averageWind.stdDev'){
-  #       varNames[x] <- 'avgWindStdDev'
-  #     }
-  #
 
   setnames(data,varNames)
   setkey(data,day)

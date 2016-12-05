@@ -70,7 +70,7 @@ you want to include).  Uses the aWhere API Lat/Lon construct to request data. Us
 units returned by the API
 }
 \examples{
-agronomic_norms_latlng('39.8282', '-98.5795', '07-01', '07-10', '2008', '2015','2010,2011','','standard','10','10','30')
+\dontrun{gronomic_norms_latlng('39.8282', '-98.5795', '07-01', '07-10', '2008', '2015','2010,2011','','standard','10','10','30')}
 }
 \references{
 http://developer.awhere.com/api/reference/agronomics/norms/geolocation

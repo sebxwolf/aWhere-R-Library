@@ -22,8 +22,8 @@ The delete should cascade, if there are associated records to a field, they are 
 This applies when we design/implement "Plantings" API.
 }
 \examples{
-delete_field("field123")
+\dontrun{delete_field("field123")
 delete_field("field456")
-
+}
 }
 
