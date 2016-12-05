@@ -29,13 +29,11 @@
 #'
 #' @references http://developer.awhere.com/api/reference/fields/create-field
 #'
-#' @import httr
-#' @import RCurl
-#' @import jsonlite
-#'
 #' @examples
+#' \dontrun{
 #' create_field("field123","39.8282","-98.5795","farmA","Some Field Location","100")
 #' create_field("field456","40.8282","-100.5795","farmA","Some Field Location","100")
+#' }
 
 #' @export
 create_field <- function(field_id, latitude, longitude, farm_id, field_name = "", acres = "") {
@@ -102,10 +100,10 @@ create_field <- function(field_id, latitude, longitude, farm_id, field_name = ""
 
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
-    request <- POST(url, body=postbody, content_type('application/json'),
-                    add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+    request <- httr::POST(url, body=postbody, httr::content_type('application/json'),
+                          httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
 
-    a <- content(request, as = "text")
+    a <- httr::content(request, as = "text")
 
     #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -127,7 +125,6 @@ create_field <- function(field_id, latitude, longitude, farm_id, field_name = ""
   } else {
     cat(paste0('Operation Complete \n'))
   }
-
 }
 
 
@@ -172,17 +169,13 @@ create_field <- function(field_id, latitude, longitude, farm_id, field_name = ""
 #' @param - yield_units: units of actual yield (string)
 #' @param - harvest_date: actual harvest date at end of season. Format as YYYY-MM-DD (string)
 #'
-#' @return - system generated planting id along with a print text that informs if the query succeeded or not 
+#' @return - system generated planting id along with a print text that informs if the query succeeded or not
 #'
 #' @references http://developer.awhere.com/api/reference/plantings/create
 #'
-#' @import httr
-#' @import RCurl
-#' @import jsonlite
-#'
 #' @examples
-#' create_planting('field123','corn','2015-10-25','100','Bushels', '2016-02-01','110','Bushels','2016-02-01')
-
+#' \dontrun{create_planting(field_id='field123',crop='corn',planting_date='2015-10-25',proj_yield_amount='100',proj_yield_units='Bushels', proj_harvest_date='2016-02-01',yield_amount='110',yield_units='Bushels',harvest_date='2016-02-01')
+#' }
 #' @export
 
 create_planting <- function(field_id, crop, planting_date = "", proj_yield_amount = "", proj_yield_units = "", proj_harvest_date = "",
@@ -226,7 +219,7 @@ create_planting <- function(field_id, crop, planting_date = "", proj_yield_amoun
       }
     }
     if(proj_harvest_date != "") {
-      postbody <- paste0(postbody, '"harvest_date":"', proj_harvest_date, '"',
+      postbody <- paste0(postbody, '"harvestDate":"', proj_harvest_date, '"',
                          '}')
     }
   }
@@ -234,10 +227,10 @@ create_planting <- function(field_id, crop, planting_date = "", proj_yield_amoun
     postbody <- paste0(postbody, ',"yield":{',
                        '"amount":', yield_amount, ',',
                        '"units":"', yield_units, '"',
-                       '}')
+                       '},')
   }
   if(harvest_date != "") {
-    postbody <- paste0(postbody, '"harvest_date":"', harvest_date, '"')
+    postbody <- paste0(postbody, '"harvestDate":"', harvest_date, '"')
   }
 
   postbody <- paste0(postbody, '}')
@@ -245,10 +238,10 @@ create_planting <- function(field_id, crop, planting_date = "", proj_yield_amoun
 
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
-    request <- POST(url, body=postbody, content_type('application/json'),
-                    add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+    request <- httr::POST(url, body=postbody, httr::content_type('application/json'),
+                          httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
 
-    a <- content(request)
+    a <- httr::content(request)
 
     if (any(grepl('API Access Expired',a))) {
       get_token(awhereEnv75247$uid,awhereEnv75247$secret)
@@ -297,8 +290,8 @@ create_planting <- function(field_id, crop, planting_date = "", proj_yield_amoun
 #' @references https://developer.awhere.com/api/reference/batch/create
 #'
 #' @examples
-#' create_job(c("GET /v2/weather/fields/farmA/observations", "GET /v2/weather/fields/farmB/observations"), c("farmA", "farmB"), "job_1")
-
+#' \dontrun{create_job(c("GET /v2/weather/fields/farmA/observations", "GET /v2/weather/fields/farmB/observations"), c("farmA", "farmB"), "job_1")
+#' }
 #' @export
 create_job <- function(api_requests, request_titles, job_title, job_type="batch") {
 
@@ -326,10 +319,10 @@ create_job <- function(api_requests, request_titles, job_title, job_type="batch"
                                requests=requests), auto_unbox=T)
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
-    request <- POST(url, body=postbody, content_type('application/json'),
-                    add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+    request <- httr::POST(url, body=postbody, httr::content_type('application/json'),
+                          httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
 
-    a <- content(request)
+    a <- httr::content(request)
 
     if (any(grepl('API Access Expired',a))) {
       get_token(awhereEnv75247$uid,awhereEnv75247$secret)

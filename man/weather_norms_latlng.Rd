@@ -5,7 +5,7 @@
 \title{Get Weather Norms Lat Lon}
 \usage{
 weather_norms_latlng(latitude, longitude, monthday_start, monthday_end = "",
-  year_start, year_end, exclude_years = "")
+  year_start = "", year_end = "", exclude_years = "")
 }
 \arguments{
 \item{-}{latitude: the latitude for the location for which you want data}
@@ -25,7 +25,7 @@ you're calculating norms, as a string, e.g., '2008'}
 calculating norms, as a string, e.g., '2015'}
 
 \item{-}{exclude_years: You can opt to exclude one or more years from the range, and
-it's values will not be included in the averages. To exclude
+ it's values will not be included in the averages. To exclude
 multiple years, separate them with a comma. Note: You must always have
 at least three years of data to average}
 }
@@ -43,7 +43,7 @@ the previous year to the long-term normals (however many years you want to inclu
 Each day's worth of data also includes the standard deviation for the average.
 }
 \examples{
-weather_norms_latlng('39.8282', '-98.5795', '07-01', '07-10', '2008', '2015','2010,2011')
+\dontrun{weather_norms_latlng('39.8282', '-98.5795', '07-01', '07-10', '2008', '2015','2010,2011')}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/norms

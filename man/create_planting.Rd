@@ -28,7 +28,7 @@ create_planting(field_id, crop, planting_date = "", proj_yield_amount = "",
 \item{-}{harvest_date: actual harvest date at end of season. Format as YYYY-MM-DD (string)}
 }
 \value{
-- a print text that informs if the query succeeded or not
+- system generated planting id along with a print text that informs if the query succeeded or not
 }
 \description{
 \code{create_planting} creates a planting in a field location in the aWhere platform for which you can request weather
@@ -60,7 +60,8 @@ This script creates a planting in a field location in the aWhere platform. By se
 and agronomics for that location in all the other APIs. The planting ID corresponds to a planting within a field.
 }
 \examples{
-create_planting('field123','corn','2015-10-25','100','Bushels', '2016-02-01','110','Bushels','2016-02-01')
+\dontrun{create_planting(field_id='field123',crop='corn',planting_date='2015-10-25',proj_yield_amount='100',proj_yield_units='Bushels', proj_harvest_date='2016-02-01',yield_amount='110',yield_units='Bushels',harvest_date='2016-02-01')
+}
 }
 \references{
 http://developer.awhere.com/api/reference/plantings/create

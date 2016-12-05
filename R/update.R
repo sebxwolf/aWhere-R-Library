@@ -31,14 +31,10 @@
 #'
 #' @references http://developer.awhere.com/api/reference/fields/update-field
 #'
-#' @import httr
-#' @import RCurl
-#' @import jsonlite
-#'
 #' @examples
-#' update_field( field_id = 'field123',
+#' \dontrun{update_field( field_id = 'field123',
 #' 				variable_search = 'farmId', value_search = 'farmA',
-#'              variable_update = 'farmId', value_update = 'This is my territory')
+#'        variable_update = 'farmId', value_update = 'This is my territory')}
 
 #' @export
 
@@ -55,11 +51,11 @@ update_field <- function(field_id, variable_search, value_search, variable_updat
     doWeatherGet <- TRUE
     while (doWeatherGet == TRUE) {
       ## Get data
-      request <- PATCH(url, body = postbody, content_type('application/json'),
-                       add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+      request <- httr::PATCH(url, body = postbody, httr::content_type('application/json'),
+                             httr:: add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
 
       # Re formating the response recieved from API
-      a <- content(request, as = "text")
+      a <- httr::content(request, as = "text")
 
       #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -108,15 +104,11 @@ update_field <- function(field_id, variable_search, value_search, variable_updat
 #'
 #' @return - A message confirming the changes have been made
 #'
-#' @import httr
-#' @import RCurl
-#'
 #' @examples
-#' update_planting("64322", "FieldA", "2016-02-01", "60", "Bushels")
+#' \dontrun{update_planting("field123", "64322", harvest_date = "2016-02-01", yield_amount = "60", yield_units = "Bushels")}
 #'
 #' @export
-update_planting <- function(field_id, planting_id = "", planting_date = "", proj_yield_amount = "", proj_yield_units = "",
-                           proj_harvest_date = "", yield_amount = "", yield_units = "", harvest_date = "") {
+update_planting <- function(field_id, planting_id = "", planting_date = "", proj_yield_amount = "", proj_yield_units = "", proj_harvest_date = "", yield_amount = "", yield_units = "", harvest_date = "") {
 
   ## Error checking
 
@@ -144,13 +136,15 @@ update_planting <- function(field_id, planting_id = "", planting_date = "", proj
     stop("Yield amounts must be numeric")
   }
 
-  if(planting_date != "" & !is.Date(planting_date)){
+  if(planting_date != "" & !is.Date(ymd(planting_date))){
     stop("Dates must be in 'YYYY-MM-DD' format")
   }
-  if(proj_harvest_date != "" & !is.Date(proj_harvest_date)){
+
+  if(proj_harvest_date != "" & !is.Date(ymd(proj_harvest_date))){
     stop("Dates must be in 'YYYY-MM-DD' format")
   }
-  if(harvest_date != "" & !is.Date(harvest_date)){
+
+  if(harvest_date != "" & !is.Date(ymd(harvest_date))){
     stop("Dates must be in 'YYYY-MM-DD' format")
   }
 
@@ -162,7 +156,7 @@ update_planting <- function(field_id, planting_id = "", planting_date = "", proj
 
   if(planting_date != "") {
     i = i + 1
-    postbody[i] <- paste0('{"op":"replace","path":"/planting_date","value":"', planting_date, '"}')
+    postbody[i] <- paste0('{"op":"replace","path":"/plantingDate","value":"', planting_date, '"}')
   }
   if(proj_yield_amount != "") {
     i = i + 1
@@ -174,7 +168,7 @@ update_planting <- function(field_id, planting_id = "", planting_date = "", proj
   }
   if(proj_harvest_date != "") {
     i = i + 1
-    postbody[i] <- paste0('{"op":"replace","path":"/projections/harvest_date","value":"', proj_harvest_date, '"}')
+    postbody[i] <- paste0('{"op":"replace","path":"/projections/harvestDate","value":"', proj_harvest_date, '"}')
   }
   if(yield_amount != "") {
     i = i + 1
@@ -186,7 +180,7 @@ update_planting <- function(field_id, planting_id = "", planting_date = "", proj
   }
   if(harvest_date != "") {
     i = i + 1
-    postbody[i] <- paste0('{"op":"replace","path":"/harvest_date","value":"', harvest_date, '"}')
+    postbody[i] <- paste0('{"op":"replace","path":"/harvestDate","value":"', harvest_date, '"}')
   }
 
   if(i == 0) {
@@ -201,8 +195,6 @@ update_planting <- function(field_id, planting_id = "", planting_date = "", proj
   }
   body <- paste0(body, "]")
 
-
-
   ## Creating the request
 
   url <- paste0("https://api.awhere.com/v2/agronomics/fields/", field_id, "/plantings/")
@@ -215,14 +207,14 @@ update_planting <- function(field_id, planting_id = "", planting_date = "", proj
 
 
   ##Send request
-  request <- PATCH(url, body = body, content_type('application/json'),
-                   add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+  request <- httr::PATCH(url, body = body, httr::content_type('application/json'),
+                         httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
 
 
 
   # Re formating the response recieved from API
 
-  a <- content(request, as = "text")
+  a <- httr::content(request, as = "text")
 
   # Did the query work?
 

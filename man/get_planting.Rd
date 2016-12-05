@@ -4,7 +4,8 @@
 \alias{get_planting}
 \title{Get Planting}
 \usage{
-get_planting(field_id = "", planting_id = "", current = F)
+get_planting(field_id = "", planting_id = "", current = F, offset = "",
+  limit = "")
 }
 \arguments{
 \item{-}{field_id: a field ID to look within (string)}
@@ -13,6 +14,10 @@ get_planting(field_id = "", planting_id = "", current = F)
 
 \item{-}{current: whether to just get current plantings(T) or include historical plantings(F).
 To get most recent planting record for a field, set current to TRUE and do not pass in a planting_id (boolean)}
+
+\item{-}{offset: The number of objects to skip before returning objects. Used in conjunction with offset to paginate.}
+
+\item{-}{limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate.}
 }
 \value{
 - data: data.table containing information about requested field(s)
@@ -35,7 +40,10 @@ for any given field in the platform. In this function by setting an Id you can r
 and agronomics for that location in all the other APIs.
 }
 \examples{
-GetField(1234)
+\dontrun{get_planting(field_id='field1')
+get_planting(field_id = 'field1', planting_id = '73227')
+get_planting('field1', current = T)
+get_planting(field_id='field1', offset = '0', limit = '5')}
 }
 \references{
 http://developer.awhere.com/api/reference/plantings/get-plantings

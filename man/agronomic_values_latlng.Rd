@@ -61,7 +61,7 @@ P/Pet, accumulated GDD, accumulated Precipitation, accumulated Pet, accumulated 
 in API default units (metric)
 }
 \examples{
-agronomic_values_latlng('39.8282', '-98.5795','2015-07-01','2015-07-31','','standard','10','10','30')
+\dontrun{agronomic_values_latlng('39.8282', '-98.5795','2015-07-01','2015-07-31','','standard','10','10','30')}
 }
 \references{
 http://developer.awhere.com/api/reference/agronomics/values/geolocation

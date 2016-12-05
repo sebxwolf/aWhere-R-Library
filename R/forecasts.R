@@ -27,14 +27,8 @@
 #'                     Defaults to a 1 hour block.  This value must divide evenly into 24
 #' @return data.table of requested data for dates requested
 #'
-#' @import httr
-#' @import data.table
-#' @import lubridate
-#' @import jsonlite
-#'
 #' @examples
-#' forecasts_fields('field123','2016-01-19','2016-01-24',12)
-
+#' \dontrun{forecasts_fields('field123', block_size = 12)}
 #' @export
 
 
@@ -222,7 +216,7 @@ forecasts_fields <- function(field_id, day_start = '', day_end = '',
 #' @import jsonlite
 #'
 #' @examples
-#' forecasts_latlng('39.8282', '-98.5795','2016-01-19','2016-01-24',12)
+#' \dontrun{forecasts_latlng('39.8282', '-98.5795','2016-01-19','2016-01-24',12)}
 
 #' @export
 
@@ -339,36 +333,6 @@ forecasts_latlng <- function(latitude, longitude, day_start = Sys.Date(), day_en
 
   #This removes the non-data info returned with the JSON object
   data[,grep('.units',varNames) := NULL, with = FALSE]
-
-  #   varNames <- colnames(data)
-  #
-  #   for (x in 1:length(varNames)) {
-  #     if (varNames[x] == 'temperatures.max'){
-  #       varNames[x] <- 'maxTemperature'
-  #     } else if (varNames[x] == 'temperatures.min'){
-  #       varNames[x] <- 'minTemperature'
-  #     } else if (varNames[x] == 'precipitation.amount'){
-  #       varNames[x] <- 'precipitationAmount'
-  #     } else if (varNames[x] == 'precipitation.chance'){
-  #       varNames[x] <- 'chancePrecipitation'
-  #     } else if (varNames[x] == 'solar.amount'){
-  #       varNames[x] <- 'solarEnergy'
-  #     } else if (varNames[x] == 'relativeHumidity.max'){
-  #       varNames[x] <- 'maxRH'
-  #     } else if (varNames[x] == 'relativeHumidity.average'){
-  #       varNames[x] <- 'avgRH'
-  #     } else if (varNames[x] == 'wind.average'){
-  #       varNames[x] <- 'avgWind'
-  #     } else if (varNames[x] == 'wind.max'){
-  #       varNames[x] <- 'maxWind'
-  #     } else if (varNames[x] == 'sky.cloudCover'){
-  #       varNames[x] <- 'pctCloudCover'
-  #     }  else if (varNames[x] == 'sky.sunshine'){
-  #       varNames[x] <- 'pctSunshine'
-  #     }
-  #   }
-  #
-  #   setnames(data,varNames)
 
   return(as.data.frame(data))
   }

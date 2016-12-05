@@ -31,7 +31,7 @@ Fields are universal across all our APIs, and as you provide information about a
 calculate information for you.
 }
 \examples{
-get_fields('field123')
+\dontrun{get_fields('field1')}
 }
 \references{
 http://developer.awhere.com/api/reference/fields/get-fields

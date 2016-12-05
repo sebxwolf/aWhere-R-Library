@@ -17,10 +17,8 @@
 #' @references http://developer.awhere.com/api/reference/agronomics/values
 #'
 #' @param - field_id: the field_id having previously been created with the createField Function
-#' @param - day_start: character string of start date in form: YYYY-MM-DD
-#'                    Defaults to using the associated planting date if no date set
-#' @param - day_end: character string of end date in form: YYYY-MM-DD
-#'                  If Not included will return data only for start date
+#' @param - day_start: required, character string of start date in form: YYYY-MM-DD
+#' @param - day_end: required, character string of end date in form: YYYY-MM-DD
 #' @param - accumulation_start_date: If you want to start counting accumulations from
 #'                                 before the specified start date (or before the
 #'                                 planting date if using the most recent Planting),
@@ -42,21 +40,15 @@
 #'                          The default value of 30 will be used if none is specified
 #' @return data.table of requested data for dates requested
 #'
-#' @import httr
-#' @import data.table
-#' @import lubridate
-#' @import jsonlite
-#'
 #' @examples
-#' agronomic_values_fields('field123','2015-07-01','2015-07-31','','standard','10','10','30')
-
+#' \dontrun{agronomic_values_fields('field123','2015-07-01','2015-07-31','','standard','10','10','30')
+#' agronomic_values_fields("field123", day_start = "2016-07-01", day_end = "2016-07-31", accumulation_start_date = "2016-06-01", gdd_method = "modifiedstandard", gdd_base_temp = "10", gdd_min_boundary = "10", gdd_max_boundary = "30")}
 #' @export
 
-
 agronomic_values_fields <- function(field_id,
-                                       day_start = '', day_end = '',
-                                       accumulation_start_date = '',gdd_method = 'standard',gdd_base_temp = '10',
-                                       gdd_min_boundary = '10', gdd_max_boundary = '30') {
+                                    day_start = '', day_end = '',
+                                    accumulation_start_date = '',gdd_method = 'standard',gdd_base_temp = '10',
+                                    gdd_min_boundary = '10', gdd_max_boundary = '30') {
 
   if (exists('awhereEnv75247') == FALSE) {
     warning('Please Run the Command \'get_token()\' and then retry running command. \n')
@@ -91,9 +83,9 @@ agronomic_values_fields <- function(field_id,
               Use the GetForecast function to request data from today onward.\n')
       return()
     }# else if (ymd(day_start) <= ymd(Sys.Date())-months(30)) {
-     # warning('By default, the aWhere APIs only allow daily data from the previous 30 months. \n
-     #        Use the Norms API for long-term averages or speak to your account manager for longer access.\n')
-     # return()
+    # warning('By default, the aWhere APIs only allow daily data from the previous 30 months. \n
+    #        Use the Norms API for long-term averages or speak to your account manager for longer access.\n')
+    # return()
     #}
   }
 
@@ -106,9 +98,9 @@ agronomic_values_fields <- function(field_id,
               Use the GetForecast function to request data from today onward.\n')
       return()
     }# else if (ymd(day_end) <= ymd(Sys.Date())-months(30)) {
-     # warning('By default, the aWhere APIs only allow daily data from the previous 30 months. \n
-     #        Use the Norms API for long-term averages or speak to your account manager for longer access.\n')
-     # return()
+    # warning('By default, the aWhere APIs only allow daily data from the previous 30 months. \n
+    #        Use the Norms API for long-term averages or speak to your account manager for longer access.\n')
+    # return()
     #}
 
     if ((day_start != '') == TRUE) {
@@ -242,15 +234,15 @@ agronomic_values_fields <- function(field_id,
 
     while (doWeatherGet == TRUE) {
 
-      requestString <- paste0('request <- GET(address,
-  	                                    add_headers(Authorization =
+      requestString <- paste0('request <- httr::GET(address,
+  	                                    httr::add_headers(Authorization =
   	                                    paste0(\"Bearer \", awhereEnv75247$token)))')
 
       # Make request
 
       eval(parse(text = requestString))
 
-      a <- suppressMessages(content(request, as = "text"))
+      a <- suppressMessages(httr::content(request, as = "text"))
 
       #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -263,7 +255,7 @@ agronomic_values_fields <- function(field_id,
       }
     }
 
-    data <- as.data.table(x[[3]])
+    data <- data.table::as.data.table(x[[3]])
 
     varNames <- colnames(data)
 
@@ -271,43 +263,9 @@ agronomic_values_fields <- function(field_id,
     data[,grep('_links',varNames) := NULL, with = FALSE]
     data[,grep('.units',varNames) := NULL, with = FALSE]
 
-#    varNames <- colnames(data)
-#
-#     for (x in 1:length(varNames)) {
-#
-#       if (varNames[x] == 'location.latitude'){
-#         varNames[x] <- 'latitude'
-#       } else if (varNames[x] == 'location.longitude'){
-#         varNames[x] <- 'longitude'
-#       } else if (varNames[x] == 'temperatures.max'){
-#         varNames[x] <- 'maxTemperature'
-#       } else if (varNames[x] == 'temperatures.min'){
-#         varNames[x] <- 'minTemperature'
-#       } else if (varNames[x] == 'precipitation.amount'){
-#         varNames[x] <- 'precipitation'
-#       } else if (varNames[x] == 'solar.amount'){
-#         varNames[x] <- 'solarEnergy'
-#       } else if (varNames[x] == 'relativeHumidity.max'){
-#         varNames[x] <- 'maxRH'
-#       } else if (varNames[x] == 'relativeHumidity.min'){
-#         varNames[x] <- 'minRH'
-#       } else if (varNames[x] == 'wind.morningMax'){
-#         varNames[x] <- 'maxMorningWind'
-#       } else if (varNames[x] == 'wind.dayMax'){
-#         varNames[x] <- 'maxDayWind'
-#       } else if (varNames[x] == 'wind.average'){
-#         varNames[x] <- 'avgWind'
-#       } else if (varNames[x] == 'location.field_id') {
-#         varNames[x] <- 'field_id'
-#       }
-#     }
-
-#    setnames(data,varNames)
-
-    dataList[[i]] <- data
+      dataList[[i]] <- data
 
   }
-
 
   allWeath <- rbindlist(dataList)
   setkey(allWeath,date)
@@ -360,21 +318,15 @@ agronomic_values_fields <- function(field_id,
 #'                          The default value of 30 will be used if none is specified
 #' @return data.table of requested data for dates requested
 #'
-#' @import httr
-#' @import data.table
-#' @import lubridate
-#' @import jsonlite
-#'
 #' @examples
-#' agronomic_values_latlng('39.8282', '-98.5795','2015-07-01','2015-07-31','','standard','10','10','30')
-
+#' \dontrun{agronomic_values_latlng('39.8282', '-98.5795','2015-07-01','2015-07-31','','standard','10','10','30')}
 #' @export
 
 
 agronomic_values_latlng <- function(latitude, longitude,
-                                     day_start = ymd(Sys.Date()) - days(1), day_end = '',
-                                     accumulation_start_date = '',gdd_method = 'standard',gdd_base_temp = '10',
-                                     gdd_min_boundary = '10', gdd_max_boundary = '30') {
+                                    day_start = ymd(Sys.Date()) - days(1), day_end = '',
+                                    accumulation_start_date = '',gdd_method = 'standard',gdd_base_temp = '10',
+                                    gdd_min_boundary = '10', gdd_max_boundary = '30') {
 
   if (exists('awhereEnv75247') == FALSE) {
     warning('Please Run the Command \'get_token()\' and then retry running command. \n')
@@ -534,15 +486,15 @@ agronomic_values_latlng <- function(latitude, longitude,
 
     while (doWeatherGet == TRUE) {
 
-      requestString <- paste0('request <- GET(address,
-                              add_headers(Authorization =
+      requestString <- paste0('request <- httr::GET(address,
+                              httr::add_headers(Authorization =
                               paste0(\"Bearer \", awhereEnv75247$token)))')
 
       # Make request
 
       eval(parse(text = requestString))
 
-      a <- suppressMessages(content(request, as = "text"))
+      a <- suppressMessages(httr::content(request, as = "text"))
 
       #The JSONLITE Serializer properly handles the JSON conversion
 
@@ -555,46 +507,13 @@ agronomic_values_latlng <- function(latitude, longitude,
       }
     }
 
-    data <- as.data.table(x[[3]])
+    data <- data.table::as.data.table(x[[3]])
 
     varNames <- colnames(data)
 
     #This removes the non-data info returned with the JSON object
     data[,grep('_links',varNames) := NULL, with = FALSE]
     data[,grep('.units',varNames) := NULL, with = FALSE]
-
-    #    varNames <- colnames(data)
-    #
-    #     for (x in 1:length(varNames)) {
-    #
-    #       if (varNames[x] == 'location.latitude'){
-    #         varNames[x] <- 'latitude'
-    #       } else if (varNames[x] == 'location.longitude'){
-    #         varNames[x] <- 'longitude'
-    #       } else if (varNames[x] == 'temperatures.max'){
-    #         varNames[x] <- 'maxTemperature'
-    #       } else if (varNames[x] == 'temperatures.min'){
-    #         varNames[x] <- 'minTemperature'
-    #       } else if (varNames[x] == 'precipitation.amount'){
-    #         varNames[x] <- 'precipitation'
-    #       } else if (varNames[x] == 'solar.amount'){
-    #         varNames[x] <- 'solarEnergy'
-    #       } else if (varNames[x] == 'relativeHumidity.max'){
-    #         varNames[x] <- 'maxRH'
-    #       } else if (varNames[x] == 'relativeHumidity.min'){
-    #         varNames[x] <- 'minRH'
-    #       } else if (varNames[x] == 'wind.morningMax'){
-    #         varNames[x] <- 'maxMorningWind'
-    #       } else if (varNames[x] == 'wind.dayMax'){
-    #         varNames[x] <- 'maxDayWind'
-    #       } else if (varNames[x] == 'wind.average'){
-    #         varNames[x] <- 'avgWind'
-    #       } else if (varNames[x] == 'location.field_id') {
-    #         varNames[x] <- 'field_id'
-    #       }
-    #     }
-
-    #    setnames(data,varNames)
 
     dataList[[i]] <- data
 
@@ -605,5 +524,5 @@ agronomic_values_latlng <- function(latitude, longitude,
   setkey(allWeath,date)
 
   return(as.data.frame(allWeath))
-  }
+}
 

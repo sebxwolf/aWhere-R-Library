@@ -32,7 +32,7 @@ that is capable of hourly updates.  Uses the Fields Name construct for requestio
 Uses default units returned by the API
 }
 \examples{
-current_conditions_fields('field123','all')
+\dontrun{current_conditions_fields('field123','all')}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/current

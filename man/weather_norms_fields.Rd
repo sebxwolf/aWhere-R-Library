@@ -10,10 +10,10 @@ weather_norms_fields(field_id, monthday_start = "", monthday_end = "",
 \arguments{
 \item{-}{field_id: the field_id having previously been created with the createField Function}
 
-\item{-}{monthday_start: character string of the month and day for the start
+\item{-}{monthday_start: required, character string of the month and day for the start
 of the range of days you are calculating norms for, e.g., '07-01' (July 1)}
 
-\item{-}{monthday_end: character string of the month and day for the end of the
+\item{-}{monthday_end: required, character string of the month and day for the end of the
 range of days you are calculating norms for, e.g., '07-10' (July 10)}
 
 \item{-}{year_start: the starting year (inclusive) of the range of years for which
@@ -22,9 +22,9 @@ you're calculating norms, as a string, e.g., '2008'}
 \item{-}{year_start: the end year (inclusive) of the range of years for which you're
 calculating norms, as a string, e.g., '2015'}
 
-\item{-}{exclude_years: You can opt to exclude one or more years from the range, and
-it's values will not be included in the averages. To exclude
-multiple years, separate them with a comma. Note: You must always have
+\item{-}{exclude_year: You can opt to exclude one or more years from the range, and
+  it's values will not be included in the averages. To exclude
+ multiple years, separate them with a comma. Note: You must always have
 at least three years of data to average}
 }
 \value{
@@ -41,7 +41,8 @@ the previous year to the long-term normals (however many years you want to inclu
 Each day's worth of data also includes the standard deviation for the average.
 }
 \examples{
-weather_norms_fields('field123','07-01', '07-10', '2008', '2015','2010,2011')
+\dontrun{weather_norms_fields('field123', monthday_start = '07-01', monthday_end = '07-10',
+year_start = '2008', year_end = '2015', exclude_years = '2009,2013')}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/norms

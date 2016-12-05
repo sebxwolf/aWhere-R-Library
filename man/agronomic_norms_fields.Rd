@@ -68,7 +68,7 @@ you want to include).  Uses the aWhere API Fields construct to request data. Use
 units returned by the API
 }
 \examples{
-agronomic_norms_fields('field123','07-01', '07-10', '2008', '2015','2010,2011','','standard','10','10','30')
+\dontrun{agronomic_norms_fields(field_id = 'field123', '07-01', '07-10', '2008', '2016', '2010,2011','','standard','10','10','30')}
 }
 \references{
 http://developer.awhere.com/api/reference/agronomics/norms

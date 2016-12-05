@@ -25,7 +25,7 @@ second line should be the associated secret.  A blank 3rd line should be inserte
 an error from being returned by R
 }
 \examples{
-load_credentials("C:/aWhere/credentials/credentials.txt")
+\dontrun{load_credentials("C:/aWhere/credentials/credentials.txt")}
 
 }
 
