@@ -4,23 +4,23 @@
 \alias{get_planting}
 \title{Get Planting}
 \usage{
-get_planting(field_id = "", planting_id = "", current = F, offset = "",
+get_planting(field_id, planting_id = "", current = F, offset = "",
   limit = "")
 }
 \arguments{
 \item{-}{field_id: a field ID to look within (string)}
 
-\item{-}{planting_id: a planting ID to look for (string)}
+\item{-}{planting_id: a planting ID to look for (string - optional)}
 
 \item{-}{current: whether to just get current plantings(T) or include historical plantings(F).
-To get most recent planting record for a field, set current to TRUE and do not pass in a planting_id (boolean)}
+To get most recent planting record for a field, set current to TRUE and do not pass in a planting_id (boolean - optional)}
 
-\item{-}{offset: The number of objects to skip before returning objects. Used in conjunction with offset to paginate.}
+\item{-}{offset: The number of objects to skip before returning objects. Used in conjunction with offset to paginate. (optional)}
 
-\item{-}{limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate.}
+\item{-}{limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate. (optional)}
 }
 \value{
-- data: data.table containing information about requested field(s)
+- data.frame containing information about requested field(s)
 }
 \description{
 \code{get_planting} Gets a planting or list of plantings in the aWhere platform for which you can request weather

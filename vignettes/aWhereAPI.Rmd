@@ -69,7 +69,7 @@ One-time generation of a token can be done with the `get_token()` function. The 
 Alternatively, the `load_credentials()` function accesses a text file saved on your computer with your API Key on the first line, and your Secret on the second. This function invokes `get_token()` so no further work is needed to generate additional access tokens while making calls.
 
 ```{r}
-load_credentials("C:/Users/Hannacamp/Documents/R Working Directory/API/credentials.txt")
+load_credentials("C:/aWhere/credentials/credentials.txt")
 ```    
 
 ___________________________________________________________________________
@@ -88,7 +88,7 @@ This API provides an interface for customers to register their field locations a
 
 ```{r}
 
-create_field("field_test","40.828200","-100.579500","farmA")
+create_field("field_test",40.828200,-100.579500,"farmA")
 
 ```    
 
@@ -130,7 +130,7 @@ Requires both a previously-created field ID and specific information relating to
 
 
 ```{r}
-pid <- create_planting("field_test", "corn", "2015-07-01")
+pid <- create_planting("field_test", "corn", "2016-07-01")
 
 ```
 
@@ -173,8 +173,6 @@ All weather data requests are requested point by point. The API does not yet hav
 By default, you can request up to 30 months of daily historical data, counting back from the present date. For data beyond that, use the Norms API or speak with your aWhere representative for access to more of the daily data archive. The function `daily_observed_fields` provides the simplest method for retrieving historical data.
 
 ```{r}
-daily_observed_fields("field_test", "2015-07-01")
-
 daily_observed_fields("field_test", day_start = "2015-07-01", day_end = "2015-07-07")
 ```
 
@@ -183,7 +181,7 @@ daily_observed_fields("field_test", day_start = "2015-07-01", day_end = "2015-07
 Users also have the option of using the alternative function `daily_observed_latlng` to retrieve historical data for a given pair of coordinates.
 
 ```{r}
-daily_observed_latlng(latitude = "39.8282", longitude = "-98.5795", day_start = "2015-07-01", day_end = "2015-07-07")
+daily_observed_latlng(latitude = 39.8282, longitude = -98.5795, day_start = "2015-07-01", day_end = "2015-07-07")
 
 ```
 
@@ -203,7 +201,7 @@ forecasts_fields("field_test", day_start = as.character(Sys.Date() + 1), day_end
 As with daily observed historical data, forecast data can also be called based on latitude, longitude pairs.
 
 ```{r}
-forecasts_latlng(latitude = "39.8282", longitude = "-98.5795", day_start = as.character(Sys.Date() + 1), block_size = 24)
+forecasts_latlng(latitude = 39.8282, longitude = -98.5795, day_start = as.character(Sys.Date() + 1), block_size = 24)
 
 ```
 
@@ -215,7 +213,7 @@ The weather norms API allows you to offload the calculation of multi-year averag
 
 
 ```{r}
-weather_norms_fields(field_id = "field_test", monthday_start = "07-01", monthday_end = "07-07", year_start = "2010", year_end = "2015")
+weather_norms_fields(field_id = "field_test", monthday_start = "07-01", monthday_end = "07-07", year_start = 2010, year_end = 2015)
 
 ```
 
@@ -246,7 +244,7 @@ Calculations can be customized in a number of different ways, consult the [API D
 
 ```{r}
 
-agronomic_values_fields("field_test", day_start = "2016-07-01", day_end = "2016-07-07", accumulation_start_date = "2016-06-01", gdd_method = "modifiedstandard", gdd_base_temp = "10", gdd_min_boundary = "10", gdd_max_boundary = "30")
+agronomic_values_fields("field_test", day_start = "2016-07-01", day_end = "2016-07-07", accumulation_start_date = "2016-06-01", gdd_method = "modifiedstandard", gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30)
 
 ```
 
@@ -257,7 +255,7 @@ agronomic_values_fields("field_test", day_start = "2016-07-01", day_end = "2016-
 The Agronomic Norms API returns the long-term normals for the agronomic values on any given set of days across any range of years for which we have data. The same customizable parameters for changing the calculation of agronomic values are also available in the norms.
 
 ```{r}
-agronomic_norms_fields("field_test", month_day_start = "07-01", month_day_end = "07-07", year_start = "2010", year_end = "2015", gdd_method = "modifiedstandard")
+agronomic_norms_fields("field_test", month_day_start = "07-01", month_day_end = "07-07", year_start = 2010, year_end = 2015, gdd_method = "modifiedstandard")
 
 ```
 

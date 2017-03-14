@@ -4,7 +4,7 @@
 \alias{create_planting}
 \title{Create Planting}
 \usage{
-create_planting(field_id, crop, planting_date = "", proj_yield_amount = "",
+create_planting(field_id, crop, planting_date, proj_yield_amount = "",
   proj_yield_units = "", proj_harvest_date = "", yield_amount = "",
   yield_units = "", harvest_date = "")
 }
@@ -17,15 +17,15 @@ create_planting(field_id, crop, planting_date = "", proj_yield_amount = "",
 
 \item{-}{proj_yield_amount: amount of projected yield from planting (string)}
 
-\item{-}{proj_yield_units: units of projected yield (string)}
+\item{-}{proj_yield_units: units of projected yield (string - optional)}
 
-\item{-}{proj_harvest_date: projected harvest date at the start of the season. Format as YYYY-MM-DD (string)}
+\item{-}{proj_harvest_date: projected harvest date at the start of the season. Format as YYYY-MM-DD (string - optional)}
 
-\item{-}{yield_amount: actual yield (string)}
+\item{-}{yield_amount: actual yield (string - optional)}
 
-\item{-}{yield_units: units of actual yield (string)}
+\item{-}{yield_units: units of actual yield (string - optional)}
 
-\item{-}{harvest_date: actual harvest date at end of season. Format as YYYY-MM-DD (string)}
+\item{-}{harvest_date: actual harvest date at end of season. Format as YYYY-MM-DD (string - optional)}
 }
 \value{
 - system generated planting id along with a print text that informs if the query succeeded or not
@@ -60,7 +60,7 @@ This script creates a planting in a field location in the aWhere platform. By se
 and agronomics for that location in all the other APIs. The planting ID corresponds to a planting within a field.
 }
 \examples{
-\dontrun{create_planting(field_id='field123',crop='corn',planting_date='2015-10-25',proj_yield_amount='100',proj_yield_units='Bushels', proj_harvest_date='2016-02-01',yield_amount='110',yield_units='Bushels',harvest_date='2016-02-01')
+\dontrun{create_planting(field_id='field123',crop='corn', planting_date='2015-10-25', proj_yield_amount='100', proj_yield_units='Bushels', proj_harvest_date='2016-02-01', yield_amount='110', yield_units='Bushels', harvest_date='2016-02-01')
 }
 }
 \references{

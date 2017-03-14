@@ -2,48 +2,52 @@
 % Please edit documentation in R/weather-norms.R
 \name{weather_norms_latlng}
 \alias{weather_norms_latlng}
-\title{Get Weather Norms Lat Lon}
+\title{weather_norms_latlng}
 \usage{
-weather_norms_latlng(latitude, longitude, monthday_start, monthday_end = "",
-  year_start = "", year_end = "", exclude_years = "")
+weather_norms_latlng(latitude, longitude, monthday_start, monthday_end,
+  year_start, year_end, exclude_years = c())
 }
 \arguments{
-\item{-}{latitude: the latitude for the location for which you want data}
+\item{-}{latitude: the latitude of the requested location (double)}
 
-\item{-}{longitude: the latitude for the location for which you want data}
+\item{-}{longitude: the longitude of the requested locations (double)}
 
-\item{-}{monthday_start: character string of the month and day for the start
-of the range of days you are calculating norms for, e.g., '07-01' (July 1)}
+\item{-}{monthday_start: character string of the first month and day for which you want to retrieve data,
+in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)}
 
-\item{-}{monthday_end: character string of the month and day for the end of the
-range of days you are calculating norms for, e.g., '07-10' (July 10)}
+\item{-}{monthday_end: character string of the last month and day for which you want to retrieve data,
+in the form: MM-DD.  This is the end of your date range. e.g. '07-01' (July 1) (required)}
 
-\item{-}{year_start: the starting year (inclusive) of the range of years for which
-you're calculating norms, as a string, e.g., '2008'}
+\item{-}{year_start: character string of the starting year (inclusive) of the range of years for which
+you're calculating norms, in the form YYYY. e.g., 2008 (required)}
 
-\item{-}{year_end: the end year (inclusive) of the range of years for which you're
-calculating norms, as a string, e.g., '2015'}
+\item{-}{year_end: character string of the last year (inclusive) of the range of years for which
+you're calculating norms, in the form YYYY. e.g., 2015 (required)}
 
-\item{-}{exclude_years: You can opt to exclude one or more years from the range, and
- it's values will not be included in the averages. To exclude
-multiple years, separate them with a comma. Note: You must always have
-at least three years of data to average}
+\item{-}{exclude_year: character string of a year or years which you'd like to exclude from
+ your range of years on which to calculate norms. To exclude
+ multiple years, provide a vector of years. You must include
+at least three years of data with which to calculate the norms. (optional)}
 }
 \value{
-data.table of requested data for dates requested
+data.frame of requested data for dates requested
 }
 \description{
-\code{weather_norms_latlng} calls Historic Agronomic Norms by Geolocation Endpoint of API using Lat/Lon
+\code{weather_norms_latlng} pulls long term norm weather data from aWhere's API based on latitude & longitude
 }
 \details{
-This is a flexible API that allows you to calculate the averages for weather attribute
-across any range of years for which we have data. Whereas the Daily Observed API only
-supports up to 30 months of daily data, this API allow you to compare this year and
-the previous year to the long-term normals (however many years you want to include).
-Each day's worth of data also includes the standard deviation for the average.
+This function allows you to calculate the averages for weather attributes
+across any range of years for which data are available.  The data pulled includes
+meanTemp, maxTemp, minTemp, precipitation average, solar radiation average,
+minHumidity, maxHumidity, maxWind and averageWind, along with the standard deviations
+for these variables.  The data pulled is for the latitude & longitude identified.
+
+The data returned in this function
+allow you to compare this year or previous years to the long-term normals, calculated as
+the average of those weather conditions on that day in that location over the years specified.
 }
 \examples{
-\dontrun{weather_norms_latlng('39.8282', '-98.5795', '07-01', '07-10', '2008', '2015','2010,2011')}
+\dontrun{weather_norms_latlng(39.8282, -98.5795, '07-01', '07-10', 2008, 2015, "2010")}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/norms

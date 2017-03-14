@@ -4,22 +4,16 @@
 \alias{update_field}
 \title{Update Field}
 \usage{
-update_field(field_id, variable_search, value_search, variable_update,
-  value_update)
+update_field(field_id, variable_update, value_update)
 }
 \arguments{
-\item{-}{field_id: the variable that will be used to search for the particular}
+\item{-}{field_id: the unique field ID for the field you want to update (character string) (required)}
 
-\item{-}{variable_search: the variable that will be used to search for the particular
-locations that need information updated (character string).
-Either "farmId" or "name"}
+\item{-}{variable_update: the variable that needs to be updated, either "farmId", "name", or "acres" 
+(character string) (required)}
 
-\item{-}{value_search: the value for the variable_search (character string)}
-
-\item{-}{variable_update: the variable that needs to be updated (character string).
-Either "farmId" or "name"}
-
-\item{-}{value_update: the new value that will be placed (character string)}
+\item{-}{value_update: the new value for variable_update, to replace the existing value. The existing 
+value can be found using get_fields("field_id") (character string) (required)}
 }
 \value{
 - A message confirming the changes have been made
@@ -28,23 +22,18 @@ Either "farmId" or "name"}
 \code{update_field} To update details (Farm ID or FieldName) of a particular location in the aWhere API.
 }
 \details{
-Fields are how you manage the locations for which you're tracking weather, agronomics,
-models, and progress over growing seasons. By registering a field, you create a quick way
-to consistently reference locations across all our APIs, and allow our modeling APIs
-to better operate and tune to the conditions and status of each specific field. A Planting
-is the record of a crop's season in a given field, and is where you tell the platform
-about what is planted there and when it was planted.
+Fields are the easiest way to manage locations in the aWhere APIs, providing an easy reference 
+for tracking weather, agronomics, models, and progress over growing seasons. Once a field is 
+registered, plantings can also be registered for that field with specific information about the
+crop planted at that location, the date of planting, and other optional information.
 
-Occasionally, you may need to update a field location detail.
-Only the Farm ID and Field Name can be updated at this time.
-IMPORTANT - to look for a set of data points which need update, you can only update parameters
-            one at a time:
-                   - only farmId
-                   - only name
+Occasionally, you may need to update the details of your field. At this time, only the farm ID, 
+field Name, and number of acres can be updated using this function. Field details can only be 
+updated one variable at a time, for one field at a time. If you need to update multiple fields or
+multiple variables associated with a field, please pass commands sequentially.
 }
 \examples{
-\dontrun{update_field( field_id = 'field123',
-				variable_search = 'farmId', value_search = 'farmA',
+\dontrun{update_field(fieldIDOrName = 'field123',
        variable_update = 'farmId', value_update = 'This is my territory')}
 }
 \references{

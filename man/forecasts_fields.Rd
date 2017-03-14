@@ -2,43 +2,46 @@
 % Please edit documentation in R/forecasts.R
 \name{forecasts_fields}
 \alias{forecasts_fields}
-\title{forecasts_fields.}
+\title{forecasts_fields}
 \usage{
-forecasts_fields(field_id, day_start = "", day_end = "", block_size = 1)
+forecasts_fields(field_id, day_start = as.character(Sys.Date()),
+  day_end = "", block_size = 1)
 }
 \arguments{
-\item{-}{field_id: the field_id having previously been created with the createField Function}
+\item{-}{field_id: the field_id associated with the location for which you want to pull data.
+Field IDs are created using the create_field function. (string)}
 
-\item{-}{day_start: character string of start date in form: YYYY-MM-DD
-Defaults to system date if left blank}
+\item{-}{day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
+Defaults to system date if left blank. (optional)}
 
-\item{-}{day_end: character string of end date in form: YYYY-MM-DD
-Defaults to system date + 7 if left blank}
+\item{-}{day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD
+Defaults to system date + 7 if left blank. (optional)}
 
 \item{-}{block_size: Integer value that corresponds to the number of hours to include in each time block.
-Defaults to a 1 hour block.  This value must divide evenly into 24}
+Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)}
 }
 \value{
-data.table of requested data for dates requested
+data.frame of requested data for dates requested
 }
 \description{
-\code{forecasts_fields} calls Forecast Weather Endpoint of API using Field Location Construct
+\code{forecasts_fields} pulls forecast weather data from aWhere's API based on field id
 }
 \details{
-The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain™ system,
-and allows retrieval and integration of data across all different time ranges—long term normals,
-daily observed, current weather, and forecasts. These APIs are designed for efficiency,
-allowing you to customize the responses to return just the attributes you need.
-
-Use this API to return today's forecast plus the forecast for up to 7 more days. Forecasts are available
-in many sizes of hourly blocks, from hourly to daily. The data this function returns is
+This function returns today's forecast plus the forecast for up to 7 more days. Forecasts are available
+in many sizes of time blocks, from hourly to daily. The data this function returns is
 Min/Max Temperature, Precipitation Amount, Chance of Precipitation,
 Max Humidity, Relative Humidity, Solar Radiation, Average Wind Speed, Max Windspeed, Percentage
-of Sky Covered by Clouds, and Percentage of Clear Sky.  Used the Fields Name construct to request data.
-Uses default units returned by the API
+of Sky Covered by Clouds, and Percentage of Clear Sky for the field id specified.
+Default units are returned by the API.
+
+The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
+and allows retrieval and integration of data across all different time ranges long term normals,
+daily observed, current weather, and forecasts. These APIs are designed for efficiency,
+allowing you to customize the responses to return just the attributes you need.
 }
 \examples{
-\dontrun{forecasts_fields('field123', block_size = 12)}
+\dontrun{forecasts_fields('field123', day_start = '2017-01-01', block_size = 12)
+forecasts_fields('aWhere', day_start = '2017-01-01', day_end = '2017-01-04')}
 }
 \references{
 http://developer.awhere.com/api/forecast-weather-api

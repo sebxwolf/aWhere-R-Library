@@ -1,11 +1,11 @@
-#' @title current_conditions_fields.
+#' @title current_conditions_fields
 #'
 #' @description
 #' \code{current_conditions_fields} calls Current Weather Conditions Endpoint of API using Fields Name Constuct
 #'
 #' @details
-#' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain™ system,
-#' and allows retrieval and integration of data across all different time ranges—long term normals,
+#' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
+#' and allows retrieval and integration of data across all different time ranges long term normals,
 #' daily observed, current weather, and forecasts. These APIs are designed for efficiency,
 #' allowing you to customize the responses to return just the attributes you need.
 #'
@@ -21,7 +21,13 @@
 #' @param - field_id: the field_id having previously been created with the createField Function
 #' @param - sources: Which source to use for pulling the current conditions.  Valid values are
 #'                    'metar', 'mesonet', 'metar-mesonet', 'pws', 'all'.  Default value is 'all'
-#' @return data.table of requested data for dates requested
+#'
+#' @import httr
+#' @import data.table
+#' @import lubridate
+#' @import jsonlite
+#'
+#' @return data.frame of requested data for dates requested
 #'
 #' @examples
 #' \dontrun{current_conditions_fields('field123','all')}
@@ -31,29 +37,9 @@
 
 current_conditions_fields <- function(field_id,sources = 'all') {
 
-  if (exists('awhereEnv75247') == FALSE) {
-    warning('Please Run the Command \'get_token()\' and then retry running command. \n')
-    return()
-  }
-
-  if (exists('uid', envir = awhereEnv75247) == FALSE |
-      exists('secret', envir = awhereEnv75247) == FALSE |
-      exists('token', envir = awhereEnv75247) == FALSE) {
-    warning('Please Run the Command \'get_token()\' and then retry running command. \n')
-    return()
-  }
-
-  currentFields <- get_fields(field_id)
-  if ((field_id %in% currentFields$field_id) == FALSE) {
-    warning('The Provided field name is not a field currently associated with your account. \n
-            Please create the field before proceeding. \n')
-    return()
-  }
-
-  if ((sources %in% c('metar','mesonet','metar-mesonet','pws','all')) == FALSE) {
-    warning('The specified source is not valid. Please correct. \n')
-    return()
-  }
+  checkCredentials()
+  checkValidField(field_id)
+  checkForecastSources(sources)
 
   # Create query
 
@@ -64,19 +50,16 @@ current_conditions_fields <- function(field_id,sources = 'all') {
   strType <- paste0('/currentconditions')
   strSources <- paste0('?sources=',sources)
 
-  address <- paste0(urlAddress, strBeg, strCoord, strType, strSources)
+  url <- paste0(urlAddress, strBeg, strCoord, strType, strSources)
 
   doWeatherGet <- TRUE
 
   while (doWeatherGet == TRUE) {
-
-    requestString <- paste0('request <- httr::GET(address,
-	                                    httr::add_headers(Authorization =
-	                                    paste0(\"Bearer \", awhereEnv75247$token)))')
+    postbody = ''
+    request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
+                         httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
 
     # Make request
-
-    eval(parse(text = requestString))
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
@@ -98,21 +81,21 @@ current_conditions_fields <- function(field_id,sources = 'all') {
   varNames <- colnames(data)
 
   #This removes the non-data info returned with the JSON object
-  data[,grep('_links',varNames) := NULL, with = FALSE]
-  data[,grep('.units',varNames) := NULL, with = FALSE]
+  data[,grep('_links',varNames) := NULL]
+  data[,grep('.units',varNames) := NULL]
 
   return(as.data.frame(data))
 }
 
 
-#' @title current_conditions_latlng.
+#' @title current_conditions_latlng
 #'
 #' @description
 #' \code{current_conditions_latlng} calls Current Weather Conditions Endpoint of API using Lat/Lon
 #'
 #' @details
-#' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain™ system,
-#' and allows retrieval and integration of data across all different time ranges—long term normals,
+#' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
+#' and allows retrieval and integration of data across all different time ranges long term normals,
 #' daily observed, current weather, and forecasts. These APIs are designed for efficiency,
 #' allowing you to customize the responses to return just the attributes you need.
 #'
@@ -137,49 +120,16 @@ current_conditions_fields <- function(field_id,sources = 'all') {
 #' @import jsonlite
 #'
 #' @examples
-#' \dontrun{current_conditions_latlng('39.8282', '-98.5795','all')}
+#' \dontrun{current_conditions_latlng(39.8282, -98.5795, 'all')}
 
 #' @export
 
 
 current_conditions_latlng <- function(latitude,longitude,sources = 'all') {
 
-  if (exists('awhereEnv75247') == FALSE) {
-    warning('Please Run the Command \'get_token()\' and then retry running command. \n')
-    return()
-  }
-
-  if (exists('uid', envir = awhereEnv75247) == FALSE |
-      exists('secret', envir = awhereEnv75247) == FALSE |
-      exists('token', envir = awhereEnv75247) == FALSE) {
-    warning('Please Run the Command \'get_token()\' and then retry running command. \n')
-    return()
-  }
-
-  if (suppressWarnings(is.na(as.double(latitude))) == FALSE) {
-    if ((as.double(latitude) >= -90 & as.double(latitude) <= 90) == FALSE) {
-      warning('The entered Latitude Value is not valid. Please correct\n')
-      return()
-    }
-  } else {
-    warning('The entered Latitude Value is not valid. Please correct\n')
-    return()
-  }
-
-  if (suppressWarnings(is.na(as.double(longitude))) == FALSE) {
-    if ((as.double(longitude) >= -180 & as.double(longitude) <= 180) == FALSE) {
-      warning('The entered Longitude Value is not valid. Please correct\n')
-      return()
-    }
-  } else {
-    warning('The entered Longitude Value is not valid. Please correct\n')
-    return()
-  }
-
-  if ((sources %in% c('metar','mesonet','metar-mesonet','pws','all')) == FALSE) {
-    warning('The specified source is not valid. Please correct. \n')
-    return()
-  }
+  checkCredentials()
+  checkValidLatLong(latitude,longitude)
+  checkForecastSources(sources)
 
   # Create query
 
@@ -190,19 +140,15 @@ current_conditions_latlng <- function(latitude,longitude,sources = 'all') {
   strType <- paste0('/currentconditions')
   strSources <- paste0('?sources=',sources)
 
-  address <- paste0(urlAddress, strBeg, strCoord, strType, strSources)
+  url <- paste0(urlAddress, strBeg, strCoord, strType, strSources)
 
   doWeatherGet <- TRUE
 
   while (doWeatherGet == TRUE) {
 
-    requestString <- paste0('request <- httr::GET(address,
-                            httr::add_headers(Authorization =
-                            paste0(\"Bearer \", awhereEnv75247$token)))')
-
-    # Make request
-
-    eval(parse(text = requestString))
+    postbody = ''
+    request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
+                         httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
@@ -224,8 +170,8 @@ current_conditions_latlng <- function(latitude,longitude,sources = 'all') {
   varNames <- colnames(data)
 
   #This removes the non-data info returned with the JSON object
-  data[,grep('_links',varNames) := NULL, with = FALSE]
-  data[,grep('.units',varNames) := NULL, with = FALSE]
+  data[,grep('_links',varNames) := NULL]
+  data[,grep('.units',varNames) := NULL]
 
   return(as.data.frame(data))
 }

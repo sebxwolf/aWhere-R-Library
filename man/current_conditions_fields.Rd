@@ -2,7 +2,7 @@
 % Please edit documentation in R/current-conditions.R
 \name{current_conditions_fields}
 \alias{current_conditions_fields}
-\title{current_conditions_fields.}
+\title{current_conditions_fields}
 \usage{
 current_conditions_fields(field_id, sources = "all")
 }
@@ -13,14 +13,14 @@ current_conditions_fields(field_id, sources = "all")
 'metar', 'mesonet', 'metar-mesonet', 'pws', 'all'.  Default value is 'all'}
 }
 \value{
-data.table of requested data for dates requested
+data.frame of requested data for dates requested
 }
 \description{
 \code{current_conditions_fields} calls Current Weather Conditions Endpoint of API using Fields Name Constuct
 }
 \details{
-The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain™ system,
-and allows retrieval and integration of data across all different time ranges—long term normals,
+The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
+and allows retrieval and integration of data across all different time ranges long term normals,
 daily observed, current weather, and forecasts. These APIs are designed for efficiency,
 allowing you to customize the responses to return just the attributes you need.
 

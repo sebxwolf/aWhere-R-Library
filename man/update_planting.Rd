@@ -4,7 +4,7 @@
 \alias{update_planting}
 \title{Update Planting}
 \usage{
-update_planting(field_id, planting_id = "", planting_date = "",
+update_planting(field_id, planting_id, planting_date = "",
   proj_yield_amount = "", proj_yield_units = "", proj_harvest_date = "",
   yield_amount = "", yield_units = "", harvest_date = "")
 }

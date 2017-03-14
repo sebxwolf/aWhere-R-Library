@@ -12,10 +12,10 @@ get_job(job_id, wait = T, retry_secs = 60, num_retries = 60)
 \item{-}{wait: wait for job to complete before returning}
 }
 \value{
-- data: data.table containing the requested payload(s).
+- data.frame containing the requested payload(s).
 }
 \description{
-\code{get_planting} Gets a job's results when complete.
+\code{get_job} Gets a job's results when complete.
 }
 \details{
 Once a batch job is queued you can check on its status with this API. If the job is complete and results are available, they will be included in the response body.

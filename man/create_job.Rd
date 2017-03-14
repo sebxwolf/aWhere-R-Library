@@ -7,9 +7,12 @@
 create_job(api_requests, request_titles, job_title, job_type = "batch")
 }
 \arguments{
-\item{-}{api_requests: a list of "verb endpoint" strings. This is the actual API request you're asking the Batch Jobs system to call. It must be a valid aWhere endpoint and is expressed as the HTTP verb, a space, and the relative URI. For example: "GET /v2/weather/fields/1234/observations"}
+\item{-}{api_requests: a list of "verb endpoint" strings. This is the actual API request you're asking the Batch Jobs system to call.
+It must be a valid aWhere endpoint and is expressed as the HTTP verb, a space, and the relative URI.
+For example: "GET /v2/weather/fields/1234/observations"}
 
-\item{-}{titles: a vector of names for each individual request in api, which can aid in identifying each set of results within a batch. This need not be unique between all the jobs.}
+\item{-}{titles: a vector of names for each individual request in api, which can aid in identifying each set of results within a batch.
+This need not be unique between all the jobs.}
 
 \item{-}{job_title: A name for the job, which can aid you in identifying the result set.}
 
@@ -22,21 +25,20 @@ create_job(api_requests, request_titles, job_title, job_type = "batch")
 \code{create_job} This API will register a batch job in the aWhere platform.
 }
 \details{
-Batch jobs allow you to execute many API calls in a single batch, which is much more efficient and faster than making hundreds or thousands of individual requests. When you create a batch, you define each endpoint you want to call, and then aWhere's platform steps through each internally and provides all the results at once.
+Batch jobs allow you to execute many API calls in a single batch, which is much more efficient and faster than making hundreds
+or thousands of individual requests. When you create a batch, you define each endpoint you want to call, and then aWhere's platform
+steps through each internally and provides all the results at once.  Any GET request from any of our Version-2 APIs can be included
 
-Any GET request from any of our Version-2 APIs can be included in a batch. The batch job system treats each API request individually, which means you can easily identify which API request produced which results. It is also fault-tolerant, so that if one request resulted in an error, all the others will execute normally. Note that if you request a set of paged results, only the first page of results will be returned; be sure to use the limit and offset parameters of that API to get all the results you need.
-
-Batch jobs are queued and executed in the order they are created, from across all customers using aWhere APIs. While many jobs can run concurrently, the rest are inserted into a queue and executed quite quickly. Use the Status and Results endpoint to monitor your job status and retrieve the results when complete.
+Batch jobs are queued and executed in the order they are created, from across all customers using aWhere APIs. While many jobs can run
+concurrently, the rest are inserted into a queue and executed quite quickly. Use the Status and Results endpoint to monitor your job status
+and retrieve the results when complete.
 
 Important: This API will return a job ID which you must retain; there is not currently an API to list all jobs that you've created.
-
 Important: There is a limit of 10,000 requests per batch job.
-
 Note: The current conditions API cannot be included in batch jobs.
 }
 \examples{
-\dontrun{create_job(c("GET /v2/weather/fields/farmA/observations", "GET /v2/weather/fields/farmB/observations"), c("farmA", "farmB"), "job_1")
-}
+\dontrun{create_job(c("GET /v2/weather/fields/field_test/observations", "GET /v2/weather/fields/aWhereOffice/observations"), c("farmA", "farmB"), "job_1")}
 }
 \references{
 https://developer.awhere.com/api/reference/batch/create

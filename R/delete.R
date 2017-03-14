@@ -12,7 +12,10 @@
 #' @param - field_id: an ID of your choosing (string)
 #'
 #' @return - a print text that informs if the query succeded or not
+#'
 #' @importFrom RCurl getCurlHandle
+#' @import httr
+#'
 #' @examples
 #' \dontrun{delete_field("field123")
 #' delete_field("field456")
@@ -20,6 +23,9 @@
 #' @export
 
 delete_field <- function(field_id) {
+
+  checkCredentials()
+  checkValidField(field_id)
 
   url <- paste0("https://api.awhere.com/v2/fields/", field_id)
 
@@ -68,12 +74,17 @@ delete_field <- function(field_id) {
 #'
 #' @return - a print text that informs if the query succeded or not
 #'
+#' @import httr
+#'
 #' @examples
 #' \dontrun{delete_planting("field123",'133972')}
 
 #' @export
 
 delete_planting <- function(field_id,planting_id) {
+
+  checkCredentials()
+  checkValidField(field_id)
 
   url <- paste0("https://api.awhere.com/v2/agronomics/fields/", field_id,'/plantings/',planting_id)
 
