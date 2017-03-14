@@ -7,31 +7,32 @@
 get_fields(field_id = "")
 }
 \arguments{
-\item{-}{field_id: Either a specified field name (as a string) to retrieve info on only that field
-or an empty string to retrieve info on all fields}
+\item{-}{field_id: Either a field id to retrieve information for that specific field
+or an empty string to retrieve information on all fields associated 
+with the user's aWhere API account (string - optional)}
 }
 \value{
-- data: data.table containing information about requested field(s)
+- data.frame containing information about requested field(s)
 }
 \description{
 \code{get_fields} calls Get Field Locations Endpoint of API
 }
 \details{
 Fields are how you manage the locations for which you're tracking weather, agronomics,
-models, and progress over growing seasons. By registering a field, you create a quick way
-to consistently reference locations across all our APIs, and allow our modeling APIs
-to better operate and tune to the conditions and status of each specific field. A Planting
-is the record of a crop's season in a given field, and is where you tell the platform
-about what is planted there and when it was planted.
+models, and progress over growing seasons in the aWhere API. By registering a field, you create a quick way
+to consistently reference locations across all of our APIs, and allow our modeling APIs
+to better operate and tune to the conditions and status of each specific field. 
 
-Before using our other APIs you'll need to register the field locations if using the Fields Name construct.
+Before using aWhere's APIs you'll need to register the field locations.
 This is a one-time step. Every field has an ID that you define, plus a latitude and longitude.
-Fields are universal across all our APIs, and as you provide information about a field, some APIs
+Fields are universal across all of our APIs, and as you provide information about a field, some APIs
 (such as agronomics and models) can leverage that detail internally to more easily and seamlessly
 calculate information for you.
 }
 \examples{
-\dontrun{get_fields('field1')}
+\dontrun{get_fields('field1')
+         get_fields()
+}
 }
 \references{
 http://developer.awhere.com/api/reference/fields/get-fields

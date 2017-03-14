@@ -2,73 +2,83 @@
 % Please edit documentation in R/agronomic-norms.R
 \name{agronomic_norms_fields}
 \alias{agronomic_norms_fields}
-\title{Agronomic Norms Fields.}
+\title{agronomic_norms_fields}
 \usage{
-agronomic_norms_fields(field_id, month_day_start = "", month_day_end = "",
-  year_start = "", year_end = "", exclude_years = "",
-  accumulation_start_date = "", gdd_method = "standard",
-  gdd_base_temp = "10", gdd_min_boundary = "10", gdd_max_boundary = "30")
+agronomic_norms_fields(field_id, month_day_start, month_day_end, year_start,
+  year_end, exclude_years = c(), accumulation_start_date = "",
+  gdd_method = "standard", gdd_base_temp = 10, gdd_min_boundary = 10,
+  gdd_max_boundary = 30)
 }
 \arguments{
-\item{-}{field_id: the field_id having previously been created with the createField Function}
+\item{-}{field_id: the field_id associated with the location for which you want to pull data.
+Field IDs are created using the create_field function. (string)}
 
-\item{-}{month_day_start: character string of the month and day for the start
-of the range of days you are calculating norms for, e.g., '07-01' (July 1)}
+\item{-}{monthday_start: character string of the first month and day for which you want to retrieve data,
+in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)}
 
-\item{-}{month_day_end: character string of the month and day for the end of the
-range of days you are calculating norms for, e.g., '07-10' (July 10)}
+\item{-}{monthday_end: character string of the last month and day for which you want to retrieve data,
+in the form: MM-DD.  This is the end of your date range. e.g. '07-01' (July 1) (required)}
 
-\item{-}{year_start: the starting year (inclusive) of the range of years for which
-you're calculating norms, as a string, e.g., '2008'}
+\item{-}{year_start: character string of the starting year (inclusive) of the range of years for which
+you're calculating norms, in the form YYYY. e.g., 2008 (required)}
 
-\item{-}{year_end: the end year (inclusive) of the range of years for which you're
-calculating norms, as a string, e.g., '2015'}
+\item{-}{year_end: character string of the last year (inclusive) of the range of years for which
+you're calculating norms, in the form YYYY. e.g., 2015 (required)}
 
-\item{-}{exclude_years: You can opt to exclude one or more years from the range, and
-it's values will not be included in the averages. To exclude
-multiple years, separate them with a comma. Note: You must always have
-at least three years of data to average}
+\item{-}{exclude_year: character string of a year or years which you'd like to exclude from
+ your range of years on which to calculate norms. To exclude
+ multiple years, provide a vector of years. You must include
+at least three years of data with which to calculate the norms. (optional)}
 
-\item{-}{accumulation_start_date: If you want to start counting accumulations from
+\item{-}{accumulation_start_date: Allows the user to start counting accumulations from
 before the specified start date (or before the
-planting date if using the most recent Planting),
-use this parameter to specify the date from which
-you wish to start counting. The daily values object
+planting date if using the most recent planting).
+Use this parameter to specify the date from which
+you wish to start counting, in the form: YYYY-MM-DD.
+The daily values object
 will still only return the days between the start
-and end date. This date must come before the start date.}
+and end date. This date must come before the start date. (optional)}
 
 \item{-}{gdd_method: There are variety of equations available for calculating growing degree-days.
 Valid entries are: 'standard', 'modifiedstandard', 'min-temp-cap', 'min-temp-constant'
 See the API documentation for a description of each method.  The standard
-method will be used if none is specified}
+method will be used if none is specified. (character - optional)}
 
 \item{-}{gdd_base_temp: The base temp to use for the any of the GDD equations. The default value of 10 will
-be used if none is specified}
+be used if none is specified. (optional)}
 
 \item{-}{gdd_min_boundary: The minimum boundary to use in the selected GDD equation.
 The behavior of this value is different depending on the equation you're using
-The default value of 10 will be used if none is specified}
+The default value of 10 will be used if none is specified. (optional)}
 
 \item{-}{gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 behavior of this value is different depending on the equation you're using.
-The default value of 30 will be used if none is specified}
+The default value of 30 will be used if none is specified. (optional)}
 }
 \value{
-data.table of requested data for dates requested
+dataframe of requested data for dates requested
 }
 \description{
-\code{agronomic_norms_fields} calls Historic Agronomic Norms Endpoint of API using Field Location Construct
+\code{agronomic_norms_fields} pulls agronomic norm data from aWhere's API based on field id
 }
 \details{
-This is a flexible API that allows you to calculate the averages for agronomic values
-and accumulations across any range of years for which we have data. Whereas the Agronomic
-Values and Accumulations API only supports up to 30 months of daily data, this API allow
-you to compare this year and the previous year to the long-term normals (however many years
-you want to include).  Uses the aWhere API Fields construct to request data. Uses default
-units returned by the API
+This function allows you to calculate the averages for agronomic attributes
+across any range of years for which data are available.  The data pulled includes norms for
+growing degree days (GDDs), potential evapotranspiration (PET), Precipitation over
+potential evapotranspiration (P/PET), accumulated GDDs, accumulated precipitation,
+accumulated PET, and accumulated P/PET, along with the standard deviations
+for these variables.  The data pulled is for the field id identified.
+Default units are returned by the API.
+
+The data returned in this function
+allow you to compare this year or previous years to the long-term normals, calculated as
+the average of those agronomic conditions on that day in that location over the years specified.
 }
 \examples{
-\dontrun{agronomic_norms_fields(field_id = 'field123', '07-01', '07-10', '2008', '2016', '2010,2011','','standard','10','10','30')}
+\dontrun{agronomic_norms_fields(field_id = 'field_test', month_day_start = '07-01', month_day_end = '07-10',
+                                year_start = 2008, year_end = 2016, exclude_years = "2010",
+                                 accumulation_start_date = '', gdd_method = 'standard', gdd_base_temp = 10,
+                                 gdd_min_boundary = 10, gdd_max_boundary = 30)}
 }
 \references{
 http://developer.awhere.com/api/reference/agronomics/norms

@@ -10,41 +10,40 @@ create_field(field_id, latitude, longitude, farm_id, field_name = "",
 \arguments{
 \item{-}{field_id: an ID of your choosing (string)}
 
-\item{-}{latitude: the latitude of the field location in decimal format. (string)}
+\item{-}{latitude: the latitude of the field location in decimal format (double)}
 
-\item{-}{longitude: the longitude of the field location in decimal format (string)}
+\item{-}{longitude: the longitude of the field location in decimal format (double)}
 
-\item{-}{farmd: an arbitrary ID for the farm to which this field belongs (string)}
+\item{-}{farmid: an ID of your choosing for the farm to which this field belongs (string)}
 
-\item{-}{field_name: a name of the location (optional -string)}
+\item{-}{field_name: a name of the location (optional - string)}
 
-\item{-}{acres: the acres of the field (optional -string)}
+\item{-}{acres: the acres of the field (optional)}
 }
 \value{
 - printed text that informs if the query succeeded or not
 }
 \description{
-\code{create_field} This API will register a field location in the aWhere platform. This is a one-time operation for each field.
+\code{create_field} This function will generate a new field associated with the user's account in the aWhere API.
+  This is a one-time operation for each field.
 }
 \details{
 Fields are how you manage the locations for which you're tracking weather, agronomics,
-models, and progress over growing seasons. By registering a field, you create a quick way
-to consistently reference locations across all our APIs, and allow our modeling APIs
-to better operate and tune to the conditions and status of each specific field. A Planting
-is the record of a crop's season in a given field, and is where you tell the platform
-about what is planted there and when it was planted.
+models, and progress over growing seasons in the aWhere API. By registering a field, you create a quick way
+to consistently reference locations across all of our APIs, and allow our modeling APIs
+to better operate and tune to the conditions and status of each specific field. 
 
 Creating a field registers the location with the aWhere system, making it easier to reference
 and track your locations as well as run agronomics and models automatically. You
-only need to create a field once, after which point you can reference it by the ID you create
-(you'll use this ID in virtually every URI endpoint in our system).
+only need to create a field once, after which you can reference the field by ID 
+(you'll use this ID in most URI endpoints in the aWhere system).
 
-All Spaces will be converted to underscores to conform with the requirements of the API
+All spaces will be converted to underscores to conform with the requirements of the API.
 }
 \examples{
 \dontrun{
-create_field("field123","39.8282","-98.5795","farmA","Some Field Location","100")
-create_field("field456","40.8282","-100.5795","farmA","Some Field Location","100")
+create_field("field123",39.8282,-98.5795,"farmA","Some Field Location",100)
+create_field(field_id = "aWhere", latitude = 39.971906, longitude = -105.088773, farm_id = "Office")
 }
 }
 \references{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/current-conditions.R
 \name{current_conditions_latlng}
 \alias{current_conditions_latlng}
-\title{current_conditions_latlng.}
+\title{current_conditions_latlng}
 \usage{
 current_conditions_latlng(latitude, longitude, sources = "all")
 }
@@ -21,8 +21,8 @@ data.table of requested data for dates requested
 \code{current_conditions_latlng} calls Current Weather Conditions Endpoint of API using Lat/Lon
 }
 \details{
-The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain™ system,
-and allows retrieval and integration of data across all different time ranges—long term normals,
+The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
+and allows retrieval and integration of data across all different time ranges long term normals,
 daily observed, current weather, and forecasts. These APIs are designed for efficiency,
 allowing you to customize the responses to return just the attributes you need.
 
@@ -34,7 +34,7 @@ that is capable of hourly updates.  Uses the Lat/Lon construct for requesting da
 Uses default units returned by the API
 }
 \examples{
-\dontrun{current_conditions_latlng('39.8282', '-98.5795','all')}
+\dontrun{current_conditions_latlng(39.8282, -98.5795, 'all')}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/current

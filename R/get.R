@@ -5,31 +5,38 @@
 #'
 #' @details
 #' Fields are how you manage the locations for which you're tracking weather, agronomics,
-#' models, and progress over growing seasons. By registering a field, you create a quick way
-#' to consistently reference locations across all our APIs, and allow our modeling APIs
-#' to better operate and tune to the conditions and status of each specific field. A Planting
-#' is the record of a crop's season in a given field, and is where you tell the platform
-#' about what is planted there and when it was planted.
+#' models, and progress over growing seasons in the aWhere API. By registering a field, you create a quick way
+#' to consistently reference locations across all of our APIs, and allow our modeling APIs
+#' to better operate and tune to the conditions and status of each specific field. 
 #'
-#' Before using our other APIs you'll need to register the field locations if using the Fields Name construct.
+#' Before using aWhere's APIs you'll need to register the field locations.
 #' This is a one-time step. Every field has an ID that you define, plus a latitude and longitude.
-#' Fields are universal across all our APIs, and as you provide information about a field, some APIs
+#' Fields are universal across all of our APIs, and as you provide information about a field, some APIs
 #' (such as agronomics and models) can leverage that detail internally to more easily and seamlessly
 #' calculate information for you.
 #'
 #' @references http://developer.awhere.com/api/reference/fields/get-fields
 #'
-#' @param - field_id: Either a specified field name (as a string) to retrieve info on only that field
-#'                   or an empty string to retrieve info on all fields
+#' @param - field_id: Either a field id to retrieve information for that specific field
+#'                   or an empty string to retrieve information on all fields associated 
+#'                   with the user's aWhere API account (string - optional)
 #'
-#' @return - data: data.table containing information about requested field(s)
+#' @import httr
+#'
+#' @return - data.frame containing information about requested field(s)
 #'
 #' @examples
-#' \dontrun{get_fields('field1')}
+#' \dontrun{get_fields('field1')
+#'          get_fields()
+#' }
 
 #' @export
 
-get_fields <- function(field_id = "") {
+get_fields <- function(field_id = '') {
+
+  #checkCredentials()
+  #checkValidField(field_id)
+
   ## Create Request
   url <- "https://api.awhere.com/v2/fields/"
 
@@ -105,13 +112,15 @@ get_fields <- function(field_id = "") {
 #' and agronomics for that location in all the other APIs.
 #'
 #' @param - field_id: a field ID to look within (string)
-#' @param - planting_id: a planting ID to look for (string)
+#' @param - planting_id: a planting ID to look for (string - optional)
 #' @param - current: whether to just get current plantings(T) or include historical plantings(F).
-#'                   To get most recent planting record for a field, set current to TRUE and do not pass in a planting_id (boolean)
-#' @param - offset: The number of objects to skip before returning objects. Used in conjunction with offset to paginate.
-#' @param - limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate.
+#'                   To get most recent planting record for a field, set current to TRUE and do not pass in a planting_id (boolean - optional)
+#' @param - offset: The number of objects to skip before returning objects. Used in conjunction with offset to paginate. (optional)
+#' @param - limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate. (optional)
 #'
-#' @return - data: data.table containing information about requested field(s)
+#' @return - data.frame containing information about requested field(s)
+#'
+#' @import httr
 #'
 #' @references http://developer.awhere.com/api/reference/plantings/get-plantings
 #'
@@ -123,8 +132,10 @@ get_fields <- function(field_id = "") {
 #' get_planting(field_id='field1', offset = '0', limit = '5')}
 #' @export
 
-get_planting <- function(field_id = "", planting_id = "", current = F, offset="", limit="") {
+get_planting <- function(field_id, planting_id = '', current = F, offset="", limit="") {
 
+  checkCredentials()
+  checkValidField(field_id)
 
   ## Create Request
   url <- "https://api.awhere.com/v2/agronomics/"
@@ -219,7 +230,7 @@ get_planting <- function(field_id = "", planting_id = "", current = F, offset=""
 #' @title Get Job
 #'
 #' @description
-#' \code{get_planting} Gets a job's results when complete.
+#' \code{get_job} Gets a job's results when complete.
 #'
 #' @details
 #' Once a batch job is queued you can check on its status with this API. If the job is complete and results are available, they will be included in the response body.
@@ -227,7 +238,9 @@ get_planting <- function(field_id = "", planting_id = "", current = F, offset=""
 #' @param - job_id: a job ID assigned by an aWhere create job.
 #' @param - wait: wait for job to complete before returning
 #'
-#' @return - data: data.table containing the requested payload(s).
+#' @return - data.frame containing the requested payload(s).
+#'
+#' @import httr
 #'
 #' @references https://developer.awhere.com/api/reference/batch/status-results
 #'
@@ -237,6 +250,9 @@ get_planting <- function(field_id = "", planting_id = "", current = F, offset=""
 #' @export
 
 get_job <- function(job_id, wait=T, retry_secs=60, num_retries=60) {
+
+  checkCredentials()
+
   ## Create Request
   url <- "https://api.awhere.com/v2/jobs/"
 

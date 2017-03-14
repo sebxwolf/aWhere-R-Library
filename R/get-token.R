@@ -4,15 +4,16 @@
 #' \code{get_token} gets Access Token for V2 aWhere API
 #'
 #' @details
-#' this script gets the aWHERE access token for the current session of the API
+#' This script provides an aWhere access token for the current session of the API. Information for the key and secret in this 
+#' function can be found on a user's account at developer.awhere.com, under the apps.
 #'
-#' @param - uid: Username associated with the aWhere API
-#' @param - secret: Alphanumeric key associated with your aWhere API account
+#' @param - uid: Consumer key associated with the user's aWhere API account
+#' @param - secret: Consumer secret associated the user's aWhere API account
 #'
 #' @return None
 #'
 #' @examples
-#' \dontrun{get_token(uid, secret)}
+#' \dontrun{get_token("uid", "secret")}
 #' @export
 
 get_token <- function(uid, secret) {
@@ -28,7 +29,7 @@ get_token <- function(uid, secret) {
   a <- suppressMessages(httr::content(request, as = "text"))
 
   if (request$status_code != 200) {
-    warning('The UID/Secret combination is incorrect. \n')
+    stop('The UID/Secret combination is incorrect. \n')
   }
 
   parsedResponse <- unlist(strsplit(a,split = "\""))

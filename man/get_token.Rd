@@ -7,9 +7,9 @@
 get_token(uid, secret)
 }
 \arguments{
-\item{-}{uid: Username associated with the aWhere API}
+\item{-}{uid: Consumer key associated with the user's aWhere API account}
 
-\item{-}{secret: Alphanumeric key associated with your aWhere API account}
+\item{-}{secret: Consumer secret associated the user's aWhere API account}
 }
 \value{
 None
@@ -18,9 +18,10 @@ None
 \code{get_token} gets Access Token for V2 aWhere API
 }
 \details{
-this script gets the aWHERE access token for the current session of the API
+This script provides an aWhere access token for the current session of the API. Information for the key and secret in this 
+function can be found on a user's account at developer.awhere.com, under the apps.
 }
 \examples{
-\dontrun{get_token(uid, secret)}
+\dontrun{get_token("uid", "secret")}
 }
 
