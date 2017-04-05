@@ -19,7 +19,7 @@ This package can be installed directly from GitHub with the following command:
 
 #### If you have problems, try
 On Windows
-install.packages(c('chron', 'magrittr', 'btcops', 'DBI', 'assertthat', 'Rcpp', 'tibble'))
+install.packages(c('chron', 'magrittr', 'bitops', 'DBI', 'assertthat', 'Rcpp', 'tibble'))
 
 On CentOS 7
 yum install openssl-devel libcurl-devel -y
