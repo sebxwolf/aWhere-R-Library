@@ -9,14 +9,21 @@
 #'
 #' @param - uid: Consumer key associated with the user's aWhere API account
 #' @param - secret: Consumer secret associated the user's aWhere API account
-#'
-#' @return None
+#' @param - use_enviroment: Optional logical value, determines whether API access
+#' token will be saved in a local locked environment in addition to being returned
+#' by the function. Defaults to \code{TRUE} to avoid breaking existing code.
+#' 
+#' @return List with three elements:#' 
+#' error: logical indicating whether there was an error
+#' error_message: \code{NULL} if error is \code{FALSE}, a character error message otherwise
+#' token: aWhere API access token value
 #'
 #' @examples
 #' \dontrun{get_token("uid", "secret")}
+#' \dontrun{token_response <- get_token('uid', 'secret', use_environment = FALSE)}
 #' @export
 
-get_token <- function(uid, secret) {
+get_token <- function(uid, secret, use_environment = TRUE) {
 
   url <- "https://api.awhere.com/oauth/token"
 
@@ -29,43 +36,60 @@ get_token <- function(uid, secret) {
   a <- suppressMessages(httr::content(request, as = "text"))
 
   if (request$status_code != 200) {
-    stop('The UID/Secret combination is incorrect. \n')
-  }
+    error <- TRUE
+    error_message <- 'The UID/Secret combination is incorrect.'
+    token <- NULL
+    
+    cat(paste(error_message, '\n'))
+  } else {
+    
+    error <- FALSE
+    error_message <- NULL
+  
+    parsedResponse <- jsonlite::fromJSON(a, simplifyDataFrame = FALSE)
 
-  parsedResponse <- unlist(strsplit(a,split = "\""))
-
-  if (exists('awhereEnv75247') == FALSE) {
-    awhereEnv75247 <- new.env()
-    assign('awhereEnv75247',awhereEnv75247,envir = baseenv())
-    rm(awhereEnv75247)
-  }
-
-  if (exists('uid',envir = awhereEnv75247,inherits = FALSE) == TRUE) {
-    if (bindingIsLocked('uid',awhereEnv75247) == TRUE) {
-      unlockBinding('uid',awhereEnv75247)
+    # Keeping environment approach for backward compatibility,
+    # but adding an optional argument to skip it.
+    if (use_environment) {
+      if (exists('awhereEnv75247') == FALSE) {
+        awhereEnv75247 <- new.env()
+        assign('awhereEnv75247',awhereEnv75247,envir = baseenv())
+        rm(awhereEnv75247)
+      }
+    
+      if (exists('uid',envir = awhereEnv75247,inherits = FALSE) == TRUE) {
+        if (bindingIsLocked('uid',awhereEnv75247) == TRUE) {
+          unlockBinding('uid',awhereEnv75247)
+        }
+      }
+      if (exists('secret',where = awhereEnv75247,inherits = FALSE) == TRUE) {
+        if (bindingIsLocked('secret',awhereEnv75247) == TRUE) {
+          unlockBinding('secret',awhereEnv75247)
+        }
+      }
+      if (exists('token',where = awhereEnv75247,inherits = FALSE) == TRUE) {
+        if (bindingIsLocked('token',awhereEnv75247) == TRUE) {
+          unlockBinding('token',awhereEnv75247)
+        }
+      }
+    
+      awhereEnv75247$uid    <- uid
+      awhereEnv75247$secret <- secret
+      awhereEnv75247$token  <- token <- parsedResponse$access_token
+    
+      lockBinding('uid',    awhereEnv75247)
+      lockBinding('secret', awhereEnv75247)
+      lockBinding('token',  awhereEnv75247)
+    
+      lockEnvironment(awhereEnv75247,bindings = TRUE)
+      rm(awhereEnv75247)
     }
   }
-  if (exists('secret',where = awhereEnv75247,inherits = FALSE) == TRUE) {
-    if (bindingIsLocked('secret',awhereEnv75247) == TRUE) {
-      unlockBinding('secret',awhereEnv75247)
-    }
-  }
-  if (exists('token',where = awhereEnv75247,inherits = FALSE) == TRUE) {
-    if (bindingIsLocked('token',awhereEnv75247) == TRUE) {
-      unlockBinding('token',awhereEnv75247)
-    }
-  }
-
-  awhereEnv75247$uid    <- uid
-  awhereEnv75247$secret <- secret
-  awhereEnv75247$token  <- parsedResponse[4]
-
-  lockBinding('uid',    awhereEnv75247)
-  lockBinding('secret', awhereEnv75247)
-  lockBinding('token',  awhereEnv75247)
-
-  lockEnvironment(awhereEnv75247,bindings = TRUE)
-  rm(awhereEnv75247)
+  
+  list(
+    error = error,
+    error_message = error_message,
+    token = token)
 }
 
 #' @title Load Credentials.
