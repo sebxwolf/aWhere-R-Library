@@ -4,10 +4,10 @@
 #' \code{agronomic_values_fields} pulls agronomic data from aWhere's API based on field id
 #'
 #' @details
-#' This function returns agronomic data on growing degree days (GDDs), potential evapotranspiration (PET), Precipitation over 
+#' This function returns agronomic data on growing degree days (GDDs), potential evapotranspiration (PET), Precipitation over
 #' potential evapotranspiration (P/PET), accumulated GDDs, accumulated precipitation, accumulated PET, and
 #' accumulated P/PET.  Default units are returned by the API.
-#' 
+#'
 #' Agronomic Values are calculated numbers that can be used to show the agronomic status of a field or crop.
 #' These figures can be used, for example, to track and predict plant growth or identify water stress.
 #' Accumulated values allow growers to easily identify how the weather has been over the season.
@@ -15,11 +15,11 @@
 #' that supports a wide variety of configurations to get exactly the data you want as efficiently as
 #' possible. It's also designed to work with the Fields and Plantings system to reduce the amount of input.
 #' While a planting is not required to use this API, creating a Planting for your Fields will allow you
-#' to get the most out of the aWhere platform.  
+#' to get the most out of the aWhere platform.
 #'
 #' @references http://developer.awhere.com/api/reference/agronomics/values
 #'
-#' @param - field_id: the field_id associated with the location for which you want to pull data.  
+#' @param - field_id: the field_id associated with the location for which you want to pull data.
 #' Field IDs are created using the create_field function. (string)
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
@@ -53,8 +53,8 @@
 #'
 #' @examples
 #' \dontrun{agronomic_values_fields('field123','2015-07-01','2015-07-31','','standard', 10, 10, 30)
-#' agronomic_values_fields("field123", day_start = "2016-07-01", day_end = "2016-07-31", 
-#' accumulation_start_date = "2016-06-01", gdd_method = "modifiedstandard", gdd_base_temp = 10, 
+#' agronomic_values_fields("field123", day_start = "2016-07-01", day_end = "2016-07-31",
+#' accumulation_start_date = "2016-06-01", gdd_method = "modifiedstandard", gdd_base_temp = 10,
 #' gdd_min_boundary = 10, gdd_max_boundary = 30)}
 #' @export
 
@@ -64,7 +64,7 @@ agronomic_values_fields <- function(field_id, day_start, day_end,
 
   checkCredentials()
   checkValidField(field_id)
-  checkValidStartEndDates(day_start,day_end)
+  checkValidStartEndDatesAgronomics(day_start,day_end)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
   checkAccumulationStartDate(accumulation_start_date, day_start)
 
@@ -135,10 +135,10 @@ agronomic_values_fields <- function(field_id, day_start, day_end,
 #' \code{agronomic_values_latlng} pulls agronomic data from aWhere's API based on latitude & longitude
 #'
 #' @details
-#' This function returns agronomic data on GDDs, potential evapotranspiration (PET), Precipitation over 
+#' This function returns agronomic data on GDDs, potential evapotranspiration (PET), Precipitation over
 #' potential evapotranspiration (P/PET), accumulated GDDs, accumulated precipitation, accumulated PET, and
 #' accumulated P/PET.  Default units are returned by the API.
-#' 
+#'
 #' Agronomic Values are calculated numbers that can be used to show the agronomic status of a field or crop.
 #' These figures can be used, for example, to track and predict plant growth or identify water stress.
 #' Accumulated values allow growers to easily identify how the weather has been over the season.
@@ -146,7 +146,7 @@ agronomic_values_fields <- function(field_id, day_start, day_end,
 #' that supports a wide variety of configurations to get exactly the data you want as efficiently as
 #' possible. It's also designed to work with the Fields and Plantings system to reduce the amount of input.
 #' While a planting is not required to use this API, creating a Planting for your Fields will allow you
-#' to get the most out of the aWhere platform.  
+#' to get the most out of the aWhere platform.
 #'
 #' @references http://developer.awhere.com/api/reference/agronomics/values
 #'
@@ -193,7 +193,7 @@ agronomic_values_latlng <- function(latitude, longitude,day_start, day_end,
 
   checkCredentials()
   checkValidLatLong(latitude,longitude)
-  checkValidStartEndDates(day_start,day_end)
+  checkValidStartEndDatesAgronomics(day_start,day_end)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
   checkAccumulationStartDate(accumulation_start_date)
 

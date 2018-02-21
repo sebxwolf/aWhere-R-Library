@@ -48,7 +48,7 @@ dataframe of requested data for dates requested
 \code{agronomic_values_fields} pulls agronomic data from aWhere's API based on field id
 }
 \details{
-This function returns agronomic data on growing degree days (GDDs), potential evapotranspiration (PET), Precipitation over 
+This function returns agronomic data on growing degree days (GDDs), potential evapotranspiration (PET), Precipitation over
 potential evapotranspiration (P/PET), accumulated GDDs, accumulated precipitation, accumulated PET, and
 accumulated P/PET.  Default units are returned by the API.
 
@@ -63,8 +63,8 @@ to get the most out of the aWhere platform.
 }
 \examples{
 \dontrun{agronomic_values_fields('field123','2015-07-01','2015-07-31','','standard', 10, 10, 30)
-agronomic_values_fields("field123", day_start = "2016-07-01", day_end = "2016-07-31", 
-accumulation_start_date = "2016-06-01", gdd_method = "modifiedstandard", gdd_base_temp = 10, 
+agronomic_values_fields("field123", day_start = "2016-07-01", day_end = "2016-07-31",
+accumulation_start_date = "2016-06-01", gdd_method = "modifiedstandard", gdd_base_temp = 10,
 gdd_min_boundary = 10, gdd_max_boundary = 30)}
 }
 \references{

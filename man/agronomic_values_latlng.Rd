@@ -49,7 +49,7 @@ data.frame of requested data for dates requested
 \code{agronomic_values_latlng} pulls agronomic data from aWhere's API based on latitude & longitude
 }
 \details{
-This function returns agronomic data on GDDs, potential evapotranspiration (PET), Precipitation over 
+This function returns agronomic data on GDDs, potential evapotranspiration (PET), Precipitation over
 potential evapotranspiration (P/PET), accumulated GDDs, accumulated precipitation, accumulated PET, and
 accumulated P/PET.  Default units are returned by the API.
 

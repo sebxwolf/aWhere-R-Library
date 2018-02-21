@@ -98,6 +98,42 @@ checkValidStartEndDates <- function(day_start,day_end) {
   }
 }
 
+#' @title Check Valid Start End Dates for Agronomics Endpoint
+#'
+#' @description
+#' \code{checkValidStartEndDates} Checks to see if Start/End Dates passed are valid
+#'
+#' @param - day_start: character string of start date in form: YYYY-MM-DD
+#' @param - day_end: character string of end date in form: YYYY-MM-DD
+
+checkValidStartEndDatesAgronomics <- function(day_start,day_end) {
+
+  if (day_start == '' & day_end != '') {
+    stop('The day_end is specified, therefor day_start must also be. Please correct\n')
+  }
+
+  if (day_end != '') {
+    if (ymd(day_start) > ymd(day_end)) {
+      stop('The endDate must come after the startDate. Please correct\n')
+    } else if ((ymd(day_end) - ymd(Sys.Date())) > 7) {
+      stop('Forecast data only availabe 7 days into future\n')
+    }
+  }
+
+  if ((day_start != '') == TRUE) {
+    if (suppressWarnings(is.na(ymd(day_start))) == TRUE) {
+      stop('The Start Date is Not Properly Formatted.  Please change to proper format. \n')
+    }
+  }
+
+  if ((day_end != '') == TRUE) {
+    if (suppressWarnings(is.na(ymd(day_end))) == TRUE) {
+      stop('The End Date is Not Properly Formatted.  Please change to proper format. \n')
+    }
+  }
+}
+
+
 
 #' @title Check Valid Start End Dates for Forecast
 #'
