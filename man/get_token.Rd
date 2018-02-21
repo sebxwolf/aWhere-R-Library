@@ -13,10 +13,10 @@ get_token(uid, secret, use_environment = TRUE)
 
 \item{-}{use_enviroment: Optional logical value, determines whether API access
 token will be saved in a local locked environment in addition to being returned
-by the function.}
+by the function. Defaults to \code{TRUE} to avoid breaking existing code.}
 }
 \value{
-List with three elements:
+List with three elements:#' 
 error: logical indicating whether there was an error
 error_message: \code{NULL} if error is \code{FALSE}, a character error message otherwise
 token: aWhere API access token value
@@ -32,3 +32,4 @@ function can be found on a user's account at developer.awhere.com, under the app
 \dontrun{get_token("uid", "secret")}
 \dontrun{token_response <- get_token('uid', 'secret', use_environment = FALSE)}
 }
+
