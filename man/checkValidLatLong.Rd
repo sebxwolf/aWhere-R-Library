@@ -14,4 +14,3 @@ checkValidLatLong(latitude, longitude)
 \description{
 \code{checkValidLatLong} Checks to see if Lat/Long coordinates are valid
 }
-

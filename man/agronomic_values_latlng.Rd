@@ -6,7 +6,9 @@
 \usage{
 agronomic_values_latlng(latitude, longitude, day_start, day_end,
   accumulation_start_date = "", gdd_method = "standard",
-  gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30)
+  gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{latitude: the latitude of the requested location (double)}
@@ -41,6 +43,12 @@ The default value of 10 will be used if none is specified. (optional)}
 \item{-}{gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 behavior of this value is different depending on the equation you're using.
 The default value of 30 will be used if none is specified. (optional)}
+
+\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
 }
 \value{
 data.frame of requested data for dates requested
@@ -68,4 +76,3 @@ to get the most out of the aWhere platform.
 \references{
 http://developer.awhere.com/api/reference/agronomics/values
 }
-

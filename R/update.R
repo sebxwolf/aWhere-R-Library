@@ -16,9 +16,12 @@
 #'
 #' @param - field_id: the unique field ID for the field you want to update (character string) (required)
 #' @param - variable_update: the variable that needs to be updated, either "farmId", "name", or "acres" 
-#' (character string) (required)
+#'                           (character string) (required)
 #' @param - value_update: the new value for variable_update, to replace the existing value. The existing 
-#' value can be found using get_fields("field_id") (character string) (required)
+#'                        value can be found using get_fields("field_id") (character string) (required)
+#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
 #'
 #' @return - A message confirming the changes have been made
 #'
@@ -27,49 +30,42 @@
 #' @import httr
 #'
 #' @examples
-#' \dontrun{update_field(fieldIDOrName = 'field123',
-#'        variable_update = 'farmId', value_update = 'This is my territory')}
+#' \dontrun{update_field(field_id = 'field_test',variable_update = 'farmId', value_update = 'This is my territory')}
 
 #' @export
 
-update_field <- function(field_id, variable_update, value_update) {
+update_field <- function(field_id
+                         ,variable_update
+                         ,value_update
+                         ,keyToUse = awhereEnv75247$uid
+                         ,secretToUse = awhereEnv75247$secret
+                         ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials()
-  checkValidField(field_id)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
 
   ## Creating the request
-
   url <- paste0("https://api.awhere.com/v2/fields/",field_id)
 
   postbody <- paste0('[{"op":"replace","path":"/', variable_update, '","value":"', value_update, '"}]')
 
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
-    ## Get data
     request <- httr::PATCH(url, body = postbody, httr::content_type('application/json'),
-                           httr:: add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+                           httr:: add_headers(Authorization = paste0("Bearer ", tokenToUse)))
 
     # Re formating the response recieved from API
-    a <- httr::content(request, as = "text")
-
-    #The JSONLITE Serializer properly handles the JSON conversion
+    a <- suppressMessages(httr::content(request, as = "text"))
 
     if (any(grepl('API Access Expired',a)) == TRUE) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
 
-  # Did the query work?
-
-  if ((request$status_code %in% c(200,201,204)) == FALSE) { # status code = 200 means that the query worked
-      warning('WARNING: Problem with Query')
-      cat(paste0(x))
-      return()
-  } else {
-    cat(paste0('Operation Complete'))
-  }
+  cat(paste0('Operation Complete'))
 }
 
 #' @title Update Planting
@@ -94,20 +90,33 @@ update_field <- function(field_id, variable_update, value_update) {
 #' @param - yield_amount: new amount to update as planting's yield amount
 #' @param - yield_units: new units to update as planting's yield units
 #' @param - harvest_date: new actual harvest date to update as planting's harvest date
+#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
 #'
 #' @return - A message confirming the changes have been made
 #'
 #' @import httr
 #'
 #' @examples
-#' \dontrun{update_planting("field123", "64322", harvest_date = "2016-02-01", yield_amount = "60", yield_units = "Bushels")}
+#' \dontrun{update_planting("field_test", "156036", harvest_date = "2016-02-01", yield_amount = "60", yield_units = "Bushels")}
 #'
 #' @export
-update_planting <- function(field_id, planting_id, planting_date = "", proj_yield_amount = "",
-                            proj_yield_units = "", proj_harvest_date = "", yield_amount = "", yield_units = "", harvest_date = "") {
+update_planting <- function(field_id
+                            ,planting_id
+                            ,planting_date = ""
+                            ,proj_yield_amount = ""
+                            ,proj_yield_units = ""
+                            ,proj_harvest_date = ""
+                            ,yield_amount = ""
+                            ,yield_units = ""
+                            ,harvest_date = ""
+                            ,keyToUse = awhereEnv75247$uid
+                            ,secretToUse = awhereEnv75247$secret
+                            ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials()
-  checkValidField(field_id)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
 
   ## Error checking
 
@@ -192,25 +201,22 @@ update_planting <- function(field_id, planting_id, planting_date = "", proj_yiel
     url <- paste0(url, planting_id)
   }
 
-
+  doWeatherGet <- TRUE
+  while (doWeatherGet == TRUE) {
   ##Send request
-  request <- httr::PATCH(url, body = body, httr::content_type('application/json'),
-                         httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+    request <- httr::PATCH(url, body = body, httr::content_type('application/json'),
+                           httr::add_headers(Authorization = paste0("Bearer ", tokenToUse)))
 
-
-
-  # Re formating the response recieved from API
-
-  a <- httr::content(request, as = "text")
-
-  # Did the query work?
-
-  if (request$status_code != 200) { # status code = 200 means that the query worked
-    warning('WARNING: Problem with Query')
-    cat(paste0(x))
-    return()
+    a <- suppressMessages(httr::content(request, as = "text"))
+    
+    if (grepl('API Access Expired',a)) {
+      get_token(keyToUse,secretToUse)
+    } else {
+      checkStatusCode(request)
+      doWeatherGet <- FALSE
+    }
   }
-
-
+  
+  cat(paste0('Operation Complete'))
 }
 

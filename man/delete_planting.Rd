@@ -4,12 +4,19 @@
 \alias{delete_planting}
 \title{Delete Planting}
 \usage{
-delete_planting(field_id, planting_id)
+delete_planting(field_id, planting_id, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the ID of the field for which you want to delete an associated planting (string)}
 
 \item{-}{planting_id: The planting Id that you want to delete.  You can also use "current" to delete the most recent planting (string)}
+
+\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
 }
 \value{
 - a print text that informs if the query succeded or not
@@ -25,4 +32,3 @@ purposes you can delete errant or incorrect plantings.
 \examples{
 \dontrun{delete_planting("field123",'133972')}
 }
-

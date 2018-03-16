@@ -10,6 +10,9 @@
 #' This applies when we design/implement "Plantings" API.
 #'
 #' @param - field_id: an ID of your choosing (string)
+#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
 #'
 #' @return - a print text that informs if the query succeded or not
 #'
@@ -17,15 +20,16 @@
 #' @import httr
 #'
 #' @examples
-#' \dontrun{delete_field("field123")
-#' delete_field("field456")
-#' }
+#' \dontrun{delete_field("field123")}
 #' @export
 
-delete_field <- function(field_id) {
+delete_field <- function(field_id
+                         ,keyToUse = awhereEnv75247$uid
+                         ,secretToUse = awhereEnv75247$secret
+                         ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials()
-  checkValidField(field_id)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
 
   url <- paste0("https://api.awhere.com/v2/fields/", field_id)
 
@@ -35,28 +39,20 @@ delete_field <- function(field_id) {
   while (doWeatherGet == TRUE) {
     ## Get data
     request <- httr::DELETE(url, body=postbody, httr::content_type('application/json'),
-                            httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)), curl = getCurlHandle())
+                            httr::add_headers(Authorization = paste0("Bearer ", tokenToUse)),
+                            curl = getCurlHandle())
 
-    a <- httr::content(request, as = "text")
-    parsedResponse <- unlist(strsplit(a,split = "\""))
-
-    #The JSONLITE Serializer propely handles the JSON conversion
+    a <- suppressMessages(httr::content(request, as = "text"))
 
     if (any(grepl('API Access Expired',a)) == TRUE) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
-
-  if ((request$status_code %in% c(200,204)) == FALSE) { # status code = 200 means that the query worked. I don't know what 204 is but it does delete the field
-      warning('WARNING: Problem with Query')
-      cat(paste0(parsedResponse))
-      return()
-  } else {
-      cat(paste0('Operation Complete'))
-  }
-
+  
+  cat(paste0('Operation Complete'))
 }
 
 #' @title Delete Planting
@@ -71,6 +67,9 @@ delete_field <- function(field_id) {
 #'
 #' @param - field_id: the ID of the field for which you want to delete an associated planting (string)
 #' @param - planting_id: The planting Id that you want to delete.  You can also use "current" to delete the most recent planting (string)
+#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
 #'
 #' @return - a print text that informs if the query succeded or not
 #'
@@ -81,37 +80,32 @@ delete_field <- function(field_id) {
 
 #' @export
 
-delete_planting <- function(field_id,planting_id) {
+delete_planting <- function(field_id
+                            ,planting_id
+                            ,keyToUse = awhereEnv75247$uid
+                            ,secretToUse = awhereEnv75247$secret
+                            ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials()
-  checkValidField(field_id)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
 
   url <- paste0("https://api.awhere.com/v2/agronomics/fields/", field_id,'/plantings/',planting_id)
 
   doWeatherGet = TRUE
   while (doWeatherGet == TRUE) {
     ## Get data
-    request <- httr::DELETE(url, httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+    request <- httr::DELETE(url, httr::add_headers(Authorization = paste0("Bearer ", tokenToUse)))
 
-    a <- httr::content(request, as = "text")
-    parsedResponse <- unlist(strsplit(a,split = "\""))
-
-    #The JSONLITE Serializer properly handles the JSON conversion
+    a <- suppressMessages(httr::content(request, as = "text"))
 
     if (any(grepl('API Access Expired',a)) == TRUE) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
 
-  if ((request$status_code %in% c(200,204)) == FALSE) { # status code = 200 means that the query worked. I don't know what 204 is but it does delete the field
-    warning('WARNING: Problem with Query')
-    cat(paste0(parsedResponse))
-    return()
-  } else {
-    cat(paste0('Operation Complete'))
-  }
-
+  cat(paste0('Operation Complete'))
 }
 

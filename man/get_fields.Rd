@@ -4,12 +4,19 @@
 \alias{get_fields}
 \title{Get Fields}
 \usage{
-get_fields(field_id = "")
+get_fields(field_id = "", keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: Either a field id to retrieve information for that specific field
 or an empty string to retrieve information on all fields associated 
 with the user's aWhere API account (string - optional)}
+
+\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
 }
 \value{
 - data.frame containing information about requested field(s)
@@ -30,11 +37,10 @@ Fields are universal across all of our APIs, and as you provide information abou
 calculate information for you.
 }
 \examples{
-\dontrun{get_fields('field1')
+\dontrun{get_fields('field_test')
          get_fields()
 }
 }
 \references{
 http://developer.awhere.com/api/reference/fields/get-fields
 }
-

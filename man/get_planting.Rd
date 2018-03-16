@@ -5,7 +5,8 @@
 \title{Get Planting}
 \usage{
 get_planting(field_id, planting_id = "", current = F, offset = "",
-  limit = "")
+  limit = "", keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: a field ID to look within (string)}
@@ -18,6 +19,12 @@ To get most recent planting record for a field, set current to TRUE and do not p
 \item{-}{offset: The number of objects to skip before returning objects. Used in conjunction with offset to paginate. (optional)}
 
 \item{-}{limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate. (optional)}
+
+\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
 }
 \value{
 - data.frame containing information about requested field(s)
@@ -40,12 +47,11 @@ for any given field in the platform. In this function by setting an Id you can r
 and agronomics for that location in all the other APIs.
 }
 \examples{
-\dontrun{get_planting(field_id='field1')
-get_planting(field_id = 'field1', planting_id = '73227')
-get_planting('field1', current = T)
-get_planting(field_id='field1', offset = '0', limit = '5')}
+\dontrun{get_planting(field_id='field_test')
+get_planting(field_id = 'field_test', planting_id = '156035')
+get_planting('field_test', current = T)
+get_planting(field_id='field_test', offset = '0', limit = '5')}
 }
 \references{
 http://developer.awhere.com/api/reference/plantings/get-plantings
 }
-

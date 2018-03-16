@@ -4,7 +4,9 @@
 \alias{update_field}
 \title{Update Field}
 \usage{
-update_field(field_id, variable_update, value_update)
+update_field(field_id, variable_update, value_update,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the unique field ID for the field you want to update (character string) (required)}
@@ -14,6 +16,12 @@ update_field(field_id, variable_update, value_update)
 
 \item{-}{value_update: the new value for variable_update, to replace the existing value. The existing 
 value can be found using get_fields("field_id") (character string) (required)}
+
+\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
 }
 \value{
 - A message confirming the changes have been made
@@ -33,10 +41,8 @@ updated one variable at a time, for one field at a time. If you need to update m
 multiple variables associated with a field, please pass commands sequentially.
 }
 \examples{
-\dontrun{update_field(fieldIDOrName = 'field123',
-       variable_update = 'farmId', value_update = 'This is my territory')}
+\dontrun{update_field(field_id = 'field_test',variable_update = 'farmId', value_update = 'This is my territory')}
 }
 \references{
 http://developer.awhere.com/api/reference/fields/update-field
 }
-

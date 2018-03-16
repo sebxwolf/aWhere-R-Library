@@ -4,10 +4,17 @@
 \alias{delete_field}
 \title{Delete Field}
 \usage{
-delete_field(field_id)
+delete_field(field_id, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: an ID of your choosing (string)}
+
+\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
 }
 \value{
 - a print text that informs if the query succeded or not
@@ -22,8 +29,5 @@ The delete should cascade, if there are associated records to a field, they are 
 This applies when we design/implement "Plantings" API.
 }
 \examples{
-\dontrun{delete_field("field123")
-delete_field("field456")
+\dontrun{delete_field("field123")}
 }
-}
-

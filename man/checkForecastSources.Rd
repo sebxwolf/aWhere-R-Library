@@ -9,4 +9,3 @@ checkForecastSources(sources)
 \description{
 \code{checkForecastSources} Checks that the requested Forecast source is valid
 }
-

@@ -4,7 +4,9 @@
 \alias{create_job}
 \title{Create Job}
 \usage{
-create_job(api_requests, request_titles, job_title, job_type = "batch")
+create_job(api_requests, request_titles, job_title, job_type = "batch",
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{api_requests: a list of "verb endpoint" strings. This is the actual API request you're asking the Batch Jobs system to call.
@@ -17,6 +19,12 @@ This need not be unique between all the jobs.}
 \item{-}{job_title: A name for the job, which can aid you in identifying the result set.}
 
 \item{-}{job_type: The type of job. Currently this system only supports the type "batch."}
+
+\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
 }
 \value{
 - job_id: The Job ID. You will need this to retrieve the job status and results.
@@ -43,4 +51,3 @@ Note: The current conditions API cannot be included in batch jobs.
 \references{
 https://developer.awhere.com/api/reference/batch/create
 }
-

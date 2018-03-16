@@ -28,4 +28,3 @@ an error from being returned by R
 \dontrun{load_credentials("C:/aWhere/credentials/credentials.txt")}
 
 }
-

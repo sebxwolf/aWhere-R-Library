@@ -26,10 +26,14 @@
 #'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
 #' @param - year_end: character string of the last year (inclusive) of the range of years for which
 #'                     you're calculating norms, in the form YYYY. e.g., 2015 (required)
-#' @param - exclude_year: character string of a year or years which you'd like to exclude from
+#' @param - exclude_year: Year or years which you'd like to exclude from
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
-#'                       at least three years of data with which to calculate the norms. (optional)
+#'                       at least three years of data with which to calculate the norms. (numeric, optional)
+#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' 
 #' @import httr
 #' @import data.table
 #' @import lubridate
@@ -38,16 +42,23 @@
 #' @return dataframe of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{weather_norms_fields("aWhere", monthday_start = "06-01", monthday_end = "09-01",
-#' year_start = 2006, year_end = 2015)}
+#' \dontrun{weather_norms_fields("field_test", monthday_start = "06-01", monthday_end = "09-01",
+#'                                year_start = 2006, year_end = 2015)}
 #' @export
 #'
-weather_norms_fields <- function(field_id, monthday_start, monthday_end,
-                                 year_start, year_end, exclude_years = c()) {
+weather_norms_fields <- function(field_id
+                                 ,monthday_start
+                                 ,monthday_end
+                                 ,year_start
+                                 ,year_end
+                                 ,exclude_years = NULL
+                                 ,keyToUse = awhereEnv75247$uid
+                                 ,secretToUse = awhereEnv75247$secret
+                                 ,tokenToUse = awhereEnv75247$token) {
 
   #Checking Input Parameters
-  checkCredentials()
-  checkValidField(field_id)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
   checkNormsStartEndDates(monthday_start,monthday_end)
   checkNormsYearsToRequest(year_start,year_end,monthday_start,monthday_end,exclude_years)
 
@@ -85,21 +96,21 @@ weather_norms_fields <- function(field_id, monthday_start, monthday_end,
   while (doWeatherGet == TRUE) {
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                         httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
+                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
     # Make request
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    #The JSONLITE Serializer properly handles the JSON conversion
-
-    x <- jsonlite::fromJSON(a,flatten = TRUE)
-
     if (grepl('API Access Expired',a)) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
+  
+  #The JSONLITE Serializer properly handles the JSON conversion
+  x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   data <- data.table::as.data.table(x$norms)
 
@@ -108,6 +119,8 @@ weather_norms_fields <- function(field_id, monthday_start, monthday_end,
   data[,grep('_links',varNames) := NULL]
   data[,grep('.units',varNames) := NULL]
 
+  checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years)
+  
   return(as.data.frame(data))
 }
 
@@ -129,8 +142,8 @@ weather_norms_fields <- function(field_id, monthday_start, monthday_end,
 #'
 #' @references http://developer.awhere.com/api/reference/weather/norms
 #'
-#' @param - latitude: the latitude of the requested location (double)
-#' @param - longitude: the longitude of the requested locations (double)
+#' @param - latitude: the latitude of the requested location (double, required)
+#' @param - longitude: the longitude of the requested locations (double, required)
 #' @param - monthday_start: character string of the first month and day for which you want to retrieve data,
 #'                          in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)
 #' @param - monthday_end: character string of the last month and day for which you want to retrieve data,
@@ -139,11 +152,14 @@ weather_norms_fields <- function(field_id, monthday_start, monthday_end,
 #'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
 #' @param - year_end: character string of the last year (inclusive) of the range of years for which
 #'                     you're calculating norms, in the form YYYY. e.g., 2015 (required)
-#' @param - exclude_year: character string of a year or years which you'd like to exclude from
+#' @param - exclude_year: Year or years which you'd like to exclude from
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
-#'                       at least three years of data with which to calculate the norms. (optional)
-
+#'                       at least three years of data with which to calculate the norms. (numeric, optional)
+#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' 
 #' @import httr
 #' @import data.table
 #' @import lubridate
@@ -156,11 +172,19 @@ weather_norms_fields <- function(field_id, monthday_start, monthday_end,
 #' @export
 
 
-weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_end,
-                                 year_start, year_end, exclude_years = c()) {
+weather_norms_latlng <- function(latitude
+                                 ,longitude
+                                 ,monthday_start
+                                 ,monthday_end
+                                 ,year_start
+                                 ,year_end
+                                 ,exclude_years = NULL
+                                 ,keyToUse = awhereEnv75247$uid
+                                 ,secretToUse = awhereEnv75247$secret
+                                 ,tokenToUse = awhereEnv75247$token) {
 
   #Checking Input Parameters
-  checkCredentials()
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidLatLong(latitude,longitude)
   checkNormsStartEndDates(monthday_start,monthday_end)
   checkNormsYearsToRequest(year_start,year_end,monthday_start,monthday_end,exclude_years)
@@ -201,20 +225,20 @@ weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_e
   while (doWeatherGet == TRUE) {
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                         httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
+                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    #The JSONLITE Serializer properly handles the JSON conversion
-
-    x <- jsonlite::fromJSON(a,flatten = TRUE)
-
     if (grepl('API Access Expired',a)) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
+  
+  #The JSONLITE Serializer properly handles the JSON conversion
+  x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   data <- data.table::as.data.table(x[[1]])
 
@@ -223,5 +247,7 @@ weather_norms_latlng <- function(latitude, longitude, monthday_start, monthday_e
   data[,grep('_links',varNames) := NULL]
   data[,grep('.units',varNames) := NULL]
 
+  checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years)
+  
   return(as.data.frame(data))
 }

@@ -16,4 +16,3 @@ range of days you are calculating norms for, e.g., '07-10' (July 10)}
 \description{
 \code{checkNormsStartEndDates} Checks Start/End Dates for Norms endpoint are valid
 }
-

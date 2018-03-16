@@ -5,12 +5,13 @@
 \title{weather_norms_latlng}
 \usage{
 weather_norms_latlng(latitude, longitude, monthday_start, monthday_end,
-  year_start, year_end, exclude_years = c())
+  year_start, year_end, exclude_years = NULL, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
-\item{-}{latitude: the latitude of the requested location (double)}
+\item{-}{latitude: the latitude of the requested location (double, required)}
 
-\item{-}{longitude: the longitude of the requested locations (double)}
+\item{-}{longitude: the longitude of the requested locations (double, required)}
 
 \item{-}{monthday_start: character string of the first month and day for which you want to retrieve data,
 in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)}
@@ -24,10 +25,16 @@ you're calculating norms, in the form YYYY. e.g., 2008 (required)}
 \item{-}{year_end: character string of the last year (inclusive) of the range of years for which
 you're calculating norms, in the form YYYY. e.g., 2015 (required)}
 
-\item{-}{exclude_year: character string of a year or years which you'd like to exclude from
+\item{-}{exclude_year: Year or years which you'd like to exclude from
  your range of years on which to calculate norms. To exclude
  multiple years, provide a vector of years. You must include
-at least three years of data with which to calculate the norms. (optional)}
+at least three years of data with which to calculate the norms. (numeric, optional)}
+
+\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
 }
 \value{
 data.frame of requested data for dates requested
@@ -52,4 +59,3 @@ the average of those weather conditions on that day in that location over the ye
 \references{
 http://developer.awhere.com/api/reference/weather/norms
 }
-

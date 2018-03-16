@@ -5,7 +5,8 @@
 \title{forecasts_fields}
 \usage{
 forecasts_fields(field_id, day_start = as.character(Sys.Date()),
-  day_end = "", block_size = 1)
+  day_end = "", block_size = 1, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
@@ -19,6 +20,12 @@ Defaults to system date + 7 if left blank. (optional)}
 
 \item{-}{block_size: Integer value that corresponds to the number of hours to include in each time block.
 Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)}
+
+\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
 }
 \value{
 data.frame of requested data for dates requested
@@ -40,10 +47,9 @@ daily observed, current weather, and forecasts. These APIs are designed for effi
 allowing you to customize the responses to return just the attributes you need.
 }
 \examples{
-\dontrun{forecasts_fields('field123', day_start = '2017-01-01', block_size = 12)
-forecasts_fields('aWhere', day_start = '2017-01-01', day_end = '2017-01-04')}
+\dontrun{forecasts_fields(field_id = 'field_test', day_start = as.character(Sys.Date()), block_size = 12)
+         forecasts_fields('field_test', day_start = as.character(Sys.Date()), day_end = as.character(Sys.Date() + 5))}
 }
 \references{
 http://developer.awhere.com/api/forecast-weather-api
 }
-

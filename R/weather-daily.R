@@ -24,6 +24,9 @@
 #' Field IDs are created using the create_field function.(string)
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD
+#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -34,23 +37,28 @@
 #'
 #'
 #' @examples
-#' \dontrun{daily_observed_fields('field123','2016-04-28','2016-05-01')}
+#' \dontrun{daily_observed_fields(field_id = 'field_test',day_start = '2016-04-28',day_end = '2017-05-01')}
 
 #' @export
-daily_observed_fields <- function(field_id, day_start, day_end) {
+daily_observed_fields <- function(field_id
+                                  ,day_start
+                                  ,day_end
+                                  ,keyToUse = awhereEnv75247$uid
+                                  ,secretToUse = awhereEnv75247$secret
+                                  ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials()
-  checkValidField(field_id)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDates(day_start,day_end)
 
 
   ## Create Request
-  #Calculate number of loops needed if requesting more than 50 days
+  #Calculate number of loops needed if requesting more than 120 days
   numObsReturned <- 120
 
   if (day_start != '' & day_end != '') {
-    numOfDays <- as.numeric(difftime(ymd(day_end), ymd(day_start), units = 'days'))
-    allDates <- seq(as.Date(ymd(day_start)),as.Date(ymd(day_end)), by="days")
+    numOfDays <- as.numeric(difftime(lubridate::ymd(day_end), lubridate::ymd(day_start), units = 'days'))
+    allDates <- seq(as.Date(lubridate::ymd(day_start)),as.Date(lubridate::ymd(day_end)), by="days")
 
     loops <- ((length(allDates))) %/% numObsReturned
     remainder <- ((length(allDates))) %% numObsReturned
@@ -58,7 +66,7 @@ daily_observed_fields <- function(field_id, day_start, day_end) {
   } else if (day_start != '') {
 
     numOfDays <- 1
-    allDates <- ymd(day_start)
+    allDates <- lubridate::ymd(day_start)
     loops <- 1
     remainder <- 0
   } else {
@@ -75,7 +83,7 @@ daily_observed_fields <- function(field_id, day_start, day_end) {
 
   dataList <- list()
 
-  # loop through, making requests in 50-day chunks
+  # loop through, making requests in chunks of size numObsReturned
 
   for (i in 1:loops) {
 
@@ -83,12 +91,12 @@ daily_observed_fields <- function(field_id, day_start, day_end) {
     ending = numObsReturned*i
 
     if(paste(allDates,sep = '',collapse ='') != '') {
-      day_start <- allDates[starting]
-      day_end <- allDates[ending]
-      if(is.na(day_end)) {
+      day_start_toUse <- allDates[starting]
+      day_end_toUse <- allDates[ending]
+      if(is.na(day_end_toUse)) {
         tempDates <- allDates[c(starting:length(allDates))]
-        day_start <- tempDates[1]
-        day_end <- tempDates[length(tempDates)]
+        day_start_toUse <- tempDates[1]
+        day_end_toUse <- tempDates[length(tempDates)]
       }
     }
 
@@ -102,9 +110,9 @@ daily_observed_fields <- function(field_id, day_start, day_end) {
     strType <- paste0('/observations')
 
     if(paste(allDates,sep = '',collapse ='') != '') {
-      strDates <- paste0('/',day_start,',',day_end)
+      strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
 
-      returnedAmount <- as.integer(difftime(ymd(day_end),ymd(day_start),units = 'days')) + 1L
+      returnedAmount <- as.integer(difftime(lubridate::ymd(day_end_toUse),lubridate::ymd(day_start_toUse),units = 'days')) + 1L
       if (returnedAmount > numObsReturned) {
         returnedAmount <- numObsReturned
       }
@@ -122,19 +130,20 @@ daily_observed_fields <- function(field_id, day_start, day_end) {
     while (doWeatherGet == TRUE) {
       postbody = ''
       request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                           httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
+                           httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
 
       a <- suppressMessages(httr::content(request, as = "text"))
 
-      #The JSONLITE Serializer properly handles the JSON conversion
-      x <- jsonlite::fromJSON(a, flatten = TRUE)
-
       if (grepl('API Access Expired',a)) {
-        get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+        get_token(keyToUse,secretToUse)
       } else {
+        checkStatusCode(request)
         doWeatherGet <- FALSE
       }
     }
+    
+    #The JSONLITE Serializer properly handles the JSON conversion
+    x <- jsonlite::fromJSON(a, flatten = TRUE)
 
     data <- data.table::as.data.table(x[[1]])
 
@@ -149,6 +158,8 @@ daily_observed_fields <- function(field_id, day_start, day_end) {
   allWeath[,grep('_links',varNames) := NULL]
   allWeath[,grep('.units',varNames) := NULL]
 
+  checkDataReturn_daily(allWeath,day_start,day_end)
+  
   return(as.data.frame(allWeath))
 }
 
@@ -178,6 +189,9 @@ daily_observed_fields <- function(field_id, day_start, day_end) {
 #' @param - longitude: the longitude of the requested locations (double)
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -188,24 +202,30 @@ daily_observed_fields <- function(field_id, day_start, day_end) {
 #'
 #'
 #' @examples
-#' \dontrun{daily_observed_latlng(39.8282, -98.5795,'2014-04-28','2015-05-01')}
+#' \dontrun{daily_observed_latlng(latitude = 39.8282, longitude = -98.5795,day_start = '2014-04-28',day_end = '2015-05-01')}
 
 #' @export
 
 
-daily_observed_latlng <- function(latitude, longitude, day_start, day_end) {
+daily_observed_latlng <- function(latitude
+                                  ,longitude
+                                  ,day_start
+                                  ,day_end
+                                  ,keyToUse = awhereEnv75247$uid
+                                  ,secretToUse = awhereEnv75247$secret
+                                  ,tokenToUse = awhereEnv75247$token) {
 
-  #checkCredentials()
-  #checkValidLatLong(latitude,longitude)
-  #checkValidStartEndDates(day_start,day_end)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidLatLong(latitude,longitude)
+  checkValidStartEndDates(day_start,day_end)
 
   ## Create Request
-  #Calculate number of loops needed if requesting more than 50 days
+  #Calculate number of loops needed if requesting more than 120 days
   numObsReturned <- 120
 
   if (day_end != '') {
-    numOfDays <- as.numeric(difftime(ymd(day_end), ymd(day_start), units = 'days'))
-    allDates <- seq(as.Date(ymd(day_start)),as.Date(ymd(day_end)), by="days")
+    numOfDays <- as.numeric(difftime(lubridate::ymd(day_end), lubridate::ymd(day_start), units = 'days'))
+    allDates <- seq(as.Date(lubridate::ymd(day_start)),as.Date(lubridate::ymd(day_end)), by="days")
 
     loops <- ((length(allDates))) %/% numObsReturned
     remainder <- ((length(allDates))) %% numObsReturned
@@ -213,7 +233,7 @@ daily_observed_latlng <- function(latitude, longitude, day_start, day_end) {
   } else {
 
     numOfDays <- 1
-    allDates <- ymd(day_start)
+    allDates <- lubridate::ymd(day_start)
     loops <- 1
     remainder <- 0
   }
@@ -225,18 +245,18 @@ daily_observed_latlng <- function(latitude, longitude, day_start, day_end) {
 
   dataList <- list()
 
-  # loop through, making requests in 50-day chunks
+  # loop through, making requests in chunks of size numObsReturned
 
   for (i in 1:loops) {
 
     starting = numObsReturned*(i-1)+1
     ending = numObsReturned*i
-    day_start <- allDates[starting]
-    day_end <- allDates[ending]
-    if(is.na(day_end)) {
+    day_start_toUse <- allDates[starting]
+    day_end_toUse <- allDates[ending]
+    if(is.na(day_end_toUse)) {
       tempDates <- allDates[c(starting:length(allDates))]
-      day_start <- tempDates[1]
-      day_end <- tempDates[length(tempDates)]
+      day_start_toUse <- tempDates[1]
+      day_end_toUse   <- tempDates[length(tempDates)]
     }
 
 
@@ -247,10 +267,10 @@ daily_observed_latlng <- function(latitude, longitude, day_start, day_end) {
     strBeg <- paste0('/locations')
     strCoord <- paste0('/',latitude,',',longitude)
     strType <- paste0('/observations')
-    strDates <- paste0('/',day_start,',',day_end)
+    strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
 
 
-    returnedAmount <- as.integer(difftime(ymd(day_end),ymd(day_start),units = 'days')) + 1L
+    returnedAmount <- as.integer(difftime(lubridate::ymd(day_end_toUse),lubridate::ymd(day_start_toUse),units = 'days')) + 1L
     if (returnedAmount > numObsReturned) {
       returnedAmount <- numObsReturned
     }
@@ -263,22 +283,22 @@ daily_observed_latlng <- function(latitude, longitude, day_start, day_end) {
     while (doWeatherGet == TRUE) {
       postbody = ''
       request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                           httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
+                           httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
 
       # Make request
 
       a <- suppressMessages(httr::content(request, as = "text"))
 
-      #The JSONLITE Serializer properly handles the JSON conversion
-
-      x <- jsonlite::fromJSON(a,flatten = TRUE)
-
       if (grepl('API Access Expired',a)) {
-        get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+        get_token(keyToUse,secretToUse)
       } else {
+        checkStatusCode(request)
         doWeatherGet <- FALSE
       }
     }
+    
+    #The JSONLITE Serializer properly handles the JSON conversion
+    x <- jsonlite::fromJSON(a,flatten = TRUE)
 
     data <- data.table::as.data.table(x[[1]])
 
@@ -293,5 +313,7 @@ daily_observed_latlng <- function(latitude, longitude, day_start, day_end) {
   allWeath[,grep('_links',varNames) := NULL]
   allWeath[,grep('.units',varNames) := NULL]
 
+  checkDataReturn_daily(allWeath,day_start,day_end)
+  
   return(as.data.frame(allWeath))
 }

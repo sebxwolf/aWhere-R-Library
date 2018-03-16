@@ -5,7 +5,8 @@
 \title{Create Field}
 \usage{
 create_field(field_id, latitude, longitude, farm_id, field_name = "",
-  acres = "")
+  acres = "", keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: an ID of your choosing (string)}
@@ -19,6 +20,12 @@ create_field(field_id, latitude, longitude, farm_id, field_name = "",
 \item{-}{field_name: a name of the location (optional - string)}
 
 \item{-}{acres: the acres of the field (optional)}
+
+\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
 }
 \value{
 - printed text that informs if the query succeeded or not
@@ -42,11 +49,10 @@ All spaces will be converted to underscores to conform with the requirements of 
 }
 \examples{
 \dontrun{
-create_field("field123",39.8282,-98.5795,"farmA","Some Field Location",100)
-create_field(field_id = "aWhere", latitude = 39.971906, longitude = -105.088773, farm_id = "Office")
+create_field(field_id = "field123",latitude = 39.8282,longitude = -98.5795,farm_id = "farmA",field_name = "Some Field Location",acres = 100)
+create_field(field_id = "field_test", latitude = 39.971906, longitude = -105.088773, farm_id = "Office")
 }
 }
 \references{
 http://developer.awhere.com/api/reference/fields/create-field
 }
-

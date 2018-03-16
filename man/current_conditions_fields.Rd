@@ -4,13 +4,21 @@
 \alias{current_conditions_fields}
 \title{current_conditions_fields}
 \usage{
-current_conditions_fields(field_id, sources = "all")
+current_conditions_fields(field_id, sources = "all",
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id having previously been created with the createField Function}
 
 \item{-}{sources: Which source to use for pulling the current conditions.  Valid values are
 'metar', 'mesonet', 'metar-mesonet', 'pws', 'all'.  Default value is 'all'}
+
+\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
 }
 \value{
 data.frame of requested data for dates requested
@@ -32,9 +40,8 @@ that is capable of hourly updates.  Uses the Fields Name construct for requestio
 Uses default units returned by the API
 }
 \examples{
-\dontrun{current_conditions_fields('field123','all')}
+\dontrun{current_conditions_fields('field_test','all')}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/current
 }
-
