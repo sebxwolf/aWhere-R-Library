@@ -5,7 +5,8 @@
 \title{Create Field}
 \usage{
 create_field(field_id, latitude, longitude, farm_id, field_name = "",
-  acres = "")
+  acres = "", keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: an ID of your choosing (string)}
@@ -19,6 +20,12 @@ create_field(field_id, latitude, longitude, farm_id, field_name = "",
 \item{-}{field_name: a name of the location (optional - string)}
 
 \item{-}{acres: the acres of the field (optional)}
+
+\item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 }
 \value{
 - printed text that informs if the query succeeded or not
@@ -31,22 +38,21 @@ create_field(field_id, latitude, longitude, farm_id, field_name = "",
 Fields are how you manage the locations for which you're tracking weather, agronomics,
 models, and progress over growing seasons in the aWhere API. By registering a field, you create a quick way
 to consistently reference locations across all of our APIs, and allow our modeling APIs
-to better operate and tune to the conditions and status of each specific field. 
+to better operate and tune to the conditions and status of each specific field.
 
 Creating a field registers the location with the aWhere system, making it easier to reference
 and track your locations as well as run agronomics and models automatically. You
-only need to create a field once, after which you can reference the field by ID 
+only need to create a field once, after which you can reference the field by ID
 (you'll use this ID in most URI endpoints in the aWhere system).
 
 All spaces will be converted to underscores to conform with the requirements of the API.
 }
 \examples{
 \dontrun{
-create_field("field123",39.8282,-98.5795,"farmA","Some Field Location",100)
-create_field(field_id = "aWhere", latitude = 39.971906, longitude = -105.088773, farm_id = "Office")
+create_field(field_id = "field123",latitude = 39.8282,longitude = -98.5795,farm_id = "farmA",field_name = "Some Field Location",acres = 100)
+create_field(field_id = "field_test", latitude = 39.971906, longitude = -105.088773, farm_id = "Office")
 }
 }
 \references{
 http://developer.awhere.com/api/reference/fields/create-field
 }
-

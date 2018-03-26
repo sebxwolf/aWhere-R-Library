@@ -14,4 +14,3 @@ checkForecastParams(day_start, block_size)
 \description{
 \code{checkForecastParams} Checks to see if Forecast Params are valid
 }
-

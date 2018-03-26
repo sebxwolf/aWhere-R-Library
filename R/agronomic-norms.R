@@ -30,10 +30,10 @@
 #'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
 #' @param - year_end: character string of the last year (inclusive) of the range of years for which
 #'                     you're calculating norms, in the form YYYY. e.g., 2015 (required)
-#' @param - exclude_year: character string of a year or years which you'd like to exclude from
+#' @param - exclude_year: Year or years which you'd like to exclude from
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
-#'                       at least three years of data with which to calculate the norms. (optional)
+#'                       at least three years of data with which to calculate the norms. (numeric, optional)
 #' @param - accumulation_start_date: Allows the user to start counting accumulations from
 #'                                 before the specified start date (or before the
 #'                                 planting date if using the most recent planting).
@@ -54,7 +54,9 @@
 #' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 #'                          behavior of this value is different depending on the equation you're using.
 #'                          The default value of 30 will be used if none is specified. (optional)
-#'
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -72,15 +74,25 @@
 #' @export
 
 
-agronomic_norms_fields <- function(field_id, month_day_start, month_day_end,
-                                   year_start, year_end, exclude_years = c(),
-                                   accumulation_start_date = '', gdd_method = 'standard',
-                                   gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30) {
+agronomic_norms_fields <- function(field_id
+                                   ,month_day_start
+                                   ,month_day_end
+                                   ,year_start
+                                   ,year_end
+                                   ,exclude_years = NULL
+                                   ,accumulation_start_date = ''
+                                   ,gdd_method = 'standard'
+                                   ,gdd_base_temp = 10
+                                   ,gdd_min_boundary = 10
+                                   ,gdd_max_boundary = 30
+                                   ,keyToUse = awhereEnv75247$uid
+                                   ,secretToUse = awhereEnv75247$secret
+                                   ,tokenToUse = awhereEnv75247$token) {
 
   #############################################################
   #Checking Input Parameters
-  checkCredentials()
-  checkValidField(field_id)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
   checkNormsStartEndDates(month_day_start,month_day_end)
   checkNormsYearsToRequest(year_start,year_end,month_day_start,month_day_end,exclude_years)
@@ -130,20 +142,20 @@ agronomic_norms_fields <- function(field_id, month_day_start, month_day_end,
   while (doWeatherGet == TRUE) {
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                         httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
+                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    #The JSONLITE Serializer properly handles the JSON conversion
-
-    x <- jsonlite::fromJSON(a,flatten = TRUE)
-
     if (grepl('API Access Expired',a)) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
+
+  #The JSONLITE Serializer properly handles the JSON conversion
+  x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   data <- data.table::as.data.table(x[[3]])
 
@@ -155,6 +167,8 @@ agronomic_norms_fields <- function(field_id, month_day_start, month_day_end,
   currentNames <- copy(colnames(data))
   data[,field_id  := field_id]
   setcolorder(data,c('field_id',currentNames))
+
+  checkDataReturn_norms(data,month_day_start,month_day_end,year_start,year_end,exclude_years)
 
   return(as.data.frame(data))
 }
@@ -181,8 +195,8 @@ agronomic_norms_fields <- function(field_id, month_day_start, month_day_end,
 #'
 #' @references http://developer.awhere.com/api/reference/agronomics/norms
 #'
-#' @param - latitude: the latitude of the requested location (double)
-#' @param - longitude: the longitude of the requested locations (double)
+#' @param - latitude: the latitude of the requested location (double, required)
+#' @param - longitude: the longitude of the requested locations (double, required)
 #' @param - monthday_start: character string of the first month and day for which you want to retrieve data,
 #'                          in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)
 #' @param - monthday_end: character string of the last month and day for which you want to retrieve data,
@@ -191,10 +205,10 @@ agronomic_norms_fields <- function(field_id, month_day_start, month_day_end,
 #'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
 #' @param - year_end: character string of the last year (inclusive) of the range of years for which
 #'                     you're calculating norms, in the form YYYY. e.g., 2015 (required)
-#' @param - exclude_year: character string of a year or years which you'd like to exclude from
+#' @param - exclude_year: Year or years which you'd like to exclude from
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
-#'                       at least three years of data with which to calculate the norms. (optional)
+#'                       at least three years of data with which to calculate the norms. (numeric, optional)
 #' @param - accumulation_start_date: Allows the user to start counting accumulations from
 #'                                 before the specified start date (or before the
 #'                                 planting date if using the most recent planting).
@@ -215,6 +229,9 @@ agronomic_norms_fields <- function(field_id, month_day_start, month_day_end,
 #' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 #'                          behavior of this value is different depending on the equation you're using.
 #'                          The default value of 30 will be used if none is specified. (optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -235,14 +252,25 @@ agronomic_norms_fields <- function(field_id, month_day_start, month_day_end,
 #' @export
 
 
-agronomic_norms_latlng <- function(latitude, longitude, month_day_start, month_day_end,
-                                   year_start, year_end,exclude_years = c(),
-                                   accumulation_start_date = '',gdd_method = 'standard',gdd_base_temp = 10,
-                                   gdd_min_boundary = 10, gdd_max_boundary = 30) {
+agronomic_norms_latlng <- function(latitude
+                                   ,longitude
+                                   ,month_day_start
+                                   ,month_day_end
+                                   ,year_start
+                                   ,year_end
+                                   ,exclude_years = NULL
+                                   ,accumulation_start_date = ''
+                                   ,gdd_method = 'standard'
+                                   ,gdd_base_temp = 10
+                                   ,gdd_min_boundary = 10
+                                   ,gdd_max_boundary = 30
+                                   ,keyToUse = awhereEnv75247$uid
+                                   ,secretToUse = awhereEnv75247$secret
+                                   ,tokenToUse = awhereEnv75247$token) {
 
   #############################################################
   #Checking Input Parameters
-  checkCredentials()
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidLatLong(latitude,longitude)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
   checkNormsStartEndDates(month_day_start,month_day_end)
@@ -290,19 +318,20 @@ agronomic_norms_latlng <- function(latitude, longitude, month_day_start, month_d
   while (doWeatherGet == TRUE) {
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                         httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
+                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
 
     a <- suppressMessages(content(request, as = "text"))
 
     if (grepl('API Access Expired',a)) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
-
-      #The JSONLITE Serializer properly handles the JSON conversion
-      x <- jsonlite::fromJSON(a,flatten = TRUE)
     }
   }
+
+  #The JSONLITE Serializer properly handles the JSON conversion
+  x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   data <- data.table::as.data.table(x[[3]])
 
@@ -315,6 +344,8 @@ agronomic_norms_latlng <- function(latitude, longitude, month_day_start, month_d
   data[,latitude  := latitude]
   data[,longitude := longitude]
   setcolorder(data,c('latitude','longitude',currentNames))
+
+  checkDataReturn_norms(data,month_day_start,month_day_end,year_start,year_end,exclude_years)
 
   return(as.data.frame(data))
 }

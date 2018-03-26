@@ -20,4 +20,3 @@ and end date. This date must come before the start date.}
 \description{
 \code{checkAccumulationStartDate} Checks to see if the accumulation start date is valid
 }
-

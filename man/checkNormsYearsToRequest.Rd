@@ -22,4 +22,3 @@ at least three years of data to average}
 \description{
 \code{checkNormsYearsToRequest} Check that the Years to be Requested for Norms is valid
 }
-

@@ -2,17 +2,17 @@
 #'
 #' @description
 #' \code{create_field} This function will generate a new field associated with the user's account in the aWhere API.
-#'   This is a one-time operation for each field.  
+#'   This is a one-time operation for each field.
 #'
 #' @details
 #' Fields are how you manage the locations for which you're tracking weather, agronomics,
 #' models, and progress over growing seasons in the aWhere API. By registering a field, you create a quick way
 #' to consistently reference locations across all of our APIs, and allow our modeling APIs
-#' to better operate and tune to the conditions and status of each specific field. 
+#' to better operate and tune to the conditions and status of each specific field.
 #'
 #' Creating a field registers the location with the aWhere system, making it easier to reference
 #' and track your locations as well as run agronomics and models automatically. You
-#' only need to create a field once, after which you can reference the field by ID 
+#' only need to create a field once, after which you can reference the field by ID
 #' (you'll use this ID in most URI endpoints in the aWhere system).
 #'
 #' All spaces will be converted to underscores to conform with the requirements of the API.
@@ -23,6 +23,9 @@
 #' @param - farmid: an ID of your choosing for the farm to which this field belongs (string)
 #' @param - field_name: a name of the location (optional - string)
 #' @param - acres: the acres of the field (optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @return - printed text that informs if the query succeeded or not
 #'
@@ -32,16 +35,24 @@
 #'
 #' @examples
 #' \dontrun{
-#' create_field("field123",39.8282,-98.5795,"farmA","Some Field Location",100)
-#' create_field(field_id = "aWhere", latitude = 39.971906, longitude = -105.088773, farm_id = "Office")
+#' create_field(field_id = "field123",latitude = 39.8282,longitude = -98.5795,farm_id = "farmA",field_name = "Some Field Location",acres = 100)
+#' create_field(field_id = "field_test", latitude = 39.971906, longitude = -105.088773, farm_id = "Office")
 #' }
 
 #' @export
-create_field <- function(field_id, latitude, longitude, farm_id, field_name = "", acres = "") {
+create_field <- function(field_id
+                         ,latitude
+                         ,longitude
+                         ,farm_id
+                         ,field_name = ""
+                         ,acres = ""
+                         ,keyToUse = awhereEnv75247$uid
+                         ,secretToUse = awhereEnv75247$secret
+                         ,tokenToUse = awhereEnv75247$token) {
 
   #############################################################
   #Checking Input Parameters
-  checkCredentials()
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidLatLong(latitude,longitude)
 
   if (acres != "") {
@@ -68,34 +79,22 @@ create_field <- function(field_id, latitude, longitude, farm_id, field_name = ""
   }
   postbody <- paste0(postbody, '}')
 
-
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
     request <- httr::POST(url, body=postbody, httr::content_type('application/json'),
-                          httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+                          httr::add_headers(Authorization = paste0("Bearer ", tokenToUse)))
 
-    a <- httr::content(request, as = "text")
-
-    #The JSONLITE Serializer properly handles the JSON conversion
-
-    x <- jsonlite::fromJSON(a,flatten = TRUE)
+    a <- suppressMessages(httr::content(request, as = "text"))
 
     if (grepl('API Access Expired',a)) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
 
-  parsedResponse <- unlist(strsplit(a,split = "\""))
-
-  if ((request$status_code %in% c(201)) == FALSE) { # status code = 200 means that the query worked
-    warning('WARNING: Problem with Query')
-    cat(paste0(parsedResponse))
-    return()
-  } else {
-    cat(paste0('Operation Complete \n'))
-  }
+  cat(paste0('Operation Complete \n'))
 }
 
 
@@ -139,6 +138,9 @@ create_field <- function(field_id, latitude, longitude, farm_id, field_name = ""
 #' @param - yield_amount: actual yield (string - optional)
 #' @param - yield_units: units of actual yield (string - optional)
 #' @param - harvest_date: actual harvest date at end of season. Format as YYYY-MM-DD (string - optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @return - system generated planting id along with a print text that informs if the query succeeded or not
 #'
@@ -147,16 +149,26 @@ create_field <- function(field_id, latitude, longitude, farm_id, field_name = ""
 #' @import httr
 #'
 #' @examples
-#' \dontrun{create_planting(field_id='field123',crop='corn', planting_date='2015-10-25', proj_yield_amount='100', proj_yield_units='Bushels', proj_harvest_date='2016-02-01', yield_amount='110', yield_units='Bushels', harvest_date='2016-02-01')
+#' \dontrun{create_planting(field_id='field_test',crop='corn', planting_date='2015-10-25', proj_yield_amount='100',
+#'                          proj_yield_units='Bushels', proj_harvest_date='2016-02-01', yield_amount='110',
+#'                          yield_units='Bushels', harvest_date='2016-02-01')
 #' }
 #' @export
 
-create_planting <- function(field_id, crop, planting_date, proj_yield_amount = "", proj_yield_units = "", proj_harvest_date = "",
-                            yield_amount = "", yield_units = "", harvest_date = "") {
+create_planting <- function(field_id
+                            ,crop
+                            ,planting_date
+                            ,proj_yield_amount = ""
+                            ,proj_yield_units = ""
+                            ,proj_harvest_date = ""
+                            ,yield_amount = ""
+                            ,yield_units = ""
+                            ,harvest_date = ""
+                            ,keyToUse = awhereEnv75247$uid
+                            ,secretToUse = awhereEnv75247$secret
+                            ,tokenToUse = awhereEnv75247$token) {
 
-  #INSERT CHECK FOR PLANTINGDATE AND FIELDID
-  checkCredentials()
-
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
   ## Error checking for valid entries
 
   if((proj_yield_amount != "" & proj_yield_units == "") || (proj_yield_amount == "" & proj_yield_units != "")) {
@@ -167,10 +179,9 @@ create_planting <- function(field_id, crop, planting_date, proj_yield_amount = "
     stop("Must either have both yield amount and yield units, or neither")
   }
 
-  checkValidField(field_id)
+  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
 
   url <- paste0("https://api.awhere.com/v2/agronomics/fields/", field_id, "/plantings")
-
 
   postbody <- paste0('{',
                      '"crop":"', crop, '",',
@@ -202,29 +213,23 @@ create_planting <- function(field_id, crop, planting_date, proj_yield_amount = "
 
   postbody <- paste0(postbody, '}')
 
-
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
     request <- httr::POST(url, body=postbody, httr::content_type('application/json'),
-                          httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+                          httr::add_headers(Authorization = paste0("Bearer ", tokenToUse)))
 
-    a <- httr::content(request)
+    a <- suppressMessages(httr::content(request))
 
     if (any(grepl('API Access Expired',a))) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
 
-  if (!is.null(a$statusCode)) { # status code = 200 means that the query worked
-    warning('WARNING: Problem with Query')
-    cat(paste0(a$detailedMessage))
-  } else {
-    cat(paste0('Operation Complete \n Planting ID: ', a$id))
-    a$id
-  }
-
+  cat(paste0('Operation Complete \n Planting ID: ', a$id),'\n')
+  return(a$id)
 }
 
 #' @title Create Job
@@ -257,6 +262,9 @@ create_planting <- function(field_id, crop, planting_date, proj_yield_amount = "
 #' @param - job_title: A name for the job, which can aid you in identifying the result set.
 #' @param - job_type: The type of job. Currently this system only supports the type "batch."
 #' @return - job_id: The Job ID. You will need this to retrieve the job status and results.
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @references https://developer.awhere.com/api/reference/batch/create
 #'
@@ -265,11 +273,18 @@ create_planting <- function(field_id, crop, planting_date, proj_yield_amount = "
 #' @examples
 #' \dontrun{create_job(c("GET /v2/weather/fields/field_test/observations", "GET /v2/weather/fields/aWhereOffice/observations"), c("farmA", "farmB"), "job_1")}
 #' @export
-create_job <- function(api_requests, request_titles, job_title, job_type="batch") {
+
+create_job <- function(api_requests
+                       ,request_titles
+                       ,job_title
+                       ,job_type="batch"
+                       ,keyToUse = awhereEnv75247$uid
+                       ,secretToUse = awhereEnv75247$secret
+                       ,tokenToUse = awhereEnv75247$token) {
 
   #############################################################
   #Checking Input Parameters
-  checkCredentials()
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
 
   job_title <- gsub(' ','_', job_title)
 
@@ -282,22 +297,18 @@ create_job <- function(api_requests, request_titles, job_title, job_type="batch"
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
     request <- httr::POST(url, body=postbody, httr::content_type('application/json'),
-                          httr::add_headers(Authorization = paste0("Bearer ", awhereEnv75247$token)))
+                          httr::add_headers(Authorization = paste0("Bearer ", tokenToUse)))
 
     a <- httr::content(request)
 
     if (any(grepl('API Access Expired',a))) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
 
-  if ((request$status_code %in% c(201)) == FALSE) { # status code = 200 means that the query worked
-    warning('WARNING: Problem with Query')
-    stop(paste0(a))
-  } else {
-    cat(paste0('Operation Complete \n'))
-    return(a$jobId)
-  }
+  cat(paste0('Operation Complete \n Job ID: ',a$jobId,'\n'))
+  return(a$jobId)
 }

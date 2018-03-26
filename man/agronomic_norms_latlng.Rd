@@ -5,14 +5,15 @@
 \title{agronomic_norms_latlng}
 \usage{
 agronomic_norms_latlng(latitude, longitude, month_day_start, month_day_end,
-  year_start, year_end, exclude_years = c(), accumulation_start_date = "",
+  year_start, year_end, exclude_years = NULL, accumulation_start_date = "",
   gdd_method = "standard", gdd_base_temp = 10, gdd_min_boundary = 10,
-  gdd_max_boundary = 30)
+  gdd_max_boundary = 30, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
-\item{-}{latitude: the latitude of the requested location (double)}
+\item{-}{latitude: the latitude of the requested location (double, required)}
 
-\item{-}{longitude: the longitude of the requested locations (double)}
+\item{-}{longitude: the longitude of the requested locations (double, required)}
 
 \item{-}{monthday_start: character string of the first month and day for which you want to retrieve data,
 in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)}
@@ -26,10 +27,10 @@ you're calculating norms, in the form YYYY. e.g., 2008 (required)}
 \item{-}{year_end: character string of the last year (inclusive) of the range of years for which
 you're calculating norms, in the form YYYY. e.g., 2015 (required)}
 
-\item{-}{exclude_year: character string of a year or years which you'd like to exclude from
+\item{-}{exclude_year: Year or years which you'd like to exclude from
  your range of years on which to calculate norms. To exclude
  multiple years, provide a vector of years. You must include
-at least three years of data with which to calculate the norms. (optional)}
+at least three years of data with which to calculate the norms. (numeric, optional)}
 
 \item{-}{accumulation_start_date: Allows the user to start counting accumulations from
 before the specified start date (or before the
@@ -55,6 +56,12 @@ The default value of 10 will be used if none is specified. (optional)}
 \item{-}{gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 behavior of this value is different depending on the equation you're using.
 The default value of 30 will be used if none is specified. (optional)}
+
+\item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 }
 \value{
 dataframe of requested data for dates requested
@@ -85,4 +92,3 @@ the average of those agronomic conditions on that day in that location over the 
 \references{
 http://developer.awhere.com/api/reference/agronomics/norms
 }
-

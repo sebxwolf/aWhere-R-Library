@@ -28,6 +28,9 @@
 #'                  Defaults to system date + 7 if left blank. (optional)
 #' @param - block_size: Integer value that corresponds to the number of hours to include in each time block.
 #'                     Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -37,15 +40,21 @@
 #' @return data.frame of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{forecasts_fields('field123', day_start = '2017-01-01', block_size = 12)
-#' forecasts_fields('aWhere', day_start = '2017-01-01', day_end = '2017-01-04')}
+#' \dontrun{forecasts_fields(field_id = 'field_test', day_start = as.character(Sys.Date()), block_size = 12)
+#'          forecasts_fields('field_test', day_start = as.character(Sys.Date()), day_end = as.character(Sys.Date() + 5))}
 #' @export
 
 
-forecasts_fields <- function(field_id, day_start = as.character(Sys.Date()), day_end = '',block_size = 1) {
+forecasts_fields <- function(field_id
+                             ,day_start = as.character(Sys.Date())
+                             ,day_end = ''
+                             ,block_size = 1
+                             ,keyToUse = awhereEnv75247$uid
+                             ,secretToUse = awhereEnv75247$secret
+                             ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials()
-  checkValidField(field_id)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDatesForecast(day_start,day_end)
   checkForecastParams(day_start,block_size)
 
@@ -76,16 +85,17 @@ forecasts_fields <- function(field_id, day_start = as.character(Sys.Date()), day
 
     a <- suppressMessages(content(request, as = "text"))
 
-    #The JSONLITE Serializer properly handles the JSON conversion
-
-    x <- jsonlite::fromJSON(a,flatten = TRUE)
-
     if (grepl('API Access Expired',a)) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
+
+  #The JSONLITE Serializer properly handles the JSON conversion
+  x <- jsonlite::fromJSON(a,flatten = TRUE)
+
   if (length(x) != 4) {
     dataTemp <- x[[1]]$forecast
     data <- as.data.table(rbindlist(dataTemp))
@@ -101,6 +111,8 @@ forecasts_fields <- function(field_id, day_start = as.character(Sys.Date()), day
   currentNames <- copy(colnames(data))
   data[,field_id  := field_id]
   setcolorder(data,c('field_id',currentNames))
+
+  checkDataReturn_forecasts(data,day_start,day_end,block_size)
 
   return(as.data.frame(data))
 }
@@ -123,20 +135,21 @@ forecasts_fields <- function(field_id, day_start = as.character(Sys.Date()), day
 #' daily observed, current weather, and forecasts. These APIs are designed for efficiency,
 #' allowing you to customize the responses to return just the attributes you need.
 #'
-#'
-#'
 #' @references http://developer.awhere.com/api/reference/weather/forecasts/geolocation
 #'
 #' @param - latitude: the latitude of the requested location (double)
 #' @param - longitude: the longitude of the requested locations (double)
-#'@param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #'                    Defaults to system date if left blank. (optional)
 #' @param - day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD
 #'                  Defaults to system date + 7 if left blank. (optional)
 #' @param - block_size: Integer value that corresponds to the number of hours to include in each time block.
 #'                     Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
-#' @return data.table of requested data for dates requested
+#' @return data.frame of requested data for dates requested
 #'
 #' @import httr
 #' @import data.table
@@ -144,15 +157,22 @@ forecasts_fields <- function(field_id, day_start = as.character(Sys.Date()), day
 #' @import jsonlite
 #'
 #' @examples
-#' \dontrun{forecasts_latlng(39.8282, -98.5795,'2017-02-14','2017-02-19', 12)
-#' forecasts_latlng(19.328489, -99.145681, day_start = '2017-02-14', block_size = 4)}
+#' \dontrun{forecasts_latlng(39.8282, -98.5795,as.character(Sys.Date()),as.character(Sys.Date() + 5), block_size = 12)
+#'          forecasts_latlng(19.328489, -99.145681, day_start = as.character(Sys.Date()), block_size = 4)}
 
 #' @export
 
 
-forecasts_latlng <- function(latitude, longitude, day_start = as.character(Sys.Date()), day_end = '',block_size = 1) {
+forecasts_latlng <- function(latitude
+                             ,longitude
+                             ,day_start = as.character(Sys.Date())
+                             ,day_end = ''
+                             ,block_size = 1
+                             ,keyToUse = awhereEnv75247$uid
+                             ,secretToUse = awhereEnv75247$secret
+                             ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials()
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidLatLong(latitude,longitude)
   checkValidStartEndDatesForecast(day_start,day_end)
   checkForecastParams(day_start,block_size)
@@ -173,21 +193,21 @@ forecasts_latlng <- function(latitude, longitude, day_start = as.character(Sys.D
   while (doWeatherGet == TRUE) {
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                         httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
+                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
 
     # Make forecast request
     a <- suppressMessages(content(request, as = "text"))
 
-    #The JSONLITE Serializer properly handles the JSON conversion
-
-    x <- jsonlite::fromJSON(a,flatten = TRUE)
-
     if (grepl('API Access Expired',a)) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
+
+  #The JSONLITE Serializer properly handles the JSON conversion
+  x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   if (length(x) != 4) {
     dataTemp <- x[[1]]$forecast
@@ -206,6 +226,8 @@ forecasts_latlng <- function(latitude, longitude, day_start = as.character(Sys.D
   data[,longitude := longitude]
   setcolorder(data,c('latitude','longitude',currentNames))
 
+  checkDataReturn_forecasts(data,day_start,day_end,block_size)
+
   return(as.data.frame(data))
-  }
+}
 

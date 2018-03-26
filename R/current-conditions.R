@@ -21,6 +21,9 @@
 #' @param - field_id: the field_id having previously been created with the createField Function
 #' @param - sources: Which source to use for pulling the current conditions.  Valid values are
 #'                    'metar', 'mesonet', 'metar-mesonet', 'pws', 'all'.  Default value is 'all'
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -30,15 +33,19 @@
 #' @return data.frame of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{current_conditions_fields('field123','all')}
+#' \dontrun{current_conditions_fields('field_test','all')}
 
 #' @export
 
 
-current_conditions_fields <- function(field_id,sources = 'all') {
+current_conditions_fields <- function(field_id
+                                      ,sources = 'all'
+                                      ,keyToUse = awhereEnv75247$uid
+                                      ,secretToUse = awhereEnv75247$secret
+                                      ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials()
-  checkValidField(field_id)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
   checkForecastSources(sources)
 
   # Create query
@@ -57,24 +64,21 @@ current_conditions_fields <- function(field_id,sources = 'all') {
   while (doWeatherGet == TRUE) {
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                         httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
+                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
 
     # Make request
-
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    #The JSONLITE Serializer properly handles the JSON conversion
-
-    x <- jsonlite::fromJSON(a,flatten = TRUE)
-
     if (grepl('API Access Expired',a)) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
-    } else if (grepl('Javascript runtime error',a)) {
-      doWeatherGet <- TRUE
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
+
+  #The JSONLITE Serializer properly handles the JSON conversion
+  x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   data <- data.table::as.data.table(data.frame(as.list(unlist(x)),stringsAsFactors = FALSE))
 
@@ -112,6 +116,10 @@ current_conditions_fields <- function(field_id,sources = 'all') {
 #' @param - longitude: the longitude of the requested locations
 #' @param - sources: Which source to use for pulling the current conditions.  Valid values are
 #'                    'metar', 'mesonet', 'metar-mesonet', 'pws', 'all'.  Default value is 'all'
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#'
 #' @return data.table of requested data for dates requested
 #'
 #' @import httr
@@ -125,9 +133,14 @@ current_conditions_fields <- function(field_id,sources = 'all') {
 #' @export
 
 
-current_conditions_latlng <- function(latitude,longitude,sources = 'all') {
+current_conditions_latlng <- function(latitude
+                                      ,longitude
+                                      ,sources = 'all'
+                                      ,keyToUse = awhereEnv75247$uid
+                                      ,secretToUse = awhereEnv75247$secret
+                                      ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials()
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidLatLong(latitude,longitude)
   checkForecastSources(sources)
 
@@ -143,27 +156,23 @@ current_conditions_latlng <- function(latitude,longitude,sources = 'all') {
   url <- paste0(urlAddress, strBeg, strCoord, strType, strSources)
 
   doWeatherGet <- TRUE
-
   while (doWeatherGet == TRUE) {
-
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                         httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
+                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    #The JSONLITE Serializer properly handles the JSON conversion
-
-    x <- jsonlite::fromJSON(a,flatten = TRUE)
-
     if (grepl('API Access Expired',a)) {
-      get_token(awhereEnv75247$uid,awhereEnv75247$secret)
-    } else if (grepl('Javascript runtime error',a)) {
-      doWeatherGet <- TRUE
+      get_token(keyToUse,secretToUse)
     } else {
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
+
+  #The JSONLITE Serializer properly handles the JSON conversion
+  x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   data <- data.table::as.data.table(data.frame(as.list(unlist(x)),stringsAsFactors = FALSE))
 

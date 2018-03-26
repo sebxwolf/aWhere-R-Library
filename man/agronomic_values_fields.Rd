@@ -6,7 +6,9 @@
 \usage{
 agronomic_values_fields(field_id, day_start, day_end,
   accumulation_start_date = "", gdd_method = "standard",
-  gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30)
+  gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
@@ -40,6 +42,12 @@ The default value of 10 will be used if none is specified. (optional)}
 \item{-}{gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 behavior of this value is different depending on the equation you're using.
 The default value of 30 will be used if none is specified. (optional)}
+
+\item{-}{keyToUse: aWhere API uid to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 }
 \value{
 dataframe of requested data for dates requested
@@ -62,12 +70,11 @@ While a planting is not required to use this API, creating a Planting for your F
 to get the most out of the aWhere platform.
 }
 \examples{
-\dontrun{agronomic_values_fields('field123','2015-07-01','2015-07-31','','standard', 10, 10, 30)
-agronomic_values_fields("field123", day_start = "2016-07-01", day_end = "2016-07-31",
-accumulation_start_date = "2016-06-01", gdd_method = "modifiedstandard", gdd_base_temp = 10,
-gdd_min_boundary = 10, gdd_max_boundary = 30)}
+\dontrun{agronomic_values_fields('field_test','2015-07-01','2015-07-31','','standard', 10, 10, 30)
+         agronomic_values_fields(field_id = "field_test", day_start = "2017-07-01", day_end = "2017-07-31",
+                                  accumulation_start_date = "2017-07-01", gdd_method = "modifiedstandard",
+                                  gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30)}
 }
 \references{
 http://developer.awhere.com/api/reference/agronomics/values
 }
-

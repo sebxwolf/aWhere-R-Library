@@ -43,6 +43,9 @@
 #' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 #'                          behavior of this value is different depending on the equation you're using.
 #'                          The default value of 30 will be used if none is specified. (optional)
+#' @param - keyToUse: aWhere API uid to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -52,18 +55,26 @@
 #' @return dataframe of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{agronomic_values_fields('field123','2015-07-01','2015-07-31','','standard', 10, 10, 30)
-#' agronomic_values_fields("field123", day_start = "2016-07-01", day_end = "2016-07-31",
-#' accumulation_start_date = "2016-06-01", gdd_method = "modifiedstandard", gdd_base_temp = 10,
-#' gdd_min_boundary = 10, gdd_max_boundary = 30)}
+#' \dontrun{agronomic_values_fields('field_test','2015-07-01','2015-07-31','','standard', 10, 10, 30)
+#'          agronomic_values_fields(field_id = "field_test", day_start = "2017-07-01", day_end = "2017-07-31",
+#'                                   accumulation_start_date = "2017-07-01", gdd_method = "modifiedstandard",
+#'                                   gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30)}
 #' @export
 
-agronomic_values_fields <- function(field_id, day_start, day_end,
-                                    accumulation_start_date = '',gdd_method = 'standard',gdd_base_temp = 10,
-                                    gdd_min_boundary = 10, gdd_max_boundary = 30) {
+agronomic_values_fields <- function(field_id
+                                    ,day_start
+                                    , day_end
+                                    ,accumulation_start_date = ''
+                                    ,gdd_method = 'standard'
+                                    ,gdd_base_temp = 10
+                                    ,gdd_min_boundary = 10
+                                    ,gdd_max_boundary = 30
+                                    ,keyToUse = awhereEnv75247$uid
+                                    ,secretToUse = awhereEnv75247$secret
+                                    ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials()
-  checkValidField(field_id)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDatesAgronomics(day_start,day_end)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
   checkAccumulationStartDate(accumulation_start_date, day_start)
@@ -99,21 +110,24 @@ agronomic_values_fields <- function(field_id, day_start, day_end,
                     gdd_methodString,gdd_base_tempString,gdd_min_boundaryString,
                     gdd_max_boundaryString,strAccumulation)
 
-  postbody = ''
-  request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                       httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
+  doWeatherGet <- TRUE
+  while (doWeatherGet == TRUE) {
+    postbody = ''
+    request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
+                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
 
-  a <- suppressMessages(httr::content(request, as = "text"))
+    a <- suppressMessages(httr::content(request, as = "text"))
+
+    if (grepl('API Access Expired',a)) {
+      get_token(keyToUse,secretToUse)
+    } else {
+      checkStatusCode(request)
+      doWeatherGet <- FALSE
+    }
+  }
 
   #The JSONLITE Serializer properly handles the JSON conversion
-
   x <- jsonlite::fromJSON(a,flatten = TRUE)
-
-  if (grepl('API Access Expired',a)) {
-    get_token(awhereEnv75247$uid,awhereEnv75247$secret)
-  } else {
-    doWeatherGet <- FALSE
-  }
 
   data <- as.data.table(x[[3]])
 
@@ -124,6 +138,8 @@ agronomic_values_fields <- function(field_id, day_start, day_end,
   currentNames <- copy(colnames(data))
   data[,field_id  := field_id]
   setcolorder(data,c('field_id',currentNames))
+
+  checkDataReturn_daily(data,day_start,day_end)
 
   return(as.data.frame(data))
   }
@@ -174,6 +190,9 @@ agronomic_values_fields <- function(field_id, day_start, day_end,
 #' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 #'                          behavior of this value is different depending on the equation you're using.
 #'                          The default value of 30 will be used if none is specified. (optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -187,11 +206,20 @@ agronomic_values_fields <- function(field_id, day_start, day_end,
 #' @export
 
 
-agronomic_values_latlng <- function(latitude, longitude,day_start, day_end,
-                                    accumulation_start_date = '',gdd_method = 'standard',gdd_base_temp = 10,
-                                    gdd_min_boundary = 10, gdd_max_boundary = 30) {
+agronomic_values_latlng <- function(latitude
+                                    ,longitude
+                                    ,day_start
+                                    ,day_end
+                                    ,accumulation_start_date = ''
+                                    ,gdd_method = 'standard'
+                                    ,gdd_base_temp = 10
+                                    ,gdd_min_boundary = 10
+                                    ,gdd_max_boundary = 30
+                                    ,keyToUse = awhereEnv75247$uid
+                                    ,secretToUse = awhereEnv75247$secret
+                                    ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials()
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidLatLong(latitude,longitude)
   checkValidStartEndDatesAgronomics(day_start,day_end)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
@@ -221,22 +249,24 @@ agronomic_values_latlng <- function(latitude, longitude,day_start, day_end,
                     gdd_methodString,gdd_base_tempString,gdd_min_boundaryString,
                     gdd_max_boundaryString,strAccumulation )
 
+  doWeatherGet <- TRUE
+  while (doWeatherGet == TRUE) {
+    postbody = ''
+    request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
+                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
 
-  postbody = ''
-  request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                       httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
+    a <- suppressMessages(httr::content(request, as = "text"))
 
-  a <- suppressMessages(httr::content(request, as = "text"))
+    if (grepl('API Access Expired',a)) {
+      get_token(keyToUse,secretToUse)
+    } else {
+      checkStatusCode(request)
+      doWeatherGet <- FALSE
+    }
+  }
 
   #The JSONLITE Serializer properly handles the JSON conversion
-
   x <- jsonlite::fromJSON(a,flatten = TRUE)
-
-  if (grepl('API Access Expired',a)) {
-    get_token(awhereEnv75247$uid,awhereEnv75247$secret)
-  } else {
-    doWeatherGet <- FALSE
-  }
 
   data <- as.data.table(x[[3]])
 
@@ -248,6 +278,8 @@ agronomic_values_latlng <- function(latitude, longitude,day_start, day_end,
   data[,latitude  := latitude]
   data[,longitude := longitude]
   setcolorder(data,c('latitude','longitude',currentNames))
+
+  checkDataReturn_daily(data,day_start,day_end)
 
   return(as.data.frame(data))
   }

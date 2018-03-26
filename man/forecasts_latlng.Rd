@@ -5,7 +5,8 @@
 \title{forecasts_latlng}
 \usage{
 forecasts_latlng(latitude, longitude, day_start = as.character(Sys.Date()),
-  day_end = "", block_size = 1)
+  day_end = "", block_size = 1, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{latitude: the latitude of the requested location (double)}
@@ -20,9 +21,15 @@ Defaults to system date + 7 if left blank. (optional)}
 
 \item{-}{block_size: Integer value that corresponds to the number of hours to include in each time block.
 Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)}
+
+\item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 }
 \value{
-data.table of requested data for dates requested
+data.frame of requested data for dates requested
 }
 \description{
 \code{forecasts_latlng} pulls historical weather data from aWhere's API based on latitude & longitude
@@ -41,10 +48,9 @@ daily observed, current weather, and forecasts. These APIs are designed for effi
 allowing you to customize the responses to return just the attributes you need.
 }
 \examples{
-\dontrun{forecasts_latlng(39.8282, -98.5795,'2017-02-14','2017-02-19', 12)
-forecasts_latlng(19.328489, -99.145681, day_start = '2017-02-14', block_size = 4)}
+\dontrun{forecasts_latlng(39.8282, -98.5795,as.character(Sys.Date()),as.character(Sys.Date() + 5), block_size = 12)
+         forecasts_latlng(19.328489, -99.145681, day_start = as.character(Sys.Date()), block_size = 4)}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/forecasts/geolocation
 }
-

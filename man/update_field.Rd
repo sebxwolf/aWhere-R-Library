@@ -4,16 +4,24 @@
 \alias{update_field}
 \title{Update Field}
 \usage{
-update_field(field_id, variable_update, value_update)
+update_field(field_id, variable_update, value_update,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the unique field ID for the field you want to update (character string) (required)}
 
-\item{-}{variable_update: the variable that needs to be updated, either "farmId", "name", or "acres" 
+\item{-}{variable_update: the variable that needs to be updated, either "farmId", "name", or "acres"
 (character string) (required)}
 
-\item{-}{value_update: the new value for variable_update, to replace the existing value. The existing 
+\item{-}{value_update: the new value for variable_update, to replace the existing value. The existing
 value can be found using get_fields("field_id") (character string) (required)}
+
+\item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
+
+\item{-}{secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
+
+\item{-}{tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 }
 \value{
 - A message confirming the changes have been made
@@ -22,21 +30,19 @@ value can be found using get_fields("field_id") (character string) (required)}
 \code{update_field} To update details (Farm ID or FieldName) of a particular location in the aWhere API.
 }
 \details{
-Fields are the easiest way to manage locations in the aWhere APIs, providing an easy reference 
-for tracking weather, agronomics, models, and progress over growing seasons. Once a field is 
+Fields are the easiest way to manage locations in the aWhere APIs, providing an easy reference
+for tracking weather, agronomics, models, and progress over growing seasons. Once a field is
 registered, plantings can also be registered for that field with specific information about the
 crop planted at that location, the date of planting, and other optional information.
 
-Occasionally, you may need to update the details of your field. At this time, only the farm ID, 
-field Name, and number of acres can be updated using this function. Field details can only be 
+Occasionally, you may need to update the details of your field. At this time, only the farm ID,
+field Name, and number of acres can be updated using this function. Field details can only be
 updated one variable at a time, for one field at a time. If you need to update multiple fields or
 multiple variables associated with a field, please pass commands sequentially.
 }
 \examples{
-\dontrun{update_field(fieldIDOrName = 'field123',
-       variable_update = 'farmId', value_update = 'This is my territory')}
+\dontrun{update_field(field_id = 'field_test',variable_update = 'farmId', value_update = 'This is my territory')}
 }
 \references{
 http://developer.awhere.com/api/reference/fields/update-field
 }
-

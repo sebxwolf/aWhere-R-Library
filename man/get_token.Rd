@@ -32,4 +32,3 @@ function can be found on a user's account at developer.awhere.com, under the app
 \dontrun{get_token("uid", "secret")}
 \dontrun{token_response <- get_token('uid', 'secret', use_environment = FALSE)}
 }
-

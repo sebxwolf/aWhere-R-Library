@@ -19,14 +19,12 @@ This package can be installed directly from GitHub with the following command:
 
 #### If you have problems, try
 On Windows
-
-    install.packages(c('chron', 'magrittr', 'DBI', 'assertthat', 'bitops', 'Rcpp', 'tibble', 'jsonlite', 'data.table', 'httr', 'lubridate', 'RCurl'))
+install.packages(c('chron', 'magrittr', 'btcops', 'DBI', 'assertthat', 'Rcpp', 'tibble'))
 
 On CentOS 7
-
-    yum install openssl-devel libcurl-devel -y
-    Rscript --slave --no-save --no-restore-history -e "install.packages('devtools', repos='http://cran.rstudio.com/')"
-    Rscript --slave --no-save --no-restore-history -e "devtools::install_github('aWhereAPI/aWhere-R-Library')"
+yum install openssl-devel libcurl-devel -y
+Rscript --slave --no-save --no-restore-history -e "install.packages('devtools', repos='http://cran.rstudio.com/')"
+Rscript --slave --no-save --no-restore-history -e "devtools::install_github('aWhereAPI/aWhere-R-Library')"
 
 ### Manually Install
 

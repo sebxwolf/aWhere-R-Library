@@ -14,4 +14,3 @@ checkValidStartEndDates(day_start, day_end)
 \description{
 \code{checkValidStartEndDates} Checks to see if Start/End Dates passed are valid
 }
-

@@ -2,16 +2,14 @@
 #'
 #' @description
 #' \code{checkCredentials} Checks to see if valid aWhere API credentials are loaded
+#' 
+#' @param - keyToUse: aWhere API key to use
+#' @param - secretToUse: aWhere API secret to use
+#' @param - tokenToUse: aWhere API token to use
 
-checkCredentials <- function() {
-  #MAKE THIS ERROR PRETTIER
-  if (exists('awhereEnv75247') == FALSE) {
-    stop('Please Run the Command \'get_token()\' and then retry running command. \n')
-  }
+checkCredentials <- function(keyToUse,secretToUse,tokenToUse) {
 
-  if (exists('uid', envir = awhereEnv75247) == FALSE |
-      exists('secret', envir = awhereEnv75247) == FALSE |
-      exists('token', envir = awhereEnv75247) == FALSE) {
+  if (is.null(keyToUse) | is.null(secretToUse) | is.null(tokenToUse)) {
     stop('Please Run the Command \'get_token()\' and then retry running command. \n')
   }
 }
@@ -22,10 +20,17 @@ checkCredentials <- function() {
 #' \code{checkValidField} Checks to see if the Field ID is valid
 #'
 #' @param - field_id: the field_id having previously been created with the createField Function
+#' @param - keyToUse: aWhere API key to use
+#' @param - secretToUse: aWhere API secret to use
+#' @param - tokenToUse: aWhere API token to use
 
 
-checkValidField <- function(field_id) {
-  currentFields <- get_fields(field_id)
+checkValidField <- function(field_id
+                            ,keyToUse
+                            ,secretToUse
+                            ,tokenToUse) {
+  
+  currentFields <- get_fields(field_id,keyToUse,secretToUse,tokenToUse)
   if ((field_id %in% currentFields$field_id) == FALSE) {
     stop('The Provided field name is not a field currently associated with your account. \n
             Please create the field before proceeding. \n')
@@ -73,25 +78,25 @@ checkValidStartEndDates <- function(day_start,day_end) {
   }
 
   if (day_end != '') {
-    if (ymd(day_start) > ymd(day_end)) {
+    if (lubridate::ymd(day_start) > lubridate::ymd(day_end)) {
       stop('The endDate must come after the startDate. Please correct\n')
     }
   }
 
 
   if ((day_start != '') == TRUE) {
-    if (suppressWarnings(is.na(ymd(day_start))) == TRUE) {
+    if (suppressWarnings(is.na(lubridate::ymd(day_start))) == TRUE) {
       stop('The Start Date is Not Properly Formatted.  Please change to proper format. \n')
-    } else if (ymd(day_start) > ymd(Sys.Date()) - days(1)) {
+    } else if (lubridate::ymd(day_start) > lubridate::ymd(Sys.Date()) - lubridate::days(1)) {
       stop('By default, this function can only be used to access data up until yesterday. \n
               Use the GetForecast function to request data from today onward.\n')
     }
   }
 
   if ((day_end != '') == TRUE) {
-    if (suppressWarnings(is.na(ymd(day_end))) == TRUE) {
+    if (suppressWarnings(is.na(lubridate::ymd(day_end))) == TRUE) {
       stop('The End Date is Not Properly Formatted.  Please change to proper format. \n')
-    } else if (ymd(day_end) > ymd(Sys.Date()) - days(1)) {
+    } else if (lubridate::ymd(day_end) > lubridate::ymd(Sys.Date()) - lubridate::days(1)) {
       stop('By default, this function can only be used to access data up until yesterday. \n
               Use the GetForecast function to request data from today onward.\n')
     }
@@ -113,21 +118,21 @@ checkValidStartEndDatesAgronomics <- function(day_start,day_end) {
   }
 
   if (day_end != '') {
-    if (ymd(day_start) > ymd(day_end)) {
+    if (lubridate::ymd(day_start) > lubridate::ymd(day_end)) {
       stop('The endDate must come after the startDate. Please correct\n')
-    } else if ((ymd(day_end) - ymd(Sys.Date())) > 7) {
+    } else if ((lubridate::ymd(day_end) - lubridate::ymd(Sys.Date())) > 7) {
       stop('Forecast data only availabe 7 days into future\n')
     }
   }
 
   if ((day_start != '') == TRUE) {
-    if (suppressWarnings(is.na(ymd(day_start))) == TRUE) {
+    if (suppressWarnings(is.na(lubridate::ymd(day_start))) == TRUE) {
       stop('The Start Date is Not Properly Formatted.  Please change to proper format. \n')
     }
   }
 
   if ((day_end != '') == TRUE) {
-    if (suppressWarnings(is.na(ymd(day_end))) == TRUE) {
+    if (suppressWarnings(is.na(lubridate::ymd(day_end))) == TRUE) {
       stop('The End Date is Not Properly Formatted.  Please change to proper format. \n')
     }
   }
@@ -150,26 +155,26 @@ checkValidStartEndDatesForecast <- function(day_start,day_end) {
   }
 
   if (day_end != '') {
-    if (ymd(day_start) > ymd(day_end)) {
+    if (lubridate::ymd(day_start) > lubridate::ymd(day_end)) {
       stop('The endDate must come after the startDate. Please correct\n')
-    } else if ((ymd(day_end) - ymd(day_start)) > 8) {
+    } else if ((lubridate::ymd(day_end) - lubridate::ymd(day_start)) > 8) {
       stop('Forecast data only availabe 8 days into future\n')
     }
   }
 
 
   if ((day_start != '') == TRUE) {
-    if (suppressWarnings(is.na(ymd(day_start))) == TRUE) {
+    if (suppressWarnings(is.na(lubridate::ymd(day_start))) == TRUE) {
       stop('The Start Date is Not Properly Formatted.  Please change to proper format. \n')
-    } else if (ymd(day_start) < ymd(Sys.Date())) {
+    } else if (lubridate::ymd(day_start) < lubridate::ymd(Sys.Date())) {
       stop('This function can only access data from today onward.\n')
     }
   }
 
   if ((day_end != '') == TRUE) {
-    if (suppressWarnings(is.na(ymd(day_end))) == TRUE) {
+    if (suppressWarnings(is.na(lubridate::ymd(day_end))) == TRUE) {
       stop('The End Date is Not Properly Formatted.  Please change to proper format. \n')
-    } else if (ymd(day_end) < ymd(Sys.Date())) {
+    } else if (lubridate::ymd(day_end) < lubridate::ymd(Sys.Date())) {
       stop('This function can only access data from today onward.\n')
     }
   }
@@ -230,13 +235,17 @@ checkGDDParams <- function(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_bou
 
 checkAccumulationStartDate <- function(accumulation_start_date,month_day_start) {
   if ((accumulation_start_date != '') == TRUE) {
+    
     accumulation_start_dateTest <- strsplit(accumulation_start_date,'-')
+    
     if (nchar(accumulation_start_dateTest[[1]][1]) != 4) {
       stop('The parameter accumulation_start_date is not properly formatted.  Please correct. \n')
     }
+    
     if ((as.integer(accumulation_start_dateTest [[1]][2]) >= 1 & as.integer(accumulation_start_dateTest [[1]][2]) <= 12) == FALSE) {
       stop('The month parameter in accumulation_start_date is not a valid value.  Please correct. \n')
     }
+    
     if (accumulation_start_dateTest [[1]][2] %in% c('4','6','9','11')) {
       if ((as.integer(accumulation_start_dateTest [[1]][3]) >= 1 & as.integer(accumulation_start_dateTest[[1]][3]) <= 30) == FALSE) {
         stop('The day parameter in accumulation_start_date is not a valid value.  Please correct. \n')
@@ -245,7 +254,7 @@ checkAccumulationStartDate <- function(accumulation_start_date,month_day_start) 
       if ((as.integer(accumulation_start_dateTest [[1]][3]) >= 1 & as.integer(accumulation_start_dateTest [[1]][3]) <= 28) == FALSE) {
         stop('The day parameter in accumulation_start_date is not a valid value.  Please correct. \n')
       }
-    } else {
+    } else{
       if ((as.integer(accumulation_start_dateTest [[1]][3]) >= 1 & as.integer(accumulation_start_dateTest[[1]][3]) <= 31) == FALSE) {
         stop('The day parameter in accumulation_start_date is not a valid value.  Please correct. \n')
       }
@@ -260,6 +269,14 @@ checkAccumulationStartDate <- function(accumulation_start_date,month_day_start) 
           stop('The accumulation_start_date parameter must come before the startDate parameter.  Please correct. \n')
         }
       }
+    }
+    
+    if(difftime(lubridate::ymd(Sys.Date()),lubridate::ymd(accumulation_start_date),units = 'days') > 365) {
+      stop('The parameter accumulation_start_date must be withinin 365 days of todays date.  Please correct. \n')
+    }
+    
+    if(difftime(lubridate::ymd(Sys.Date()),lubridate::ymd(accumulation_start_date),units = 'days') < 1) {
+      stop('The parameter accumulation_start_date must be no earlier than yesterday.  Please correct. \n')
     }
   }
 }
@@ -320,12 +337,12 @@ checkAccumulationStartDateNorms <- function(accumulation_start_date,month_day_st
 #' @param - block_size: Integer value that corresponds to the number of hours to include in each time block.
 
 checkForecastParams <- function(day_start,block_size) {
-  if (ymd(day_start) < ymd(Sys.Date())) {
+  if (lubridate::ymd(day_start) < lubridate::ymd(Sys.Date())) {
     stop('By default, this function can only be used to access data from today onward. \n
             Use the GetWeatherObservationsHist function to request data from yesterday backwards.\n')
   }
 
-  if (ymd(day_start) > ymd(Sys.Date()) + days(8)) {
+  if (lubridate::ymd(day_start) > lubridate::ymd(Sys.Date()) + lubridate::days(8)) {
     stop('By default, the aWhere APIs only allows forecast to be retrieved less than 8 days into the future. \n')
   }
 
@@ -421,13 +438,13 @@ checkNormsYearsToRequest <- function(year_start,year_end,month_day_start,month_d
     }
   }
   if (year_start != '' & month_day_start != '') {
-    if (ymd(paste0(year_start,'-',month_day_start)) > ymd(Sys.Date())) {
+    if (lubridate::ymd(paste0(year_start,'-',month_day_start)) > lubridate::ymd(Sys.Date())) {
       stop('The combination of year_start and month_day_start implies data from the future must be retrieved.  Please correct. \n')
     }
   }
 
   if (year_end != '' & month_day_end != '') {
-    if (ymd(paste0(year_end,'-',month_day_end)) > ymd(Sys.Date())) {
+    if (lubridate::ymd(paste0(year_end,'-',month_day_end)) > lubridate::ymd(Sys.Date())) {
       stop('The combination of year_end and month_day_end implies data from the future must be retrieved.  Please correct. \n')
     }
   }

@@ -26,4 +26,3 @@ The default value of 30 will be used if none is specified}
 \description{
 \code{checkGDDParams} Checks to see if GDD params are valid
 }
-

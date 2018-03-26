@@ -14,4 +14,3 @@ checkValidStartEndDatesForecast(day_start, day_end)
 \description{
 \code{checkValidStartEndDatesForecast} Checks to see if Start/End Dates passed are valid for Forecast
 }
-
