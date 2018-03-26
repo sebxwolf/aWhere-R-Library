@@ -16,11 +16,11 @@ current_conditions_latlng(latitude, longitude, sources = "all",
 \item{-}{sources: Which source to use for pulling the current conditions.  Valid values are
 'metar', 'mesonet', 'metar-mesonet', 'pws', 'all'.  Default value is 'all'}
 
-\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+\item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
-\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+\item{-}{secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
-\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+\item{-}{tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 }
 \value{
 data.table of requested data for dates requested

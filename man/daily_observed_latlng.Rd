@@ -17,11 +17,11 @@ daily_observed_latlng(latitude, longitude, day_start, day_end,
 
 \item{-}{day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD}
 
-\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+\item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
-\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+\item{-}{secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
-\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+\item{-}{tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 }
 \value{
 data.frame of requested data for dates requested
@@ -32,7 +32,7 @@ data.frame of requested data for dates requested
 \details{
 This function returns weather data on Min/Max Temperature, Precipitation,
 Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
-Morning Max Windspeed, and Average Windspeed for the location specified by latitude and longitude. 
+Morning Max Windspeed, and Average Windspeed for the location specified by latitude and longitude.
 Default units are returned by the API. Latitude and longitude must be in decimal degrees.
 
 The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,

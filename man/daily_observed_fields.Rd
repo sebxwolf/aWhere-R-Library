@@ -16,11 +16,11 @@ Field IDs are created using the create_field function.(string)}
 
 \item{-}{day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD}
 
-\item{-}{keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+\item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
-\item{-}{secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+\item{-}{secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
-\item{-}{tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)}
+\item{-}{tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 }
 \value{
 data.frame of requested data for dates requested
@@ -31,8 +31,8 @@ data.frame of requested data for dates requested
 \details{
 This function returns weather data on Min/Max Temperature, Precipitation,
 Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
-Morning Max Windspeed, and Average Windspeed for the field id specified. 
-Default units are returned by the API. 
+Morning Max Windspeed, and Average Windspeed for the field id specified.
+Default units are returned by the API.
 
 The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
 and allows retrieval and integration of data across all different time ranges, long term normals,
