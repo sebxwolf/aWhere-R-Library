@@ -28,9 +28,9 @@
 #'                  Defaults to system date + 7 if left blank. (optional)
 #' @param - block_size: Integer value that corresponds to the number of hours to include in each time block.
 #'                     Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)
-#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -92,10 +92,10 @@ forecasts_fields <- function(field_id
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
-  
+
   if (length(x) != 4) {
     dataTemp <- x[[1]]$forecast
     data <- as.data.table(rbindlist(dataTemp))
@@ -113,7 +113,7 @@ forecasts_fields <- function(field_id
   setcolorder(data,c('field_id',currentNames))
 
   checkDataReturn_forecasts(data,day_start,day_end,block_size)
-  
+
   return(as.data.frame(data))
 }
 
@@ -145,9 +145,9 @@ forecasts_fields <- function(field_id
 #'                  Defaults to system date + 7 if left blank. (optional)
 #' @param - block_size: Integer value that corresponds to the number of hours to include in each time block.
 #'                     Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)
-#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @return data.frame of requested data for dates requested
 #'
@@ -205,7 +205,7 @@ forecasts_latlng <- function(latitude
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -227,7 +227,7 @@ forecasts_latlng <- function(latitude
   setcolorder(data,c('latitude','longitude',currentNames))
 
   checkDataReturn_forecasts(data,day_start,day_end,block_size)
-  
+
   return(as.data.frame(data))
 }
 

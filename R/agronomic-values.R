@@ -43,9 +43,9 @@
 #' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 #'                          behavior of this value is different depending on the equation you're using.
 #'                          The default value of 30 will be used if none is specified. (optional)
-#' @param - keyToUse: aWhere API uid to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - keyToUse: aWhere API uid to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -115,17 +115,17 @@ agronomic_values_fields <- function(field_id
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                          httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-  
+
     a <- suppressMessages(httr::content(request, as = "text"))
-  
+
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)  
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -140,7 +140,7 @@ agronomic_values_fields <- function(field_id
   setcolorder(data,c('field_id',currentNames))
 
   checkDataReturn_daily(data,day_start,day_end)
-  
+
   return(as.data.frame(data))
   }
 
@@ -190,9 +190,9 @@ agronomic_values_fields <- function(field_id
 #' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 #'                          behavior of this value is different depending on the equation you're using.
 #'                          The default value of 30 will be used if none is specified. (optional)
-#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -254,20 +254,20 @@ agronomic_values_latlng <- function(latitude
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                          httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-  
+
     a <- suppressMessages(httr::content(request, as = "text"))
-  
+
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)  
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
-  
+
   data <- as.data.table(x[[3]])
 
   varNames <- colnames(data)
@@ -278,7 +278,7 @@ agronomic_values_latlng <- function(latitude
   data[,latitude  := latitude]
   data[,longitude := longitude]
   setcolorder(data,c('latitude','longitude',currentNames))
-  
+
   checkDataReturn_daily(data,day_start,day_end)
 
   return(as.data.frame(data))

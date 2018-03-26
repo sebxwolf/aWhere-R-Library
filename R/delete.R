@@ -10,9 +10,9 @@
 #' This applies when we design/implement "Plantings" API.
 #'
 #' @param - field_id: an ID of your choosing (string)
-#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @return - a print text that informs if the query succeded or not
 #'
@@ -51,7 +51,7 @@ delete_field <- function(field_id
       doWeatherGet <- FALSE
     }
   }
-  
+
   cat(paste0('Operation Complete'))
 }
 
@@ -67,9 +67,9 @@ delete_field <- function(field_id
 #'
 #' @param - field_id: the ID of the field for which you want to delete an associated planting (string)
 #' @param - planting_id: The planting Id that you want to delete.  You can also use "current" to delete the most recent planting (string)
-#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @return - a print text that informs if the query succeded or not
 #'

@@ -54,9 +54,9 @@
 #' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 #'                          behavior of this value is different depending on the equation you're using.
 #'                          The default value of 30 will be used if none is specified. (optional)
-#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -149,11 +149,11 @@ agronomic_norms_fields <- function(field_id
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)  
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -169,7 +169,7 @@ agronomic_norms_fields <- function(field_id
   setcolorder(data,c('field_id',currentNames))
 
   checkDataReturn_norms(data,month_day_start,month_day_end,year_start,year_end,exclude_years)
-  
+
   return(as.data.frame(data))
 }
 
@@ -229,10 +229,10 @@ agronomic_norms_fields <- function(field_id
 #' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 #'                          behavior of this value is different depending on the equation you're using.
 #'                          The default value of 30 will be used if none is specified. (optional)
-#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' 
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#'
 #' @import httr
 #' @import data.table
 #' @import lubridate
@@ -325,11 +325,11 @@ agronomic_norms_latlng <- function(latitude
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)  
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -346,7 +346,7 @@ agronomic_norms_latlng <- function(latitude
   setcolorder(data,c('latitude','longitude',currentNames))
 
   checkDataReturn_norms(data,month_day_start,month_day_end,year_start,year_end,exclude_years)
-  
+
   return(as.data.frame(data))
 }
 

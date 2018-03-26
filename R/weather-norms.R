@@ -30,10 +30,10 @@
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
 #'                       at least three years of data with which to calculate the norms. (numeric, optional)
-#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' 
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#'
 #' @import httr
 #' @import data.table
 #' @import lubridate
@@ -108,7 +108,7 @@ weather_norms_fields <- function(field_id
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -120,7 +120,7 @@ weather_norms_fields <- function(field_id
   data[,grep('.units',varNames) := NULL]
 
   checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years)
-  
+
   return(as.data.frame(data))
 }
 
@@ -156,10 +156,10 @@ weather_norms_fields <- function(field_id
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
 #'                       at least three years of data with which to calculate the norms. (numeric, optional)
-#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' 
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#'
 #' @import httr
 #' @import data.table
 #' @import lubridate
@@ -236,7 +236,7 @@ weather_norms_latlng <- function(latitude
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -248,6 +248,6 @@ weather_norms_latlng <- function(latitude
   data[,grep('.units',varNames) := NULL]
 
   checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years)
-  
+
   return(as.data.frame(data))
 }

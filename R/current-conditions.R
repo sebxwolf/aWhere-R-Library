@@ -21,9 +21,9 @@
 #' @param - field_id: the field_id having previously been created with the createField Function
 #' @param - sources: Which source to use for pulling the current conditions.  Valid values are
 #'                    'metar', 'mesonet', 'metar-mesonet', 'pws', 'all'.  Default value is 'all'
-#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #'
 #' @import httr
 #' @import data.table
@@ -76,7 +76,7 @@ current_conditions_fields <- function(field_id
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -116,10 +116,10 @@ current_conditions_fields <- function(field_id
 #' @param - longitude: the longitude of the requested locations
 #' @param - sources: Which source to use for pulling the current conditions.  Valid values are
 #'                    'metar', 'mesonet', 'metar-mesonet', 'pws', 'all'.  Default value is 'all'
-#' @param - keyToUse: aWhere API key to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - secretToUse: aWhere API secret to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' @param - tokenToUse: aWhere API token to use.  DO NOT USE OPTION UNLESS YOU KNOW WHAT YOU ARE DOING (optional)
-#' 
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#'
 #' @return data.table of requested data for dates requested
 #'
 #' @import httr
@@ -173,7 +173,7 @@ current_conditions_latlng <- function(latitude
 
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
-  
+
   data <- data.table::as.data.table(data.frame(as.list(unlist(x)),stringsAsFactors = FALSE))
 
   varNames <- colnames(data)
