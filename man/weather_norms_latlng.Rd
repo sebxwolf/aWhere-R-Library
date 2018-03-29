@@ -5,8 +5,9 @@
 \title{weather_norms_latlng}
 \usage{
 weather_norms_latlng(latitude, longitude, monthday_start, monthday_end,
-  year_start, year_end, exclude_years = NULL, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  year_start, year_end, exclude_years = NULL, includeFeb29thData = TRUE,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{latitude: the latitude of the requested location (double, required)}
@@ -29,6 +30,11 @@ you're calculating norms, in the form YYYY. e.g., 2015 (required)}
  your range of years on which to calculate norms. To exclude
  multiple years, provide a vector of years. You must include
 at least three years of data with which to calculate the norms. (numeric, optional)}
+
+\item{-}{includeFeb29thData: Whether to keep data from Feb 29th on leap years.  Because weather/agronomics
+summary statistics are calculated via the calendar date and 3 years are required
+to generate a value, data from this date is more likely to be NA.  ALlows user
+to drop this data to avoid later problems (defaults to TRUE)}
 
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
@@ -54,7 +60,8 @@ allow you to compare this year or previous years to the long-term normals, calcu
 the average of those weather conditions on that day in that location over the years specified.
 }
 \examples{
-\dontrun{weather_norms_latlng(39.8282, -98.5795, '07-01', '07-10', 2008, 2015, "2010")}
+\dontrun{weather_norms_latlng(latitude = 39.8282, longitude = -98.5795, monthday_start = '02-01',
+                              monthday_end = '03-10', year_start = 2008,year_end = 2015,exclude_years =  c(2010,2011)}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/norms

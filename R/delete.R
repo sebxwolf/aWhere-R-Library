@@ -51,7 +51,7 @@ delete_field <- function(field_id
       doWeatherGet <- FALSE
     }
   }
-
+  
   cat(paste0('Operation Complete'))
 }
 

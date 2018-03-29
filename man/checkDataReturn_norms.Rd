@@ -5,7 +5,7 @@
 \title{checkDataReturn_norms}
 \usage{
 checkDataReturn_norms(dataset, monthday_start, monthday_end, year_start,
-  year_end, exclude_year)
+  year_end, exclude_year, includeFeb29thData)
 }
 \arguments{
 \item{-}{dataset: the data.frame to check}
@@ -26,6 +26,8 @@ you're calculating norms, in the form YYYY. e.g., 2015}
  your range of years on which to calculate norms. To exclude
  multiple years, provide a vector of years. You must include
 at least three years of data with which to calculate the norms.}
+
+\item{-}{includeFeb29thData: Whether to keep data from Feb 29th on leap years.}
 }
 \description{
 \code{checkDataReturn_norms} Checks to see if data return is complete from norms API

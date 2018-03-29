@@ -67,8 +67,8 @@ This script creates a planting in a field location in the aWhere platform. By se
 and agronomics for that location in all the other APIs. The planting ID corresponds to a planting within a field.
 }
 \examples{
-\dontrun{create_planting(field_id='field_test',crop='corn', planting_date='2015-10-25', proj_yield_amount='100',
-                         proj_yield_units='Bushels', proj_harvest_date='2016-02-01', yield_amount='110',
+\dontrun{create_planting(field_id='field_test',crop='corn', planting_date='2015-10-25', proj_yield_amount='100', 
+                         proj_yield_units='Bushels', proj_harvest_date='2016-02-01', yield_amount='110', 
                          yield_units='Bushels', harvest_date='2016-02-01')
 }
 }

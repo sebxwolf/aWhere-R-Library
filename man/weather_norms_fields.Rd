@@ -5,8 +5,9 @@
 \title{weather_norms_fields}
 \usage{
 weather_norms_fields(field_id, monthday_start, monthday_end, year_start,
-  year_end, exclude_years = NULL, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  year_end, exclude_years = NULL, includeFeb29thData = TRUE,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
@@ -28,6 +29,11 @@ you're calculating norms, in the form YYYY. e.g., 2015 (required)}
  your range of years on which to calculate norms. To exclude
  multiple years, provide a vector of years. You must include
 at least three years of data with which to calculate the norms. (numeric, optional)}
+
+\item{-}{includeFeb29thData: Whether to keep data from Feb 29th on leap years.  Because weather/agronomics
+summary statistics are calculated via the calendar date and 3 years are required
+to generate a value, data from this date is more likely to be NA.  ALlows user
+to drop this data to avoid later problems (defaults to TRUE)}
 
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
