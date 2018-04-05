@@ -30,10 +30,14 @@
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
 #'                       at least three years of data with which to calculate the norms. (numeric, optional)
+#' @param - includeFeb29thData: Whether to keep data from Feb 29th on leap years.  Because weather/agronomics
+#'                              summary statistics are calculated via the calendar date and 3 years are required
+#'                              to generate a value, data from this date is more likely to be NA.  ALlows user
+#'                              to drop this data to avoid later problems (defaults to TRUE)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
-#'
+#' 
 #' @import httr
 #' @import data.table
 #' @import lubridate
@@ -52,6 +56,7 @@ weather_norms_fields <- function(field_id
                                  ,year_start
                                  ,year_end
                                  ,exclude_years = NULL
+                                 ,includeFeb29thData = TRUE
                                  ,keyToUse = awhereEnv75247$uid
                                  ,secretToUse = awhereEnv75247$secret
                                  ,tokenToUse = awhereEnv75247$token) {
@@ -108,19 +113,24 @@ weather_norms_fields <- function(field_id
       doWeatherGet <- FALSE
     }
   }
-
+  
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   data <- data.table::as.data.table(x$norms)
 
-  varNames <- copy(colnames(data))
+  #Get rid of leap yearData
+  if (includeFeb29thData == FALSE) {
+    data <- data[day != '02-29',]
+  }
+  
+  varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object
   data[,grep('_links',varNames) := NULL]
   data[,grep('.units',varNames) := NULL]
 
-  checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years)
-
+  checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years,includeFeb29thData)
+  
   return(as.data.frame(data))
 }
 
@@ -156,10 +166,14 @@ weather_norms_fields <- function(field_id
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
 #'                       at least three years of data with which to calculate the norms. (numeric, optional)
+#' @param - includeFeb29thData: Whether to keep data from Feb 29th on leap years.  Because weather/agronomics
+#'                              summary statistics are calculated via the calendar date and 3 years are required
+#'                              to generate a value, data from this date is more likely to be NA.  ALlows user
+#'                              to drop this data to avoid later problems (defaults to TRUE)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
-#'
+#' 
 #' @import httr
 #' @import data.table
 #' @import lubridate
@@ -168,7 +182,8 @@ weather_norms_fields <- function(field_id
 #' @return data.frame of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{weather_norms_latlng(39.8282, -98.5795, '07-01', '07-10', 2008, 2015, "2010")}
+#' \dontrun{weather_norms_latlng(latitude = 39.8282, longitude = -98.5795, monthday_start = '02-01',
+#'                               monthday_end = '03-10', year_start = 2008,year_end = 2015,exclude_years =  c(2010,2011)}
 #' @export
 
 
@@ -179,6 +194,7 @@ weather_norms_latlng <- function(latitude
                                  ,year_start
                                  ,year_end
                                  ,exclude_years = NULL
+                                 ,includeFeb29thData = TRUE
                                  ,keyToUse = awhereEnv75247$uid
                                  ,secretToUse = awhereEnv75247$secret
                                  ,tokenToUse = awhereEnv75247$token) {
@@ -236,18 +252,23 @@ weather_norms_latlng <- function(latitude
       doWeatherGet <- FALSE
     }
   }
-
+  
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   data <- data.table::as.data.table(x[[1]])
+  
+  #Get rid of leap yearData
+  if (includeFeb29thData == FALSE) {
+    data <- data[day != '02-29',]
+  }
 
-  varNames <- copy(colnames(data))
+  varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object
   data[,grep('_links',varNames) := NULL]
   data[,grep('.units',varNames) := NULL]
 
-  checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years)
-
+  checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years,includeFeb29thData)
+  
   return(as.data.frame(data))
 }

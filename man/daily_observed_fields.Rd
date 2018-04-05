@@ -31,8 +31,8 @@ data.frame of requested data for dates requested
 \details{
 This function returns weather data on Min/Max Temperature, Precipitation,
 Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
-Morning Max Windspeed, and Average Windspeed for the field id specified.
-Default units are returned by the API.
+Morning Max Windspeed, and Average Windspeed for the field id specified. 
+Default units are returned by the API. 
 
 The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
 and allows retrieval and integration of data across all different time ranges, long term normals,

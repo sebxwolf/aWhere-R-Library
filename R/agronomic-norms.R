@@ -54,6 +54,10 @@
 #' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 #'                          behavior of this value is different depending on the equation you're using.
 #'                          The default value of 30 will be used if none is specified. (optional)
+#' @param - includeFeb29thData: Whether to keep data from Feb 29th on leap years.  Because weather/agronomics
+#'                              summary statistics are calculated via the calendar date and 3 years are required
+#'                              to generate a value, data from this date is more likely to be NA.  ALlows user
+#'                              to drop this data to avoid later problems (defaults to TRUE)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -85,6 +89,7 @@ agronomic_norms_fields <- function(field_id
                                    ,gdd_base_temp = 10
                                    ,gdd_min_boundary = 10
                                    ,gdd_max_boundary = 30
+                                   ,includeFeb29thData = TRUE
                                    ,keyToUse = awhereEnv75247$uid
                                    ,secretToUse = awhereEnv75247$secret
                                    ,tokenToUse = awhereEnv75247$token) {
@@ -149,27 +154,32 @@ agronomic_norms_fields <- function(field_id
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)
+      checkStatusCode(request)  
       doWeatherGet <- FALSE
     }
   }
-
+  
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   data <- data.table::as.data.table(x[[3]])
+  
+  #Get rid of leap yearData
+  if (includeFeb29thData == FALSE) {
+    data <- data[day != '02-29',]
+  }
 
   varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object
   data[,grep('_links',varNames) := NULL]
   data[,grep('.units',varNames) := NULL]
 
-  currentNames <- copy(colnames(data))
+  currentNames <- data.table::copy(colnames(data))
   data[,field_id  := field_id]
-  setcolorder(data,c('field_id',currentNames))
+  data.table::setcolorder(data,c('field_id',currentNames))
 
-  checkDataReturn_norms(data,month_day_start,month_day_end,year_start,year_end,exclude_years)
-
+  checkDataReturn_norms(data,month_day_start,month_day_end,year_start,year_end,exclude_years,includeFeb29thData)
+  
   return(as.data.frame(data))
 }
 
@@ -229,10 +239,14 @@ agronomic_norms_fields <- function(field_id
 #' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 #'                          behavior of this value is different depending on the equation you're using.
 #'                          The default value of 30 will be used if none is specified. (optional)
+#' @param - includeFeb29thData: Whether to keep data from Feb 29th on leap years.  Because weather/agronomics
+#'                              summary statistics are calculated via the calendar date and 3 years are required
+#'                              to generate a value, data from this date is more likely to be NA.  ALlows user
+#'                              to drop this data to avoid later problems (defaults to TRUE)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
-#'
+#' 
 #' @import httr
 #' @import data.table
 #' @import lubridate
@@ -243,7 +257,7 @@ agronomic_norms_fields <- function(field_id
 #' @examples
 
 #' \dontrun{agronomic_norms_latlng(latitude = 39.8282, longitude = -98.5795,
-#'                                 month_day_start = '07-01', month_day_end = '07-10',
+#'                                 month_day_start = '02-01', month_day_end = '03-10',
 #'                                 year_start = 2008, year_end = 2015,exclude_years = c(2010,2011),
 #'                                 accumulation_start_date = '',gdd_method = 'standard',
 #'                                 gdd_base_temp = 10,gdd_min_boundary = 10,gdd_max_boundary = 30)}
@@ -264,6 +278,7 @@ agronomic_norms_latlng <- function(latitude
                                    ,gdd_base_temp = 10
                                    ,gdd_min_boundary = 10
                                    ,gdd_max_boundary = 30
+                                   ,includeFeb29thData = TRUE
                                    ,keyToUse = awhereEnv75247$uid
                                    ,secretToUse = awhereEnv75247$secret
                                    ,tokenToUse = awhereEnv75247$token) {
@@ -320,33 +335,38 @@ agronomic_norms_latlng <- function(latitude
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                          httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
 
-    a <- suppressMessages(content(request, as = "text"))
+    a <- suppressMessages(httr::content(request, as = "text"))
 
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)
+      checkStatusCode(request)  
       doWeatherGet <- FALSE
     }
   }
-
+  
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   data <- data.table::as.data.table(x[[3]])
+  
+  #Get rid of leap yearData
+  if (includeFeb29thData == FALSE) {
+    data <- data[day != '02-29',]
+  }
 
   varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object
   data[,grep('_links',varNames) := NULL]
   data[,grep('.units',varNames) := NULL]
 
-  currentNames <- copy(colnames(data))
+  currentNames <- data.table::copy(colnames(data))
   data[,latitude  := latitude]
   data[,longitude := longitude]
-  setcolorder(data,c('latitude','longitude',currentNames))
+  data.table::setcolorder(data,c('latitude','longitude',currentNames))
 
-  checkDataReturn_norms(data,month_day_start,month_day_end,year_start,year_end,exclude_years)
-
+  checkDataReturn_norms(data,month_day_start,month_day_end,year_start,year_end,exclude_years,includeFeb29thData)
+  
   return(as.data.frame(data))
 }
 

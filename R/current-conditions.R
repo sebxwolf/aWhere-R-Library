@@ -76,7 +76,7 @@ current_conditions_fields <- function(field_id
       doWeatherGet <- FALSE
     }
   }
-
+  
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -119,7 +119,7 @@ current_conditions_fields <- function(field_id
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
-#'
+#' 
 #' @return data.table of requested data for dates requested
 #'
 #' @import httr
@@ -173,7 +173,7 @@ current_conditions_latlng <- function(latitude
 
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
-
+  
   data <- data.table::as.data.table(data.frame(as.list(unlist(x)),stringsAsFactors = FALSE))
 
   varNames <- colnames(data)

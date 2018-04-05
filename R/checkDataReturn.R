@@ -8,7 +8,7 @@
 #' @param - day_end: character string of the last day for which data was retrieved, in the form: YYYY-MM-DD
 
 checkDataReturn_daily <- function(dataset,day_start,day_end) {
-  if (nrow(dataset) != (difftime(day_end,day_start,units = 'days') +1L)) {
+  if (nrow(dataset) != round(difftime(day_end,day_start,units = 'days') +1L)) {
     warning('Incorrect number of rows returned from API call; check returned data to determine issue',immediate. = TRUE)
   }
   
@@ -38,8 +38,9 @@ checkDataReturn_daily <- function(dataset,day_start,day_end) {
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
 #'                       at least three years of data with which to calculate the norms.
+#' @param - includeFeb29thData: Whether to keep data from Feb 29th on leap years. 
 
-checkDataReturn_norms <- function(dataset,monthday_start,monthday_end,year_start,year_end,exclude_year) {
+checkDataReturn_norms <- function(dataset,monthday_start,monthday_end,year_start,year_end,exclude_year,includeFeb29thData) {
   yearsToTest <- seq(year_start,year_end,1)
   
   if(!is.null(exclude_year)) {
@@ -50,10 +51,22 @@ checkDataReturn_norms <- function(dataset,monthday_start,monthday_end,year_start
   
   for (x in 1:length(yearsToTest)) {
     currentYear <- yearsToTest[x]
-    currentNumDays <- difftime(paste0(currentYear,'-',monthday_end)
-                               ,paste0(currentYear,'-',monthday_start)
-                               ,units = 'days') +1L
+    currentMonthDay_start <- paste0(currentYear,'-',monthday_start)
+    currentMonthDay_end   <- paste0(currentYear,'-',monthday_end)
+    currentNumDays <- round(difftime(currentMonthDay_end
+                               ,currentMonthDay_start
+                               ,units = 'days') +1L)
     
+    if (includeFeb29thData == FALSE) {
+      if (is.leapyear(currentYear) == TRUE) {
+        if (currentMonthDay_start <= paste0(currentYear,'-02-29')) {
+          if (currentMonthDay_end >= paste0(currentYear,'-02-29')) {
+            currentNumDays <- currentNumDays - 1L
+          }
+        }
+      }
+    }
+   
     if (currentNumDays > maxNumDays) {
       maxNumDays <- currentNumDays
     }
@@ -84,11 +97,11 @@ checkDataReturn_norms <- function(dataset,monthday_start,monthday_end,year_start
 
 checkDataReturn_forecasts <- function(dataset,day_start,day_end,block_size) {
   if (day_end != '') {
-    if (nrow(dataset) != ((difftime(day_end,day_start,units = 'days') +1L) * (24 / block_size))) {
+    if (nrow(dataset) != round((difftime(day_end,day_start,units = 'days') +1L) * (24 / block_size))) {
       warning('Incorrect number of rows returned from API call; check returned data to determine issue',immediate. = TRUE)
     }
   } else {
-    if (nrow(dataset) != ((difftime(day_start,day_start,units = 'days') +1L) * (24 / block_size))) {
+    if (nrow(dataset) != round((difftime(day_start,day_start,units = 'days') +1L) * (24 / block_size))) {
       warning('Incorrect number of rows returned from API call; check returned data to determine issue',immediate. = TRUE)
     }
   }

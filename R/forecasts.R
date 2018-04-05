@@ -92,10 +92,10 @@ forecasts_fields <- function(field_id
       doWeatherGet <- FALSE
     }
   }
-
+  
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
-
+  
   if (length(x) != 4) {
     dataTemp <- x[[1]]$forecast
     data <- as.data.table(rbindlist(dataTemp))
@@ -113,7 +113,7 @@ forecasts_fields <- function(field_id
   setcolorder(data,c('field_id',currentNames))
 
   checkDataReturn_forecasts(data,day_start,day_end,block_size)
-
+  
   return(as.data.frame(data))
 }
 
@@ -205,7 +205,7 @@ forecasts_latlng <- function(latitude
       doWeatherGet <- FALSE
     }
   }
-
+  
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -227,7 +227,7 @@ forecasts_latlng <- function(latitude
   setcolorder(data,c('latitude','longitude',currentNames))
 
   checkDataReturn_forecasts(data,day_start,day_end,block_size)
-
+  
   return(as.data.frame(data))
 }
 

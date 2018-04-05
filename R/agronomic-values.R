@@ -115,17 +115,17 @@ agronomic_values_fields <- function(field_id
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                          httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
+  
     a <- suppressMessages(httr::content(request, as = "text"))
-
+  
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)
+      checkStatusCode(request)  
       doWeatherGet <- FALSE
     }
   }
-
+  
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -135,12 +135,12 @@ agronomic_values_fields <- function(field_id
   data[,grep('_links',varNames) := NULL]
   data[,grep('.units',varNames) := NULL]
 
-  currentNames <- copy(colnames(data))
+  currentNames <- data.table::copy(colnames(data))
   data[,field_id  := field_id]
-  setcolorder(data,c('field_id',currentNames))
+  data.table::setcolorder(data,c('field_id',currentNames))
 
   checkDataReturn_daily(data,day_start,day_end)
-
+  
   return(as.data.frame(data))
   }
 
@@ -254,31 +254,31 @@ agronomic_values_latlng <- function(latitude
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                          httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
+  
     a <- suppressMessages(httr::content(request, as = "text"))
-
+  
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)
+      checkStatusCode(request)  
       doWeatherGet <- FALSE
     }
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
-
+  
   data <- as.data.table(x[[3]])
 
   varNames <- colnames(data)
   data[,grep('_links',varNames) := NULL]
   data[,grep('.units',varNames) := NULL]
 
-  currentNames <- copy(colnames(data))
+  currentNames <- data.table::copy(colnames(data))
   data[,latitude  := latitude]
   data[,longitude := longitude]
-  setcolorder(data,c('latitude','longitude',currentNames))
-
+  data.table::setcolorder(data,c('latitude','longitude',currentNames))
+  
   checkDataReturn_daily(data,day_start,day_end)
 
   return(as.data.frame(data))

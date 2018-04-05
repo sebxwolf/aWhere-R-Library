@@ -6,21 +6,21 @@
 #' @details
 #' This function returns weather data on Min/Max Temperature, Precipitation,
 #' Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
-#' Morning Max Windspeed, and Average Windspeed for the field id specified.
-#' Default units are returned by the API.
-#'
+#' Morning Max Windspeed, and Average Windspeed for the field id specified. 
+#' Default units are returned by the API. 
+#' 
 #' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
 #' and allows retrieval and integration of data across all different time ranges, long term normals,
 #' daily observed, current weather, and forecasts. These APIs are designed for efficiency,
 #' allowing you to customize the responses to return just the attributes you need.
 #'
 #' Understanding the recent and long-term daily weather is critical for making in-season decisions.
-#' This API opens the weather attributes that matter most to agriculture.
-#'
+#' This API opens the weather attributes that matter most to agriculture. 
+#' 
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations
 #'
-#' @param - field_id: the field_id associated with the location for which you want to pull data.
+#' @param - field_id: the field_id associated with the location for which you want to pull data.  
 #' Field IDs are created using the create_field function.(string)
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD
@@ -141,7 +141,7 @@ daily_observed_fields <- function(field_id
         doWeatherGet <- FALSE
       }
     }
-
+    
     #The JSONLITE Serializer properly handles the JSON conversion
     x <- jsonlite::fromJSON(a, flatten = TRUE)
 
@@ -159,7 +159,7 @@ daily_observed_fields <- function(field_id
   allWeath[,grep('.units',varNames) := NULL]
 
   checkDataReturn_daily(allWeath,day_start,day_end)
-
+  
   return(as.data.frame(allWeath))
 }
 
@@ -172,16 +172,16 @@ daily_observed_fields <- function(field_id
 #' @details
 #' This function returns weather data on Min/Max Temperature, Precipitation,
 #' Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
-#' Morning Max Windspeed, and Average Windspeed for the location specified by latitude and longitude.
+#' Morning Max Windspeed, and Average Windspeed for the location specified by latitude and longitude. 
 #' Default units are returned by the API. Latitude and longitude must be in decimal degrees.
-#'
+#' 
 #' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
 #' and allows retrieval and integration of data across all different time ranges, long term normals,
 #' daily observed, current weather, and forecasts. These APIs are designed for efficiency,
 #' allowing you to customize the responses to return just the attributes you need.
 #'
 #' Understanding the recent and long-term daily weather is critical for making in-season decisions.
-#' This API opens the weather attributes that matter most to agriculture.
+#' This API opens the weather attributes that matter most to agriculture. 
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'
@@ -296,7 +296,7 @@ daily_observed_latlng <- function(latitude
         doWeatherGet <- FALSE
       }
     }
-
+    
     #The JSONLITE Serializer properly handles the JSON conversion
     x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -314,6 +314,6 @@ daily_observed_latlng <- function(latitude
   allWeath[,grep('.units',varNames) := NULL]
 
   checkDataReturn_daily(allWeath,day_start,day_end)
-
+  
   return(as.data.frame(allWeath))
 }

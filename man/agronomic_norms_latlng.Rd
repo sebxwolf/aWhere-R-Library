@@ -7,8 +7,9 @@
 agronomic_norms_latlng(latitude, longitude, month_day_start, month_day_end,
   year_start, year_end, exclude_years = NULL, accumulation_start_date = "",
   gdd_method = "standard", gdd_base_temp = 10, gdd_min_boundary = 10,
-  gdd_max_boundary = 30, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  gdd_max_boundary = 30, includeFeb29thData = TRUE,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{latitude: the latitude of the requested location (double, required)}
@@ -57,6 +58,11 @@ The default value of 10 will be used if none is specified. (optional)}
 behavior of this value is different depending on the equation you're using.
 The default value of 30 will be used if none is specified. (optional)}
 
+\item{-}{includeFeb29thData: Whether to keep data from Feb 29th on leap years.  Because weather/agronomics
+summary statistics are calculated via the calendar date and 3 years are required
+to generate a value, data from this date is more likely to be NA.  ALlows user
+to drop this data to avoid later problems (defaults to TRUE)}
+
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
 \item{-}{secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
@@ -84,7 +90,7 @@ the average of those agronomic conditions on that day in that location over the 
 }
 \examples{
 \dontrun{agronomic_norms_latlng(latitude = 39.8282, longitude = -98.5795,
-                                month_day_start = '07-01', month_day_end = '07-10',
+                                month_day_start = '02-01', month_day_end = '03-10',
                                 year_start = 2008, year_end = 2015,exclude_years = c(2010,2011),
                                 accumulation_start_date = '',gdd_method = 'standard',
                                 gdd_base_temp = 10,gdd_min_boundary = 10,gdd_max_boundary = 30)}

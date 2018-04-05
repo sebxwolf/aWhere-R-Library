@@ -7,8 +7,9 @@
 agronomic_norms_fields(field_id, month_day_start, month_day_end, year_start,
   year_end, exclude_years = NULL, accumulation_start_date = "",
   gdd_method = "standard", gdd_base_temp = 10, gdd_min_boundary = 10,
-  gdd_max_boundary = 30, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  gdd_max_boundary = 30, includeFeb29thData = TRUE,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
@@ -55,6 +56,11 @@ The default value of 10 will be used if none is specified. (optional)}
 \item{-}{gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 behavior of this value is different depending on the equation you're using.
 The default value of 30 will be used if none is specified. (optional)}
+
+\item{-}{includeFeb29thData: Whether to keep data from Feb 29th on leap years.  Because weather/agronomics
+summary statistics are calculated via the calendar date and 3 years are required
+to generate a value, data from this date is more likely to be NA.  ALlows user
+to drop this data to avoid later problems (defaults to TRUE)}
 
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
