@@ -108,6 +108,10 @@ forecasts_fields <- function(field_id
   #This removes the non-data info returned with the JSON object
   data[,grep('.units',varNames) := NULL]
 
+  #These variables are unique to the forecast API and have a different schema
+  #than the rest.  For the time being remove
+  data[,c('soilMoisture','soilTemperatures') := NULL]
+  
   currentNames <- copy(colnames(data))
   data[,field_id  := field_id]
   setcolorder(data,c('field_id',currentNames))
@@ -221,6 +225,10 @@ forecasts_latlng <- function(latitude
   #This removes the non-data info returned with the JSON object
   data[,grep('.units',varNames) := NULL]
 
+  #These variables are unique to the forecast API and have a different schema
+  #than the rest.  For the time being remove
+  data[,c('soilMoisture','soilTemperatures') := NULL]
+  
   currentNames <- copy(colnames(data))
   data[,latitude  := latitude]
   data[,longitude := longitude]
