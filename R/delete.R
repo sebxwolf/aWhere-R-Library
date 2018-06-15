@@ -16,7 +16,6 @@
 #'
 #' @return - a print text that informs if the query succeded or not
 #'
-#' @importFrom RCurl getCurlHandle
 #' @import httr
 #'
 #' @examples
@@ -38,9 +37,9 @@ delete_field <- function(field_id
   doWeatherGet = TRUE
   while (doWeatherGet == TRUE) {
     ## Get data
+
     request <- httr::DELETE(url, body=postbody, httr::content_type('application/json'),
-                            httr::add_headers(Authorization = paste0("Bearer ", tokenToUse)),
-                            curl = getCurlHandle())
+                            httr::add_headers(Authorization = paste0("Bearer ", tokenToUse)))
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
@@ -51,7 +50,7 @@ delete_field <- function(field_id
       doWeatherGet <- FALSE
     }
   }
-  
+
   cat(paste0('Operation Complete'))
 }
 
