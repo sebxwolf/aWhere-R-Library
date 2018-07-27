@@ -5,11 +5,11 @@
 \title{agronomic_norms_latlng}
 \usage{
 agronomic_norms_latlng(latitude, longitude, month_day_start, month_day_end,
-  year_start, year_end, exclude_years = NULL, accumulation_start_date = "",
-  gdd_method = "standard", gdd_base_temp = 10, gdd_min_boundary = 10,
-  gdd_max_boundary = 30, includeFeb29thData = TRUE,
-  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
-  tokenToUse = awhereEnv75247$token)
+  year_start, year_end, propertiesToInclude = "", exclude_years = NULL,
+  accumulation_start_date = "", gdd_method = "standard",
+  gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30,
+  includeFeb29thData = TRUE, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{latitude: the latitude of the requested location (double, required)}
@@ -27,6 +27,8 @@ you're calculating norms, in the form YYYY. e.g., 2008 (required)}
 
 \item{-}{year_end: character string of the last year (inclusive) of the range of years for which
 you're calculating norms, in the form YYYY. e.g., 2015 (required)}
+
+\item{-}{propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)}
 
 \item{-}{exclude_year: Year or years which you'd like to exclude from
  your range of years on which to calculate norms. To exclude
@@ -89,11 +91,18 @@ allow you to compare this year or previous years to the long-term normals, calcu
 the average of those agronomic conditions on that day in that location over the years specified.
 }
 \examples{
-\dontrun{agronomic_norms_latlng(latitude = 39.8282, longitude = -98.5795,
-                                month_day_start = '02-01', month_day_end = '03-10',
-                                year_start = 2008, year_end = 2015,exclude_years = c(2010,2011),
-                                accumulation_start_date = '',gdd_method = 'standard',
-                                gdd_base_temp = 10,gdd_min_boundary = 10,gdd_max_boundary = 30)}
+\dontrun{agronomic_norms_latlng(latitude = 39.8282
+                                ,longitude = -98.5795
+                                ,month_day_start = '02-01'
+                                ,month_day_end = '03-10'
+                                ,year_start = 2008
+                                ,year_end = 2015
+                                ,exclude_years = c(2010,2011)
+                                ,accumulation_start_date = ''
+                                ,gdd_method = 'standard'
+                                ,gdd_base_temp = 10
+                                ,gdd_min_boundary = 10
+                                ,gdd_max_boundary = 30)}
 }
 \references{
 http://developer.awhere.com/api/reference/agronomics/norms

@@ -4,7 +4,7 @@
 \alias{daily_observed_fields}
 \title{daily_observed_fields}
 \usage{
-daily_observed_fields(field_id, day_start, day_end,
+daily_observed_fields(field_id, day_start, day_end, propertiesToInclude = "",
   keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }
@@ -15,6 +15,8 @@ Field IDs are created using the create_field function.(string)}
 \item{-}{day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD}
 
 \item{-}{day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD}
+
+\item{-}{propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)}
 
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
@@ -31,8 +33,8 @@ data.frame of requested data for dates requested
 \details{
 This function returns weather data on Min/Max Temperature, Precipitation,
 Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
-Morning Max Windspeed, and Average Windspeed for the field id specified. 
-Default units are returned by the API. 
+Morning Max Windspeed, and Average Windspeed for the field id specified.
+Default units are returned by the API.
 
 The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
 and allows retrieval and integration of data across all different time ranges, long term normals,
@@ -43,7 +45,9 @@ Understanding the recent and long-term daily weather is critical for making in-s
 This API opens the weather attributes that matter most to agriculture.
 }
 \examples{
-\dontrun{daily_observed_fields(field_id = 'field_test',day_start = '2016-04-28',day_end = '2017-05-01')}
+\dontrun{daily_observed_fields(field_id = 'field_test'
+                               ,day_start = '2018-04-28'
+                               ,day_end = '2018-05-01')}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/observations

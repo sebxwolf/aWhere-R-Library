@@ -26,6 +26,7 @@
 #'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
 #' @param - year_end: character string of the last year (inclusive) of the range of years for which
 #'                     you're calculating norms, in the form YYYY. e.g., 2015 (required)
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are meanTemp, maxTemp, minTemp, precipitation, solar, maxHumidity, minHumidity, dailyMaxWind (optional)
 #' @param - exclude_year: Year or years which you'd like to exclude from
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
@@ -37,7 +38,7 @@
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
-#' 
+#'
 #' @import httr
 #' @import data.table
 #' @import lubridate
@@ -46,8 +47,11 @@
 #' @return dataframe of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{weather_norms_fields("field_test", monthday_start = "06-01", monthday_end = "09-01",
-#'                                year_start = 2006, year_end = 2015)}
+#' \dontrun{weather_norms_fields(field_id = "field_test"
+#'                               ,monthday_start = "06-01"
+#'                               ,monthday_end = "09-01"
+#'                               ,year_start = 2006
+#'                               ,year_end = 2015)}
 #' @export
 #'
 weather_norms_fields <- function(field_id
@@ -55,6 +59,7 @@ weather_norms_fields <- function(field_id
                                  ,monthday_end
                                  ,year_start
                                  ,year_end
+                                 ,propertiesToInclude = ''
                                  ,exclude_years = NULL
                                  ,includeFeb29thData = TRUE
                                  ,keyToUse = awhereEnv75247$uid
@@ -66,7 +71,7 @@ weather_norms_fields <- function(field_id
   checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
   checkNormsStartEndDates(monthday_start,monthday_end)
   checkNormsYearsToRequest(year_start,year_end,monthday_start,monthday_end,exclude_years)
-
+  checkPropertiesEndpoint('weather_norms',propertiesToInclude)
 
   ##############################################################################
   dataList <- list()
@@ -93,9 +98,20 @@ weather_norms_fields <- function(field_id
     strexclude_years <- ''
   }
 
+  if (propertiesToInclude[1] != '') {
+    if (strexclude_years == '') {
+      propertiesString <- paste0('?properties=',paste0(propertiesToInclude,collapse = ','))
+    } else {
+      propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+    }
+  } else {
+    propertiesString <- ''
+  }
+
+
   strYearsType <- paste0('/years')
   strYears <- paste0('/',year_start,',',year_end)
-  url <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,strYears,strexclude_years)
+  url <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,strYears,strexclude_years,propertiesString)
 
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
@@ -113,7 +129,7 @@ weather_norms_fields <- function(field_id
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -123,14 +139,18 @@ weather_norms_fields <- function(field_id
   if (includeFeb29thData == FALSE) {
     data <- data[day != '02-29',]
   }
-  
+
   varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object
   data[,grep('_links',varNames) := NULL]
   data[,grep('.units',varNames) := NULL]
 
+  currentNames <- data.table::copy(colnames(data))
+  data[,field_id  := field_id]
+  data.table::setcolorder(data,c('field_id',currentNames))
+
   checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years,includeFeb29thData)
-  
+
   return(as.data.frame(data))
 }
 
@@ -162,6 +182,7 @@ weather_norms_fields <- function(field_id
 #'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
 #' @param - year_end: character string of the last year (inclusive) of the range of years for which
 #'                     you're calculating norms, in the form YYYY. e.g., 2015 (required)
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are meanTemp, maxTemp, minTemp, precipitation, solar, maxHumidity, minHumidity, dailyMaxWind (optional)
 #' @param - exclude_year: Year or years which you'd like to exclude from
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
@@ -173,7 +194,7 @@ weather_norms_fields <- function(field_id
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
-#' 
+#'
 #' @import httr
 #' @import data.table
 #' @import lubridate
@@ -182,8 +203,13 @@ weather_norms_fields <- function(field_id
 #' @return data.frame of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{weather_norms_latlng(latitude = 39.8282, longitude = -98.5795, monthday_start = '02-01',
-#'                               monthday_end = '03-10', year_start = 2008,year_end = 2015,exclude_years =  c(2010,2011)}
+#' \dontrun{weather_norms_latlng(latitude = 39.8282
+#'                               ,longitude = -98.5795
+#'                               ,monthday_start = '02-01'
+#'                               ,monthday_end = '03-10'
+#'                               ,year_start = 2008
+#'                               ,year_end = 2015
+#'                               ,exclude_years =  c(2010,2011))}
 #' @export
 
 
@@ -193,6 +219,7 @@ weather_norms_latlng <- function(latitude
                                  ,monthday_end
                                  ,year_start
                                  ,year_end
+                                 ,propertiesToInclude = ''
                                  ,exclude_years = NULL
                                  ,includeFeb29thData = TRUE
                                  ,keyToUse = awhereEnv75247$uid
@@ -204,7 +231,7 @@ weather_norms_latlng <- function(latitude
   checkValidLatLong(latitude,longitude)
   checkNormsStartEndDates(monthday_start,monthday_end)
   checkNormsYearsToRequest(year_start,year_end,monthday_start,monthday_end,exclude_years)
-
+  checkPropertiesEndpoint('weather_norms',propertiesToInclude)
 
   ##############################################################################
   dataList <- list()
@@ -217,10 +244,12 @@ weather_norms_latlng <- function(latitude
   strCoord <- paste0('/',latitude,',',longitude)
   strType <- paste0('/norms')
 
-  if (monthday_end != '') {
+  if (monthday_start != '' & monthday_end != '') {
     strMonthsDays <- paste0('/',monthday_start,',',monthday_end)
-  } else {
+  } else if (monthday_end != '') {
     strMonthsDays <- paste0('/',monthday_start,',',monthday_start)
+  } else {
+    strMonthsDays <- ''
   }
 
   if (length(exclude_years) != 0) {
@@ -229,13 +258,19 @@ weather_norms_latlng <- function(latitude
     strexclude_years <- ''
   }
 
-  if (year_start != '' & year_end != '') {
-    strYearsType <- paste0('/years')
-    strYears <- paste0('/',year_start,',',year_end)
-    url <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,strYears,strexclude_years)
+  if (propertiesToInclude[1] != '') {
+    if (strexclude_years == '') {
+      propertiesString <- paste0('?properties=',paste0(propertiesToInclude,collapse = ','))
+    } else {
+      propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+    }
   } else {
-    url <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strexclude_years)
+    propertiesString <- ''
   }
+
+  strYearsType <- paste0('/years')
+  strYears <- paste0('/',year_start,',',year_end)
+  url <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,strYears,strexclude_years,propertiesString)
 
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
@@ -252,12 +287,12 @@ weather_norms_latlng <- function(latitude
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   data <- data.table::as.data.table(x[[1]])
-  
+
   #Get rid of leap yearData
   if (includeFeb29thData == FALSE) {
     data <- data[day != '02-29',]
@@ -268,7 +303,12 @@ weather_norms_latlng <- function(latitude
   data[,grep('_links',varNames) := NULL]
   data[,grep('.units',varNames) := NULL]
 
+  currentNames <- data.table::copy(colnames(data))
+  data[,latitude  := latitude]
+  data[,longitude := longitude]
+  data.table::setcolorder(data,c('latitude','longitude',currentNames))
+
   checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years,includeFeb29thData)
-  
+
   return(as.data.frame(data))
 }

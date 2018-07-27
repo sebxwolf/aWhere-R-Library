@@ -5,10 +5,10 @@
 \title{agronomic_values_fields}
 \usage{
 agronomic_values_fields(field_id, day_start, day_end,
-  accumulation_start_date = "", gdd_method = "standard",
-  gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30,
-  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
-  tokenToUse = awhereEnv75247$token)
+  propertiesToInclude = "", accumulation_start_date = "",
+  gdd_method = "standard", gdd_base_temp = 10, gdd_min_boundary = 10,
+  gdd_max_boundary = 30, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
@@ -17,6 +17,8 @@ Field IDs are created using the create_field function. (string)}
 \item{-}{day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD}
 
 \item{-}{day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD}
+
+\item{-}{propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)}
 
 \item{-}{accumulation_start_date: Allows the user to start counting accumulations from
 before the specified start date (or before the
@@ -70,10 +72,13 @@ While a planting is not required to use this API, creating a Planting for your F
 to get the most out of the aWhere platform.
 }
 \examples{
-\dontrun{agronomic_values_fields('field_test','2015-07-01','2015-07-31','','standard', 10, 10, 30)
-         agronomic_values_fields(field_id = "field_test", day_start = "2017-07-01", day_end = "2017-07-31",
-                                  accumulation_start_date = "2017-07-01", gdd_method = "modifiedstandard",
-                                  gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30)}
+\dontrun{agronomic_values_fields(field_id = "field_test"
+                                 ,day_start = "2018-05-01"
+                                 ,day_end = "2018-05-31"
+                                 ,gdd_method = "modifiedstandard"
+                                 ,gdd_base_temp = 10
+                                 ,gdd_min_boundary = 10
+                                 ,gdd_max_boundary = 30)}
 }
 \references{
 http://developer.awhere.com/api/reference/agronomics/values

@@ -5,9 +5,9 @@
 \title{weather_norms_fields}
 \usage{
 weather_norms_fields(field_id, monthday_start, monthday_end, year_start,
-  year_end, exclude_years = NULL, includeFeb29thData = TRUE,
-  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
-  tokenToUse = awhereEnv75247$token)
+  year_end, propertiesToInclude = "", exclude_years = NULL,
+  includeFeb29thData = TRUE, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
@@ -24,6 +24,8 @@ you're calculating norms, in the form YYYY. e.g., 2008 (required)}
 
 \item{-}{year_end: character string of the last year (inclusive) of the range of years for which
 you're calculating norms, in the form YYYY. e.g., 2015 (required)}
+
+\item{-}{propertiesToInclude: character vector of properties to retrieve from API.  Valid values are meanTemp, maxTemp, minTemp, precipitation, solar, maxHumidity, minHumidity, dailyMaxWind (optional)}
 
 \item{-}{exclude_year: Year or years which you'd like to exclude from
  your range of years on which to calculate norms. To exclude
@@ -59,8 +61,11 @@ allow you to compare this year or previous years to the long-term normals, calcu
 the average of those weather conditions on that day in that location over the years specified.
 }
 \examples{
-\dontrun{weather_norms_fields("field_test", monthday_start = "06-01", monthday_end = "09-01",
-                               year_start = 2006, year_end = 2015)}
+\dontrun{weather_norms_fields(field_id = "field_test"
+                              ,monthday_start = "06-01"
+                              ,monthday_end = "09-01"
+                              ,year_start = 2006
+                              ,year_end = 2015)}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/norms

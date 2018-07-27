@@ -2,7 +2,7 @@
 #'
 #' @description
 #' \code{checkCredentials} Checks to see if valid aWhere API credentials are loaded
-#' 
+#'
 #' @param - keyToUse: aWhere API key to use
 #' @param - secretToUse: aWhere API secret to use
 #' @param - tokenToUse: aWhere API token to use
@@ -29,7 +29,7 @@ checkValidField <- function(field_id
                             ,keyToUse
                             ,secretToUse
                             ,tokenToUse) {
-  
+
   currentFields <- get_fields(field_id,keyToUse,secretToUse,tokenToUse)
   if ((field_id %in% currentFields$field_id) == FALSE) {
     stop('The Provided field name is not a field currently associated with your account. \n
@@ -235,17 +235,17 @@ checkGDDParams <- function(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_bou
 
 checkAccumulationStartDate <- function(accumulation_start_date,month_day_start) {
   if ((accumulation_start_date != '') == TRUE) {
-    
+
     accumulation_start_dateTest <- strsplit(accumulation_start_date,'-')
-    
+
     if (nchar(accumulation_start_dateTest[[1]][1]) != 4) {
       stop('The parameter accumulation_start_date is not properly formatted.  Please correct. \n')
     }
-    
+
     if ((as.integer(accumulation_start_dateTest [[1]][2]) >= 1 & as.integer(accumulation_start_dateTest [[1]][2]) <= 12) == FALSE) {
       stop('The month parameter in accumulation_start_date is not a valid value.  Please correct. \n')
     }
-    
+
     if (accumulation_start_dateTest [[1]][2] %in% c('4','6','9','11')) {
       if ((as.integer(accumulation_start_dateTest [[1]][3]) >= 1 & as.integer(accumulation_start_dateTest[[1]][3]) <= 30) == FALSE) {
         stop('The day parameter in accumulation_start_date is not a valid value.  Please correct. \n')
@@ -270,11 +270,11 @@ checkAccumulationStartDate <- function(accumulation_start_date,month_day_start) 
         }
       }
     }
-    
+
     if(difftime(lubridate::ymd(Sys.Date()),lubridate::ymd(accumulation_start_date),units = 'days') > 365) {
       stop('The parameter accumulation_start_date must be withinin 365 days of todays date.  Please correct. \n')
     }
-    
+
     if(difftime(lubridate::ymd(Sys.Date()),lubridate::ymd(accumulation_start_date),units = 'days') < 1) {
       stop('The parameter accumulation_start_date must be no earlier than yesterday.  Please correct. \n')
     }
@@ -471,3 +471,50 @@ checkNormsYearsToRequest <- function(year_start,year_end,month_day_start,month_d
     }
   }
 }
+
+#' @title Check Properties for Weather Endpoint
+#'
+#' @description
+#' \code{checkPropertiesWeather} Check that the Years to be Requested for Norms is valid
+#'
+#' @param - propertiesToInclude: vector of properties requested from API
+
+checkPropertiesEndpoint <- function(endpoint,propertiesToInclude) {
+
+
+  if(endpoint == 'weather') {
+    validProperties <- c('temperatures'
+                         ,'precipitation'
+                         ,'solar'
+                         ,'relativeHumidity'
+                         ,'wind')
+  } else if (endpoint == 'weather_norms') {
+    validProperties <- c('meanTemp'
+                         ,'maxTemp'
+                         ,'minTemp'
+                         ,'precipitation'
+                         ,'solar'
+                         ,'maxHumidity'
+                         ,'minHumidity'
+                         ,'dailyMaxWind')
+  } else if (endpoint == 'agronomics') {
+    validProperties <- c('gdd'
+                         ,'pet'
+                         ,'ppet'
+                         ,'accumulatedGdd'
+                         ,'accumulatedPrecipitation'
+                         ,'accumulatedPet'
+                         ,'accumulatedPpet'
+                         ,'accumulations')
+  }
+
+
+
+  if (propertiesToInclude[1] != '' | length(propertiesToInclude) > 1 ) {
+    if (length(base::setdiff(propertiesToInclude,validProperties)) > 0) {
+      stop(paste0('Invalid Entry for Properties Attributes.  Valid values are ',paste0(validProperties,collapse = ', ')))
+    }
+  }
+}
+
+

@@ -5,10 +5,10 @@
 \title{agronomic_values_latlng.}
 \usage{
 agronomic_values_latlng(latitude, longitude, day_start, day_end,
-  accumulation_start_date = "", gdd_method = "standard",
-  gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30,
-  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
-  tokenToUse = awhereEnv75247$token)
+  propertiesToInclude = "", accumulation_start_date = "",
+  gdd_method = "standard", gdd_base_temp = 10, gdd_min_boundary = 10,
+  gdd_max_boundary = 30, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{latitude: the latitude of the requested location (double)}
@@ -18,6 +18,8 @@ agronomic_values_latlng(latitude, longitude, day_start, day_end,
 \item{-}{day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD}
 
 \item{-}{day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD}
+
+\item{-}{propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)}
 
 \item{-}{accumulation_start_date: Allows the user to start counting accumulations from
 before the specified start date (or before the
@@ -71,7 +73,10 @@ While a planting is not required to use this API, creating a Planting for your F
 to get the most out of the aWhere platform.
 }
 \examples{
-\dontrun{agronomic_values_latlng(39.8282, -98.5795, '2015-07-01', '2015-07-31', '', 'standard', 10, 10, 30)}
+\dontrun{agronomic_values_latlng(latitude = 39.8282
+                                 ,longitude = -98.5795
+                                 ,day_start = '2018-05-01'
+                                 ,day_end = '2018-05-31')}
 }
 \references{
 http://developer.awhere.com/api/reference/agronomics/values
