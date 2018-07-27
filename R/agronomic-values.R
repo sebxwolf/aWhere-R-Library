@@ -23,6 +23,7 @@
 #' Field IDs are created using the create_field function. (string)
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)
 #' @param - accumulation_start_date: Allows the user to start counting accumulations from
 #'                                 before the specified start date (or before the
 #'                                 planting date if using the most recent planting).
@@ -55,15 +56,19 @@
 #' @return dataframe of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{agronomic_values_fields('field_test','2015-07-01','2015-07-31','','standard', 10, 10, 30)
-#'          agronomic_values_fields(field_id = "field_test", day_start = "2017-07-01", day_end = "2017-07-31",
-#'                                   accumulation_start_date = "2017-07-01", gdd_method = "modifiedstandard",
-#'                                   gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30)}
+#' \dontrun{agronomic_values_fields(field_id = "field_test"
+#'                                  ,day_start = "2018-05-01"
+#'                                  ,day_end = "2018-05-31"
+#'                                  ,gdd_method = "modifiedstandard"
+#'                                  ,gdd_base_temp = 10
+#'                                  ,gdd_min_boundary = 10
+#'                                  ,gdd_max_boundary = 30)}
 #' @export
 
 agronomic_values_fields <- function(field_id
                                     ,day_start
-                                    , day_end
+                                    ,day_end
+                                    ,propertiesToInclude = ''
                                     ,accumulation_start_date = ''
                                     ,gdd_method = 'standard'
                                     ,gdd_base_temp = 10
@@ -78,6 +83,7 @@ agronomic_values_fields <- function(field_id
   checkValidStartEndDatesAgronomics(day_start,day_end)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
   checkAccumulationStartDate(accumulation_start_date, day_start)
+  checkPropertiesEndpoint('agronomics',propertiesToInclude)
 
   # Create query
   urlAddress <- "https://api.awhere.com/v2/agronomics"
@@ -105,42 +111,53 @@ agronomic_values_fields <- function(field_id
   gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
   gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
 
+  if (propertiesToInclude[1] != '') {
+    propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+  } else {
+    propertiesString <- ''
+  }
 
   url <- paste0(urlAddress, strBeg, strCoord, strType, strDates,
                     gdd_methodString,gdd_base_tempString,gdd_min_boundaryString,
-                    gdd_max_boundaryString,strAccumulation)
+                    gdd_max_boundaryString,strAccumulation,propertiesString)
 
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                          httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-  
+
     a <- suppressMessages(httr::content(request, as = "text"))
-  
+
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)  
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
-  data <- as.data.table(x[[3]])
+  if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == FALSE) {
+    data <- as.data.table(x[[1]])
+  } else if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == TRUE) {
+    data <- as.data.table(x[[2]])
+  } else {
+    data <- as.data.table(x[[3]])
+  }
 
   varNames <- colnames(data)
-  data[,grep('_links',varNames) := NULL]
-  data[,grep('.units',varNames) := NULL]
+  suppressWarnings(data[,grep('_links',varNames) := NULL])
+  suppressWarnings(data[,grep('.units',varNames) := NULL])
 
   currentNames <- data.table::copy(colnames(data))
   data[,field_id  := field_id]
   data.table::setcolorder(data,c('field_id',currentNames))
 
   checkDataReturn_daily(data,day_start,day_end)
-  
+
   return(as.data.frame(data))
   }
 
@@ -170,6 +187,7 @@ agronomic_values_fields <- function(field_id
 #' @param - longitude: the longitude of the requested locations (double)
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)
 #' @param - accumulation_start_date: Allows the user to start counting accumulations from
 #'                                 before the specified start date (or before the
 #'                                 planting date if using the most recent planting).
@@ -202,7 +220,10 @@ agronomic_values_fields <- function(field_id
 #' @return data.frame of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{agronomic_values_latlng(39.8282, -98.5795, '2015-07-01', '2015-07-31', '', 'standard', 10, 10, 30)}
+#' \dontrun{agronomic_values_latlng(latitude = 39.8282
+#'                                  ,longitude = -98.5795
+#'                                  ,day_start = '2018-05-01'
+#'                                  ,day_end = '2018-05-31')}
 #' @export
 
 
@@ -210,6 +231,7 @@ agronomic_values_latlng <- function(latitude
                                     ,longitude
                                     ,day_start
                                     ,day_end
+                                    ,propertiesToInclude = ''
                                     ,accumulation_start_date = ''
                                     ,gdd_method = 'standard'
                                     ,gdd_base_temp = 10
@@ -224,6 +246,7 @@ agronomic_values_latlng <- function(latitude
   checkValidStartEndDatesAgronomics(day_start,day_end)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
   checkAccumulationStartDate(accumulation_start_date)
+  checkPropertiesEndpoint('agronomics',propertiesToInclude)
 
   # Create query
 
@@ -245,40 +268,52 @@ agronomic_values_latlng <- function(latitude
     strAccumulation <- ''
   }
 
+  if (propertiesToInclude[1] != '') {
+    propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+  } else {
+    propertiesString <- ''
+  }
+
   url <- paste0(urlAddress, strBeg, strCoord, strType, strDates,
                     gdd_methodString,gdd_base_tempString,gdd_min_boundaryString,
-                    gdd_max_boundaryString,strAccumulation )
+                    gdd_max_boundaryString,strAccumulation,propertiesString)
 
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
     postbody = ''
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                          httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-  
+
     a <- suppressMessages(httr::content(request, as = "text"))
-  
+
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)  
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
-  
-  data <- as.data.table(x[[3]])
+
+  if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == FALSE) {
+    data <- as.data.table(x[[1]])
+  } else if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == TRUE) {
+    data <- as.data.table(x[[2]])
+  } else {
+    data <- as.data.table(x[[3]])
+  }
 
   varNames <- colnames(data)
-  data[,grep('_links',varNames) := NULL]
-  data[,grep('.units',varNames) := NULL]
+  suppressWarnings(data[,grep('_links',varNames) := NULL])
+  suppressWarnings(data[,grep('.units',varNames) := NULL])
 
   currentNames <- data.table::copy(colnames(data))
   data[,latitude  := latitude]
   data[,longitude := longitude]
   data.table::setcolorder(data,c('latitude','longitude',currentNames))
-  
+
   checkDataReturn_daily(data,day_start,day_end)
 
   return(as.data.frame(data))

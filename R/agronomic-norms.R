@@ -30,6 +30,7 @@
 #'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
 #' @param - year_end: character string of the last year (inclusive) of the range of years for which
 #'                     you're calculating norms, in the form YYYY. e.g., 2015 (required)
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)
 #' @param - exclude_year: Year or years which you'd like to exclude from
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
@@ -70,10 +71,17 @@
 #' @return dataframe of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{agronomic_norms_fields(field_id = 'field_test', month_day_start = '07-01', month_day_end = '07-10',
-#'                                 year_start = 2008, year_end = 2016, exclude_years = "2010",
-#'                                  accumulation_start_date = '', gdd_method = 'standard', gdd_base_temp = 10,
-#'                                  gdd_min_boundary = 10, gdd_max_boundary = 30)}
+#' \dontrun{agronomic_norms_fields(field_id = 'field_test'
+#'                                 ,month_day_start = '07-01'
+#'                                 ,month_day_end = '07-10'
+#'                                 ,year_start = 2008
+#'                                 ,year_end = 2016
+#'                                 ,exclude_years = "2010"
+#'                                 ,accumulation_start_date = ''
+#'                                 ,gdd_method = 'standard'
+#'                                 ,gdd_base_temp = 10
+#'                                 ,gdd_min_boundary = 10
+#'                                 ,gdd_max_boundary = 30)}
 
 #' @export
 
@@ -83,6 +91,7 @@ agronomic_norms_fields <- function(field_id
                                    ,month_day_end
                                    ,year_start
                                    ,year_end
+                                   ,propertiesToInclude = ''
                                    ,exclude_years = NULL
                                    ,accumulation_start_date = ''
                                    ,gdd_method = 'standard'
@@ -102,6 +111,8 @@ agronomic_norms_fields <- function(field_id
   checkNormsStartEndDates(month_day_start,month_day_end)
   checkNormsYearsToRequest(year_start,year_end,month_day_start,month_day_end,exclude_years)
   checkAccumulationStartDateNorms(accumulation_start_date,month_day_start)
+  checkPropertiesEndpoint('agronomics',propertiesToInclude)
+
 
   # Create query
 
@@ -136,12 +147,17 @@ agronomic_norms_fields <- function(field_id
   gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
   gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
 
+  if (propertiesToInclude[1] != '') {
+    propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+  } else {
+    propertiesString <- ''
+  }
 
   strYearsType <- paste0('/years')
   strYears <- paste0('/',year_start,',',year_end)
   url <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,
                     strYears,gdd_methodString,gdd_base_tempString,gdd_min_boundaryString,
-                    gdd_max_boundaryString,strexclude_years,strAccumulation)
+                    gdd_max_boundaryString,strexclude_years,strAccumulation,propertiesString)
 
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
@@ -154,16 +170,22 @@ agronomic_norms_fields <- function(field_id
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)  
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
-  data <- data.table::as.data.table(x[[3]])
-  
+  if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == FALSE) {
+    data <- as.data.table(x[[1]])
+  } else if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == TRUE) {
+    data <- as.data.table(x[[2]])
+  } else {
+    data <- as.data.table(x[[3]])
+  }
+
   #Get rid of leap yearData
   if (includeFeb29thData == FALSE) {
     data <- data[day != '02-29',]
@@ -171,15 +193,15 @@ agronomic_norms_fields <- function(field_id
 
   varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object
-  data[,grep('_links',varNames) := NULL]
-  data[,grep('.units',varNames) := NULL]
+  suppressWarnings(data[,grep('_links',varNames) := NULL])
+  suppressWarnings(data[,grep('.units',varNames) := NULL])
 
   currentNames <- data.table::copy(colnames(data))
   data[,field_id  := field_id]
   data.table::setcolorder(data,c('field_id',currentNames))
 
   checkDataReturn_norms(data,month_day_start,month_day_end,year_start,year_end,exclude_years,includeFeb29thData)
-  
+
   return(as.data.frame(data))
 }
 
@@ -215,6 +237,7 @@ agronomic_norms_fields <- function(field_id
 #'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
 #' @param - year_end: character string of the last year (inclusive) of the range of years for which
 #'                     you're calculating norms, in the form YYYY. e.g., 2015 (required)
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)
 #' @param - exclude_year: Year or years which you'd like to exclude from
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
@@ -246,7 +269,7 @@ agronomic_norms_fields <- function(field_id
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
-#' 
+#'
 #' @import httr
 #' @import data.table
 #' @import lubridate
@@ -256,11 +279,18 @@ agronomic_norms_fields <- function(field_id
 #'
 #' @examples
 
-#' \dontrun{agronomic_norms_latlng(latitude = 39.8282, longitude = -98.5795,
-#'                                 month_day_start = '02-01', month_day_end = '03-10',
-#'                                 year_start = 2008, year_end = 2015,exclude_years = c(2010,2011),
-#'                                 accumulation_start_date = '',gdd_method = 'standard',
-#'                                 gdd_base_temp = 10,gdd_min_boundary = 10,gdd_max_boundary = 30)}
+#' \dontrun{agronomic_norms_latlng(latitude = 39.8282
+#'                                 ,longitude = -98.5795
+#'                                 ,month_day_start = '02-01'
+#'                                 ,month_day_end = '03-10'
+#'                                 ,year_start = 2008
+#'                                 ,year_end = 2015
+#'                                 ,exclude_years = c(2010,2011)
+#'                                 ,accumulation_start_date = ''
+#'                                 ,gdd_method = 'standard'
+#'                                 ,gdd_base_temp = 10
+#'                                 ,gdd_min_boundary = 10
+#'                                 ,gdd_max_boundary = 30)}
 
 
 #' @export
@@ -272,6 +302,7 @@ agronomic_norms_latlng <- function(latitude
                                    ,month_day_end
                                    ,year_start
                                    ,year_end
+                                   ,propertiesToInclude = ''
                                    ,exclude_years = NULL
                                    ,accumulation_start_date = ''
                                    ,gdd_method = 'standard'
@@ -291,6 +322,7 @@ agronomic_norms_latlng <- function(latitude
   checkNormsStartEndDates(month_day_start,month_day_end)
   checkNormsYearsToRequest(year_start,year_end,month_day_start,month_day_end,exclude_years)
   checkAccumulationStartDateNorms(accumulation_start_date,month_day_start)
+  checkPropertiesEndpoint('agronomics',propertiesToInclude)
 
   # Create query
 
@@ -318,16 +350,22 @@ agronomic_norms_latlng <- function(latitude
     strexclude_years <- ''
   }
 
-  gdd_methodString      <- paste0('?gddMethod=',gdd_method)
+  gdd_methodString       <- paste0('?gddMethod=',gdd_method)
   gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
   gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
   gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
+
+  if (propertiesToInclude[1] != '') {
+    propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+  } else {
+    propertiesString <- ''
+  }
 
   strYearsType <- paste0('/years')
   strYears <- paste0('/',year_start,',',year_end)
   url <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,
                     strYears,gdd_methodString,gdd_base_tempString,gdd_min_boundaryString,
-                    gdd_max_boundaryString,strexclude_years,strAccumulation)
+                    gdd_max_boundaryString,strexclude_years,strAccumulation,propertiesString)
 
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
@@ -340,16 +378,22 @@ agronomic_norms_latlng <- function(latitude
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)  
+      checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
-  data <- data.table::as.data.table(x[[3]])
-  
+  if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == FALSE) {
+    data <- as.data.table(x[[1]])
+  } else if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == TRUE) {
+    data <- as.data.table(x[[2]])
+  } else {
+    data <- as.data.table(x[[3]])
+  }
+
   #Get rid of leap yearData
   if (includeFeb29thData == FALSE) {
     data <- data[day != '02-29',]
@@ -357,8 +401,8 @@ agronomic_norms_latlng <- function(latitude
 
   varNames <- colnames(data)
   #This removes the non-data info returned with the JSON object
-  data[,grep('_links',varNames) := NULL]
-  data[,grep('.units',varNames) := NULL]
+  suppressWarnings(data[,grep('_links',varNames) := NULL])
+  suppressWarnings(data[,grep('.units',varNames) := NULL])
 
   currentNames <- data.table::copy(colnames(data))
   data[,latitude  := latitude]
@@ -366,7 +410,7 @@ agronomic_norms_latlng <- function(latitude
   data.table::setcolorder(data,c('latitude','longitude',currentNames))
 
   checkDataReturn_norms(data,month_day_start,month_day_end,year_start,year_end,exclude_years,includeFeb29thData)
-  
+
   return(as.data.frame(data))
 }
 

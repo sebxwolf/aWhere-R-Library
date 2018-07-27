@@ -6,24 +6,25 @@
 #' @details
 #' This function returns weather data on Min/Max Temperature, Precipitation,
 #' Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
-#' Morning Max Windspeed, and Average Windspeed for the field id specified. 
-#' Default units are returned by the API. 
-#' 
+#' Morning Max Windspeed, and Average Windspeed for the field id specified.
+#' Default units are returned by the API.
+#'
 #' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
 #' and allows retrieval and integration of data across all different time ranges, long term normals,
 #' daily observed, current weather, and forecasts. These APIs are designed for efficiency,
 #' allowing you to customize the responses to return just the attributes you need.
 #'
 #' Understanding the recent and long-term daily weather is critical for making in-season decisions.
-#' This API opens the weather attributes that matter most to agriculture. 
-#' 
+#' This API opens the weather attributes that matter most to agriculture.
+#'
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations
 #'
-#' @param - field_id: the field_id associated with the location for which you want to pull data.  
+#' @param - field_id: the field_id associated with the location for which you want to pull data.
 #' Field IDs are created using the create_field function.(string)
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -37,12 +38,15 @@
 #'
 #'
 #' @examples
-#' \dontrun{daily_observed_fields(field_id = 'field_test',day_start = '2016-04-28',day_end = '2017-05-01')}
+#' \dontrun{daily_observed_fields(field_id = 'field_test'
+#'                                ,day_start = '2018-04-28'
+#'                                ,day_end = '2018-05-01')}
 
 #' @export
 daily_observed_fields <- function(field_id
                                   ,day_start
                                   ,day_end
+                                  ,propertiesToInclude = ''
                                   ,keyToUse = awhereEnv75247$uid
                                   ,secretToUse = awhereEnv75247$secret
                                   ,tokenToUse = awhereEnv75247$token) {
@@ -50,6 +54,7 @@ daily_observed_fields <- function(field_id
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDates(day_start,day_end)
+  checkPropertiesEndpoint('weather',propertiesToInclude)
 
 
   ## Create Request
@@ -123,7 +128,13 @@ daily_observed_fields <- function(field_id
       limitString <- paste0('?limit=',numObsReturned)
     }
 
-    url <- paste0(urlAddress, strBeg, strCoord, strType, strDates, limitString)
+    if (propertiesToInclude[1] != '') {
+      propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+    } else {
+      propertiesString <- ''
+    }
+
+    url <- paste0(urlAddress, strBeg, strCoord, strType, strDates, limitString,propertiesString)
 
     doWeatherGet <- TRUE
 
@@ -141,7 +152,7 @@ daily_observed_fields <- function(field_id
         doWeatherGet <- FALSE
       }
     }
-    
+
     #The JSONLITE Serializer properly handles the JSON conversion
     x <- jsonlite::fromJSON(a, flatten = TRUE)
 
@@ -158,8 +169,12 @@ daily_observed_fields <- function(field_id
   allWeath[,grep('_links',varNames) := NULL]
   allWeath[,grep('.units',varNames) := NULL]
 
+  currentNames <- data.table::copy(colnames(allWeath))
+  allWeath[,field_id  := field_id]
+  data.table::setcolorder(allWeath,c('field_id',currentNames))
+
   checkDataReturn_daily(allWeath,day_start,day_end)
-  
+
   return(as.data.frame(allWeath))
 }
 
@@ -172,16 +187,16 @@ daily_observed_fields <- function(field_id
 #' @details
 #' This function returns weather data on Min/Max Temperature, Precipitation,
 #' Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
-#' Morning Max Windspeed, and Average Windspeed for the location specified by latitude and longitude. 
+#' Morning Max Windspeed, and Average Windspeed for the location specified by latitude and longitude.
 #' Default units are returned by the API. Latitude and longitude must be in decimal degrees.
-#' 
+#'
 #' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
 #' and allows retrieval and integration of data across all different time ranges, long term normals,
 #' daily observed, current weather, and forecasts. These APIs are designed for efficiency,
 #' allowing you to customize the responses to return just the attributes you need.
 #'
 #' Understanding the recent and long-term daily weather is critical for making in-season decisions.
-#' This API opens the weather attributes that matter most to agriculture. 
+#' This API opens the weather attributes that matter most to agriculture.
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'
@@ -189,6 +204,7 @@ daily_observed_fields <- function(field_id
 #' @param - longitude: the longitude of the requested locations (double)
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -202,7 +218,10 @@ daily_observed_fields <- function(field_id
 #'
 #'
 #' @examples
-#' \dontrun{daily_observed_latlng(latitude = 39.8282, longitude = -98.5795,day_start = '2014-04-28',day_end = '2015-05-01')}
+#' \dontrun{daily_observed_latlng(latitude = 39.8282
+#'                                ,longitude = -98.5795
+#'                                ,day_start = '2018-04-28'
+#'                                ,day_end = '2018-05-01')}
 
 #' @export
 
@@ -211,6 +230,7 @@ daily_observed_latlng <- function(latitude
                                   ,longitude
                                   ,day_start
                                   ,day_end
+                                  ,propertiesToInclude = ''
                                   ,keyToUse = awhereEnv75247$uid
                                   ,secretToUse = awhereEnv75247$secret
                                   ,tokenToUse = awhereEnv75247$token) {
@@ -218,6 +238,7 @@ daily_observed_latlng <- function(latitude
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidLatLong(latitude,longitude)
   checkValidStartEndDates(day_start,day_end)
+  checkPropertiesEndpoint('weather',propertiesToInclude)
 
   ## Create Request
   #Calculate number of loops needed if requesting more than 120 days
@@ -276,7 +297,13 @@ daily_observed_latlng <- function(latitude
     }
     limitString <- paste0('?limit=',returnedAmount)
 
-    url <- paste0(urlAddress, strBeg, strCoord, strType, strDates, limitString)
+    if (propertiesToInclude[1] != '') {
+      propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+    } else {
+      propertiesString <- ''
+    }
+
+    url <- paste0(urlAddress, strBeg, strCoord, strType, strDates, limitString,propertiesString)
 
     doWeatherGet <- TRUE
 
@@ -296,7 +323,7 @@ daily_observed_latlng <- function(latitude
         doWeatherGet <- FALSE
       }
     }
-    
+
     #The JSONLITE Serializer properly handles the JSON conversion
     x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -313,7 +340,12 @@ daily_observed_latlng <- function(latitude
   allWeath[,grep('_links',varNames) := NULL]
   allWeath[,grep('.units',varNames) := NULL]
 
+  currentNames <- data.table::copy(colnames(allWeath))
+  allWeath[,latitude  := latitude]
+  allWeath[,longitude := longitude]
+  data.table::setcolorder(allWeath,c('latitude','longitude',currentNames))
+
   checkDataReturn_daily(allWeath,day_start,day_end)
-  
+
   return(as.data.frame(allWeath))
 }
