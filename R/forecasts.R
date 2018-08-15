@@ -53,10 +53,10 @@ forecasts_fields <- function(field_id
                              ,secretToUse = awhereEnv75247$secret
                              ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials(keyToUse,secretToUse,tokenToUse)
-  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
-  checkValidStartEndDatesForecast(day_start,day_end)
-  checkForecastParams(day_start,block_size)
+  aWhereAPI:::checkCredentials(keyToUse,secretToUse,tokenToUse)
+  aWhereAPI:::checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
+  aWhereAPI:::checkValidStartEndDatesForecast(day_start,day_end)
+  aWhereAPI:::checkForecastParams(day_start,block_size)
 
   #Create Query
   urlAddress <- "https://api.awhere.com/v2/weather"
@@ -83,24 +83,24 @@ forecasts_fields <- function(field_id
     request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                          httr::add_headers(Authorization =paste0("Bearer ", awhereEnv75247$token)))
 
-    a <- suppressMessages(content(request, as = "text"))
+    a <- suppressMessages(httr::content(request, as = "text"))
 
     if (grepl('API Access Expired',a)) {
-      get_token(keyToUse,secretToUse)
+      aWhereAPI::get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
-  
+
   if (length(x) != 4) {
     dataTemp <- x[[1]]$forecast
-    data <- as.data.table(rbindlist(dataTemp))
+    data <- data.table::as.data.table(data.table::rbindlist(dataTemp))
   } else { #this corresponds to a single day of data
-    data <- as.data.table(x[[3]])
+    data <- data.table::as.data.table(x[[3]])
   }
 
   varNames <- colnames(data)
@@ -111,13 +111,17 @@ forecasts_fields <- function(field_id
   #These variables are unique to the forecast API and have a different schema
   #than the rest.  For the time being remove
   data[,c('soilMoisture','soilTemperatures') := NULL]
-  
-  currentNames <- copy(colnames(data))
-  data[,field_id  := field_id]
-  setcolorder(data,c('field_id',currentNames))
 
-  checkDataReturn_forecasts(data,day_start,day_end,block_size)
-  
+  currentNames <- data.table::copy(colnames(data))
+  data[,field_id  := field_id]
+  data.table::setcolorder(data,c('field_id',currentNames))
+
+  if(block_size == 1) {
+    data[,c("relativeHumidity.max", "relativeHumidity.min", "wind.max", "wind.min") := NULL]
+  }
+
+  aWhereAPI:::checkDataReturn_forecasts(data,day_start,day_end,block_size)
+
   return(as.data.frame(data))
 }
 
@@ -176,10 +180,10 @@ forecasts_latlng <- function(latitude
                              ,secretToUse = awhereEnv75247$secret
                              ,tokenToUse = awhereEnv75247$token) {
 
-  checkCredentials(keyToUse,secretToUse,tokenToUse)
-  checkValidLatLong(latitude,longitude)
-  checkValidStartEndDatesForecast(day_start,day_end)
-  checkForecastParams(day_start,block_size)
+  aWhereAPI:::checkCredentials(keyToUse,secretToUse,tokenToUse)
+  aWhereAPI:::checkValidLatLong(latitude,longitude)
+  aWhereAPI:::checkValidStartEndDatesForecast(day_start,day_end)
+  aWhereAPI:::checkForecastParams(day_start,block_size)
 
   #Create Query
   urlAddress <- "https://api.awhere.com/v2/weather"
@@ -200,24 +204,24 @@ forecasts_latlng <- function(latitude
                          httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
 
     # Make forecast request
-    a <- suppressMessages(content(request, as = "text"))
+    a <- suppressMessages(httr::content(request, as = "text"))
 
     if (grepl('API Access Expired',a)) {
       get_token(keyToUse,secretToUse)
     } else {
-      checkStatusCode(request)
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
   if (length(x) != 4) {
     dataTemp <- x[[1]]$forecast
-    data <- as.data.table(rbindlist(dataTemp))
+    data <- data.table::as.data.table(data.table::rbindlist(dataTemp))
   } else { #this corresponds to a single day of data
-    data <- as.data.table(x[[3]])
+    data <- data.table::as.data.table(x[[3]])
   }
 
   varNames <- colnames(data)
@@ -228,14 +232,18 @@ forecasts_latlng <- function(latitude
   #These variables are unique to the forecast API and have a different schema
   #than the rest.  For the time being remove
   data[,c('soilMoisture','soilTemperatures') := NULL]
-  
-  currentNames <- copy(colnames(data))
+
+  currentNames <- data.table::copy(colnames(data))
   data[,latitude  := latitude]
   data[,longitude := longitude]
-  setcolorder(data,c('latitude','longitude',currentNames))
+  data.table::setcolorder(data,c('latitude','longitude',currentNames))
 
-  checkDataReturn_forecasts(data,day_start,day_end,block_size)
-  
+  if(block_size == 1) {
+    data[,c("relativeHumidity.max", "relativeHumidity.min", "wind.max", "wind.min") := NULL]
+  }
+
+  aWhereAPI:::checkDataReturn_forecasts(data,day_start,day_end,block_size)
+
   return(as.data.frame(data))
 }
 
