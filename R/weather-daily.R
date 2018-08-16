@@ -146,9 +146,18 @@ daily_observed_fields <- function(field_id
       a <- suppressMessages(httr::content(request, as = "text"))
 
       if (grepl('API Access Expired',a)) {
-        get_token(keyToUse,secretToUse)
+        if(exists("awhereEnv75247")) {
+          if(tokenToUse == awhereEnv75247$token) {
+            get_token(keyToUse,secretToUse)
+            tokenToUse <- awhereEnv75247$token
+          } else {
+            stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+          }
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
       } else {
-        checkStatusCode(request)
+        aWhereAPI:::checkStatusCode(request)
         doWeatherGet <- FALSE
       }
     }
@@ -317,9 +326,18 @@ daily_observed_latlng <- function(latitude
       a <- suppressMessages(httr::content(request, as = "text"))
 
       if (grepl('API Access Expired',a)) {
-        get_token(keyToUse,secretToUse)
+        if(exists("awhereEnv75247")) {
+          if(tokenToUse == awhereEnv75247$token) {
+            get_token(keyToUse,secretToUse)
+            tokenToUse <- awhereEnv75247$token
+          } else {
+            stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+          }
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
       } else {
-        checkStatusCode(request)
+        aWhereAPI:::checkStatusCode(request)
         doWeatherGet <- FALSE
       }
     }
@@ -415,12 +433,11 @@ daily_observed_area <- function(polygon
       stop(e)
     })
   }
-  cat("Buffering\n")
   ## Create grid of lat/lon points within given polygon
   ## aWhere grid is spaced at .08333 decimal degrees resolution,
   ## so .08 should guarantee a grid point in each aWhere grid cell
   grid <- suppressWarnings(sp::makegrid(raster::buffer(polygon, .5), cellsize = .08))
-  grid <- sp::SpatialPoints(grid, proj4string = CRS(proj4string(polygon)))
+  grid <- sp::SpatialPoints(grid, proj4string = sp::CRS(sp::proj4string(polygon)))
   grid <- grid[polygon,]
 
   grid <- as.data.frame(grid@coords)
@@ -464,7 +481,6 @@ daily_observed_area <- function(polygon
   i <- 1
 
 
-  cat("starting data pull")
   doParallel::registerDoParallel(cores=numcores)
 
   observed <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
@@ -516,7 +532,16 @@ daily_observed_area <- function(polygon
         a <- suppressMessages(httr::content(request, as = "text"))
 
         if (grepl('API Access Expired',a)) {
-          get_token(keyToUse,secretToUse)
+          if(exists("awhereEnv75247")) {
+            if(tokenToUse == awhereEnv75247$token) {
+              get_token(keyToUse,secretToUse)
+              tokenToUse <- awhereEnv75247$token
+            } else {
+              stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+            }
+          } else {
+            stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+          }
         } else {
           aWhereAPI:::checkStatusCode(request)
           doWeatherGet <- FALSE
@@ -538,6 +563,15 @@ daily_observed_area <- function(polygon
     #This removes the non-data info returned with the JSON object
     allWeath[,grep('_links',varNames) := NULL]
     allWeath[,grep('.units',varNames) := NULL]
+
+
+    colnames(allWeath) <- gsub("location.", "", colnames(allWeath))
+    currentNames <- data.table::copy(colnames(allWeath))
+
+    allWeath$gridx <- grid$gridx[j]
+    allWeath$gridy <- grid$gridy[j]
+
+    data.table::setcolorder(allWeath,c(currentNames[c(1:3)], 'gridy', 'gridx', currentNames[c(4:length(currentNames))]))
 
     aWhereAPI:::checkDataReturn_daily(allWeath,day_start,day_end)
 
