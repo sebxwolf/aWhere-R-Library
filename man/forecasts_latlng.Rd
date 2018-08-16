@@ -4,9 +4,10 @@
 \alias{forecasts_latlng}
 \title{forecasts_latlng}
 \usage{
-forecasts_latlng(latitude, longitude, day_start = as.character(Sys.Date()),
-  day_end = "", block_size = 1, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+forecasts_latlng(latitude, longitude,
+  day_start = as.character(Sys.Date()), day_end = "", block_size = 1,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{latitude: the latitude of the requested location (double)}

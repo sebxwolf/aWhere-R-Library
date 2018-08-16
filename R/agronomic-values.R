@@ -130,9 +130,18 @@ agronomic_values_fields <- function(field_id
     a <- suppressMessages(httr::content(request, as = "text"))
 
     if (grepl('API Access Expired',a)) {
-      get_token(keyToUse,secretToUse)
+      if(exists("awhereEnv75247")) {
+        if(tokenToUse == awhereEnv75247$token) {
+          get_token(keyToUse,secretToUse)
+          tokenToUse <- awhereEnv75247$token
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
+      } else {
+        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+      }
     } else {
-      checkStatusCode(request)
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
@@ -287,9 +296,18 @@ agronomic_values_latlng <- function(latitude
     a <- suppressMessages(httr::content(request, as = "text"))
 
     if (grepl('API Access Expired',a)) {
-      get_token(keyToUse,secretToUse)
+      if(exists("awhereEnv75247")) {
+        if(tokenToUse == awhereEnv75247$token) {
+          get_token(keyToUse,secretToUse)
+          tokenToUse <- awhereEnv75247$token
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
+      } else {
+        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+      }
     } else {
-      checkStatusCode(request)
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }

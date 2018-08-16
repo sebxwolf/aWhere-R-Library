@@ -7,7 +7,7 @@
 #' Fields are how you manage the locations for which you're tracking weather, agronomics,
 #' models, and progress over growing seasons in the aWhere API. By registering a field, you create a quick way
 #' to consistently reference locations across all of our APIs, and allow our modeling APIs
-#' to better operate and tune to the conditions and status of each specific field. 
+#' to better operate and tune to the conditions and status of each specific field.
 #'
 #' Before using aWhere's APIs you'll need to register the field locations.
 #' This is a one-time step. Every field has an ID that you define, plus a latitude and longitude.
@@ -18,7 +18,7 @@
 #' @references http://developer.awhere.com/api/reference/fields/get-fields
 #'
 #' @param - field_id: Either a field id to retrieve information for that specific field
-#'                   or an empty string to retrieve information on all fields associated 
+#'                   or an empty string to retrieve information on all fields associated
 #'                   with the user's aWhere API account (string - optional)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -58,10 +58,19 @@ get_fields <- function(field_id = ''
 
     a <- suppressMessages(httr::content(request))
 
-    if (any(grepl('API Access Expired',a)) == TRUE) {
-      get_token(keyToUse,secretToUse)
+    if (grepl('API Access Expired',a)) {
+      if(exists("awhereEnv75247")) {
+        if(tokenToUse == awhereEnv75247$token) {
+          get_token(keyToUse,secretToUse)
+          tokenToUse <- awhereEnv75247$token
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
+      } else {
+        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+      }
     } else {
-      checkStatusCode(request)
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
@@ -122,7 +131,7 @@ get_fields <- function(field_id = ''
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
-#' 
+#'
 #' @return - data.frame containing information about requested field(s)
 #'
 #' @import httr
@@ -184,10 +193,19 @@ get_planting <- function(field_id
 
     a <- suppressMessages(httr::content(request))
 
-    if (any(grepl('API Access Expired',a))) {
-      get_token(keyToUse,secretToUse)
+    if (grepl('API Access Expired',a)) {
+      if(exists("awhereEnv75247")) {
+        if(tokenToUse == awhereEnv75247$token) {
+          get_token(keyToUse,secretToUse)
+          tokenToUse <- awhereEnv75247$token
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
+      } else {
+        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+      }
     } else {
-      checkStatusCode(request)
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
@@ -251,7 +269,7 @@ get_planting <- function(field_id
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
-#' 
+#'
 #' @return - data.frame containing the requested payload(s).
 #'
 #' @import httr
@@ -291,8 +309,17 @@ get_job <- function(job_id
 
     a <- suppressMessages(httr::content(request))
 
-    if (any(grepl('API Access Expired', a))) {
-      get_token(keyToUse,secretToUse)
+    if (grepl('API Access Expired',a)) {
+      if(exists("awhereEnv75247")) {
+        if(tokenToUse == awhereEnv75247$token) {
+          get_token(keyToUse,secretToUse)
+          tokenToUse <- awhereEnv75247$token
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
+      } else {
+        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+      }
     } else if (a$jobStatus == "Done") {
       doWeatherGet <- FALSE
     } else if (retries >= num_retries) {

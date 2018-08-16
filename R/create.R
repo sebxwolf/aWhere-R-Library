@@ -2,17 +2,17 @@
 #'
 #' @description
 #' \code{create_field} This function will generate a new field associated with the user's account in the aWhere API.
-#'   This is a one-time operation for each field.  
+#'   This is a one-time operation for each field.
 #'
 #' @details
 #' Fields are how you manage the locations for which you're tracking weather, agronomics,
 #' models, and progress over growing seasons in the aWhere API. By registering a field, you create a quick way
 #' to consistently reference locations across all of our APIs, and allow our modeling APIs
-#' to better operate and tune to the conditions and status of each specific field. 
+#' to better operate and tune to the conditions and status of each specific field.
 #'
 #' Creating a field registers the location with the aWhere system, making it easier to reference
 #' and track your locations as well as run agronomics and models automatically. You
-#' only need to create a field once, after which you can reference the field by ID 
+#' only need to create a field once, after which you can reference the field by ID
 #' (you'll use this ID in most URI endpoints in the aWhere system).
 #'
 #' All spaces will be converted to underscores to conform with the requirements of the API.
@@ -87,9 +87,18 @@ create_field <- function(field_id
     a <- suppressMessages(httr::content(request, as = "text"))
 
     if (grepl('API Access Expired',a)) {
-      get_token(keyToUse,secretToUse)
+      if(exists("awhereEnv75247")) {
+        if(tokenToUse == awhereEnv75247$token) {
+          get_token(keyToUse,secretToUse)
+          tokenToUse <- awhereEnv75247$token
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
+      } else {
+        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+      }
     } else {
-      checkStatusCode(request)  
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
@@ -149,8 +158,8 @@ create_field <- function(field_id
 #' @import httr
 #'
 #' @examples
-#' \dontrun{create_planting(field_id='field_test',crop='corn', planting_date='2015-10-25', proj_yield_amount='100', 
-#'                          proj_yield_units='Bushels', proj_harvest_date='2016-02-01', yield_amount='110', 
+#' \dontrun{create_planting(field_id='field_test',crop='corn', planting_date='2015-10-25', proj_yield_amount='100',
+#'                          proj_yield_units='Bushels', proj_harvest_date='2016-02-01', yield_amount='110',
 #'                          yield_units='Bushels', harvest_date='2016-02-01')
 #' }
 #' @export
@@ -182,7 +191,7 @@ create_planting <- function(field_id
   checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
 
   url <- paste0("https://api.awhere.com/v2/agronomics/fields/", field_id, "/plantings")
-  
+
   postbody <- paste0('{',
                      '"crop":"', crop, '",',
                      '"plantingDate":"', planting_date, '"')
@@ -220,10 +229,19 @@ create_planting <- function(field_id
 
     a <- suppressMessages(httr::content(request))
 
-    if (any(grepl('API Access Expired',a))) {
-      get_token(keyToUse,secretToUse)
+    if (grepl('API Access Expired',a)) {
+      if(exists("awhereEnv75247")) {
+        if(tokenToUse == awhereEnv75247$token) {
+          get_token(keyToUse,secretToUse)
+          tokenToUse <- awhereEnv75247$token
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
+      } else {
+        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+      }
     } else {
-      checkStatusCode(request) 
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
@@ -301,10 +319,19 @@ create_job <- function(api_requests
 
     a <- httr::content(request)
 
-    if (any(grepl('API Access Expired',a))) {
-      get_token(keyToUse,secretToUse)
+    if (grepl('API Access Expired',a)) {
+      if(exists("awhereEnv75247")) {
+        if(tokenToUse == awhereEnv75247$token) {
+          get_token(keyToUse,secretToUse)
+          tokenToUse <- awhereEnv75247$token
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
+      } else {
+        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+      }
     } else {
-      checkStatusCode(request) 
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }

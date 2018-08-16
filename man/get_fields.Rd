@@ -5,11 +5,12 @@
 \title{Get Fields}
 \usage{
 get_fields(field_id = "", keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: Either a field id to retrieve information for that specific field
-or an empty string to retrieve information on all fields associated 
+or an empty string to retrieve information on all fields associated
 with the user's aWhere API account (string - optional)}
 
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
@@ -28,7 +29,7 @@ with the user's aWhere API account (string - optional)}
 Fields are how you manage the locations for which you're tracking weather, agronomics,
 models, and progress over growing seasons in the aWhere API. By registering a field, you create a quick way
 to consistently reference locations across all of our APIs, and allow our modeling APIs
-to better operate and tune to the conditions and status of each specific field. 
+to better operate and tune to the conditions and status of each specific field.
 
 Before using aWhere's APIs you'll need to register the field locations.
 This is a one-time step. Every field has an ID that you define, plus a latitude and longitude.
