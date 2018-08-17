@@ -383,7 +383,7 @@ weather_norms_latlng <- function(latitude
 #' @return data.frame of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{weather_norms_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T)
+#' \dontrun{weather_norms_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = F)
 #'                               ,monthday_start = '02-01'
 #'                               ,monthday_end = '03-10'
 #'                               ,year_start = 2008
@@ -446,6 +446,11 @@ weather_norms_area <- function(polygon
   grid$lat <- getLatitude(grid$gridy)
 
   cat(paste0('This query will require ',nrow(grid),' API Calls \n'))
+  makeAPICalls <- readline("\n Do you wish to proceed? Type yes to begin API calls")
+
+  if (tolower(makeAPICalls) != 'yes') {
+    stop('User Input indicated they did not want to proceed with making API Calls')
+  }
 
 
   cat(paste0('Requesting data using parallal API calls\n'))
