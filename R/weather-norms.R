@@ -121,21 +121,7 @@ weather_norms_fields <- function(field_id
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    if (grepl('API Access Expired',a)) {
-      if(exists("awhereEnv75247")) {
-        if(tokenToUse == awhereEnv75247$token) {
-          get_token(keyToUse,secretToUse)
-          tokenToUse <- awhereEnv75247$token
-        } else {
-          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-        }
-      } else {
-        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-      }
-    } else {
-      aWhereAPI:::checkStatusCode(request)
-      doWeatherGet <- FALSE
-    }
+    doWeatherGet <- check_JSON(a)
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
@@ -287,21 +273,7 @@ weather_norms_latlng <- function(latitude
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    if (grepl('API Access Expired',a)) {
-      if(exists("awhereEnv75247")) {
-        if(tokenToUse == awhereEnv75247$token) {
-          get_token(keyToUse,secretToUse)
-          tokenToUse <- awhereEnv75247$token
-        } else {
-          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-        }
-      } else {
-        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-      }
-    } else {
-      aWhereAPI:::checkStatusCode(request)
-      doWeatherGet <- FALSE
-    }
+    doWeatherGet <- check_JSON(a)
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
@@ -367,7 +339,8 @@ weather_norms_latlng <- function(latitude
 #'                              summary statistics are calculated via the calendar date and 3 years are required
 #'                              to generate a value, data from this date is more likely to be NA.  ALlows user
 #'                              to drop this data to avoid later problems (defaults to TRUE)
-#' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()
+#' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores().
+#'                    If you receive an error regarding the speed you are making calls, reduce this number
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -383,7 +356,7 @@ weather_norms_latlng <- function(latitude
 #' @return data.frame of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{weather_norms_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = F)
+#' \dontrun{weather_norms_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T)
 #'                               ,monthday_start = '02-01'
 #'                               ,monthday_end = '03-10'
 #'                               ,year_start = 2008

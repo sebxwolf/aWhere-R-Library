@@ -145,21 +145,7 @@ daily_observed_fields <- function(field_id
 
       a <- suppressMessages(httr::content(request, as = "text"))
 
-      if (grepl('API Access Expired',a)) {
-        if(exists("awhereEnv75247")) {
-          if(tokenToUse == awhereEnv75247$token) {
-            get_token(keyToUse,secretToUse)
-            tokenToUse <- awhereEnv75247$token
-          } else {
-            stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-          }
-        } else {
-          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-        }
-      } else {
-        aWhereAPI:::checkStatusCode(request)
-        doWeatherGet <- FALSE
-      }
+      doWeatherGet <- check_JSON(a)
     }
 
     #The JSONLITE Serializer properly handles the JSON conversion
@@ -325,21 +311,7 @@ daily_observed_latlng <- function(latitude
 
       a <- suppressMessages(httr::content(request, as = "text"))
 
-      if (grepl('API Access Expired',a)) {
-        if(exists("awhereEnv75247")) {
-          if(tokenToUse == awhereEnv75247$token) {
-            get_token(keyToUse,secretToUse)
-            tokenToUse <- awhereEnv75247$token
-          } else {
-            stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-          }
-        } else {
-          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-        }
-      } else {
-        aWhereAPI:::checkStatusCode(request)
-        doWeatherGet <- FALSE
-      }
+      doWeatherGet <- check_JSON(a)
     }
 
     #The JSONLITE Serializer properly handles the JSON conversion
@@ -397,6 +369,7 @@ daily_observed_latlng <- function(latitude
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)
 #' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()
+#'                    If you receive an error regarding the speed you are making calls, reduce this number
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -411,7 +384,7 @@ daily_observed_latlng <- function(latitude
 #'
 #'
 #' @examples
-#' \dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = F),
+#' \dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T),
 #'                                ,day_start = '2018-04-28'
 #'                                ,day_end = '2018-05-01')}
 
@@ -427,8 +400,8 @@ daily_observed_area <- function(polygon
                                 ,secretToUse = awhereEnv75247$secret
                                 ,tokenToUse = awhereEnv75247$token) {
 
-  aWhereAPI:::checkCredentials(keyToUse,secretToUse,tokenToUse)
-  aWhereAPI:::checkValidStartEndDates(day_start,day_end)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidStartEndDates(day_start,day_end)
 
   ## If polygon is WKT, convert to SpatialPolygons class
   if(class(polygon) == "character") {

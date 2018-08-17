@@ -8,9 +8,9 @@
 
 verify_api_calls <- function(grid) {
   cat(paste0('This query will require ',nrow(grid),' API Calls \n'))
-  makeAPICalls <- readline("\n Do you wish to proceed? Type yes to begin API calls: ")
+  makeAPICalls <- readline("Do you wish to proceed? Type yes to begin API calls: ")
 
   if (tolower(makeAPICalls) != 'yes') {
-    stop('User Input indicated they did not want to proceed with making API Calls')
+    stop('User Input indicated they did not want to proceed with making API Calls \n')
   }
 }
