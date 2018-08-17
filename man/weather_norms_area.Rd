@@ -65,7 +65,7 @@ allow you to compare this year or previous years to the long-term normals, calcu
 the average of those weather conditions on that day in that location over the years specified.
 }
 \examples{
-\dontrun{weather_norms_latlng(polygon = polygon = raster::getData('GADM', country = "Kenya", level = 0, download = T)
+\dontrun{weather_norms_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = F)
                               ,monthday_start = '02-01'
                               ,monthday_end = '03-10'
                               ,year_start = 2008

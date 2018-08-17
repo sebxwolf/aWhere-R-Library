@@ -395,6 +395,7 @@ daily_observed_latlng <- function(latitude
 #' @param - polygon: either a SpatialPolygons object or a well-known text string
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)
 #' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -410,8 +411,9 @@ daily_observed_latlng <- function(latitude
 #'
 #'
 #' @examples
-#' \dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Kenya", level = 0, download = T),
-#'                                day_start = '2014-04-28',day_end = '2015-05-01')}
+#' \dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = F),
+#'                                ,day_start = '2018-04-28'
+#'                                ,day_end = '2018-05-01')}
 
 #' @export
 
@@ -419,6 +421,7 @@ daily_observed_latlng <- function(latitude
 daily_observed_area <- function(polygon
                                 ,day_start
                                 ,day_end
+                                ,propertiesToInclude = ''
                                 ,numcores = 2
                                 ,keyToUse = awhereEnv75247$uid
                                 ,secretToUse = awhereEnv75247$secret
@@ -433,149 +436,25 @@ daily_observed_area <- function(polygon
       stop(e)
     })
   }
-  ## Create grid of lat/lon points within given polygon
-  ## aWhere grid is spaced at .08333 decimal degrees resolution,
-  ## so .08 should guarantee a grid point in each aWhere grid cell
-  grid <- suppressWarnings(sp::makegrid(raster::buffer(polygon, .5), cellsize = .08))
-  grid <- sp::SpatialPoints(grid, proj4string = sp::CRS(sp::proj4string(polygon)))
-  grid <- grid[polygon,]
 
-  grid <- as.data.frame(grid@coords)
+  cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
+  grid <- create_awhere_grid(polygon)
 
-  colnames(grid) <- c("lon", "lat")
+  verify_api_calls(grid)
 
-  ## Calculate GridX and GridY for each calculated grid point
-  grid$gridx <- aWhereAPI:::getGridX(grid$lon)
-  grid$gridy <- aWhereAPI:::getGridY(grid$lat)
-
-  ## Keep a only unique GridX/GridY pairings
-  grid <- unique(grid[,c("gridx", "gridy")])
-
-  ## Calculate lat and lon for each GridX/GridY
-  grid$lon <- aWhereAPI:::getLongitude(grid$gridx)
-  grid$lat <- aWhereAPI:::getLatitude(grid$gridy)
-
-
-  ## Create Request
-  #Calculate number of loops needed if requesting more than 120 days
-  numObsReturned <- 120
-
-  if (day_end != '') {
-    numOfDays <- as.numeric(difftime(lubridate::ymd(day_end), lubridate::ymd(day_start), units = 'days'))
-    allDates <- seq(as.Date(lubridate::ymd(day_start)),as.Date(lubridate::ymd(day_end)), by="days")
-
-    loops <- ((length(allDates))) %/% numObsReturned
-    remainder <- ((length(allDates))) %% numObsReturned
-
-  } else {
-
-    numOfDays <- 1
-    allDates <- lubridate::ymd(day_start)
-    loops <- 1
-    remainder <- 0
-  }
-
-  if(remainder > 0) {
-    loops <- loops + 1
-  }
-  i <- 1
-
-
+  cat(paste0('Requesting data using parallal API calls\n'))
   doParallel::registerDoParallel(cores=numcores)
 
   observed <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
 
-    dataList <- list()
-
-    # loop through, making requests in chunks of size numObsReturned
-
-    for (i in 1:loops) {
-
-      starting = numObsReturned*(i-1)+1
-      ending = numObsReturned*i
-      day_start_toUse <- allDates[starting]
-      day_end_toUse <- allDates[ending]
-      if(is.na(day_end_toUse)) {
-        tempDates <- allDates[c(starting:length(allDates))]
-        day_start_toUse <- tempDates[1]
-        day_end_toUse   <- tempDates[length(tempDates)]
-      }
-
-
-      # Create query
-
-      urlAddress <- "https://api.awhere.com/v2/weather"
-
-      strBeg <- paste0('/locations')
-      strCoord <- paste0('/',grid$lat[j],',',grid$lon[j])
-      strType <- paste0('/observations')
-      strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
-
-
-      returnedAmount <- as.integer(difftime(lubridate::ymd(day_end_toUse),lubridate::ymd(day_start_toUse),units = 'days')) + 1L
-      if (returnedAmount > numObsReturned) {
-        returnedAmount <- numObsReturned
-      }
-      limitString <- paste0('?limit=',returnedAmount)
-
-      url <- paste0(urlAddress, strBeg, strCoord, strType, strDates, limitString)
-
-      doWeatherGet <- TRUE
-
-      while (doWeatherGet == TRUE) {
-        postbody = ''
-        request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                             httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
-        # Make request
-
-        a <- suppressMessages(httr::content(request, as = "text"))
-
-        if (grepl('API Access Expired',a)) {
-          if(exists("awhereEnv75247")) {
-            if(tokenToUse == awhereEnv75247$token) {
-              get_token(keyToUse,secretToUse)
-              tokenToUse <- awhereEnv75247$token
-            } else {
-              stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-            }
-          } else {
-            stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-          }
-        } else {
-          aWhereAPI:::checkStatusCode(request)
-          doWeatherGet <- FALSE
-        }
-      }
-
-      #The JSONLITE Serializer properly handles the JSON conversion
-      x <- jsonlite::fromJSON(a,flatten = TRUE)
-
-      data <- data.table::as.data.table(x[[1]])
-
-      dataList[[i]] <- data
-
-    }
-    allWeath <- data.table::rbindlist(dataList)
-
-    varNames <- colnames(allWeath)
-
-    #This removes the non-data info returned with the JSON object
-    allWeath[,grep('_links',varNames) := NULL]
-    allWeath[,grep('.units',varNames) := NULL]
-
-
-    colnames(allWeath) <- gsub("location.", "", colnames(allWeath))
-    currentNames <- data.table::copy(colnames(allWeath))
-
-    allWeath$gridx <- grid$gridx[j]
-    allWeath$gridy <- grid$gridy[j]
-
-    data.table::setcolorder(allWeath,c(currentNames[c(1:3)], 'gridy', 'gridx', currentNames[c(4:length(currentNames))]))
-
-    aWhereAPI:::checkDataReturn_daily(allWeath,day_start,day_end)
-
-    return(as.data.frame(allWeath))
+    return(daily_observed_latlng(latitude = grid$lat[j],
+                                 longitude = grid$lon[j],
+                                 day_start = day_start,
+                                 day_end = day_end,
+                                 propertiesToInclude = propertiesToInclude,
+                                 keyToUse = keyToUse,
+                                 secretToUse = secretToUse,
+                                 tokenToUse = tokenToUse))
 
   }
 

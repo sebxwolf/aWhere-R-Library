@@ -414,44 +414,10 @@ weather_norms_area <- function(polygon
 
   ##############################################################################
 
-
-  ## If polygon is WKT, convert to SpatialPolygons class
-  if(class(polygon) == "character") {
-    tryCatch({polygon <- rgeos::readWKT(polygon)}, error = function(e) {
-      stop(e)
-    })
-  }
-
   cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
-  ## Create grid of lat/lon points within given polygon
-  ## aWhere grid is spaced at .08333 decimal degrees resolution,
-  ## so .08 should guarantee a grid point in each aWhere grid cell
-  grid <- suppressWarnings(sp::makegrid(raster::buffer(polygon, .5), cellsize = .08))
-  grid <- sp::SpatialPoints(grid, proj4string = sp::CRS(sp::proj4string(polygon)))
-  grid <- grid[polygon,]
+  grid <- create_awhere_grid(polygon)
 
-  grid <- as.data.frame(grid@coords)
-
-  colnames(grid) <- c("lon", "lat")
-
-  ## Calculate GridX and GridY for each calculated grid point
-  grid$gridx <- getGridX(grid$lon)
-  grid$gridy <- getGridY(grid$lat)
-
-  ## Keep a only unique GridX/GridY pairings
-  grid <- unique(grid[,c("gridx", "gridy")])
-
-  ## Calculate lat and lon for each GridX/GridY
-  grid$lon <- getLongitude(grid$gridx)
-  grid$lat <- getLatitude(grid$gridy)
-
-  cat(paste0('This query will require ',nrow(grid),' API Calls \n'))
-  makeAPICalls <- readline("\n Do you wish to proceed? Type yes to begin API calls")
-
-  if (tolower(makeAPICalls) != 'yes') {
-    stop('User Input indicated they did not want to proceed with making API Calls')
-  }
-
+  verify_api_calls(grid)
 
   cat(paste0('Requesting data using parallal API calls\n'))
   doParallel::registerDoParallel(cores=numcores)

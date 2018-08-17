@@ -4,7 +4,8 @@
 \alias{daily_observed_area}
 \title{daily_observed_area}
 \usage{
-daily_observed_area(polygon, day_start, day_end, numcores = 2,
+daily_observed_area(polygon, day_start, day_end,
+  propertiesToInclude = "", numcores = 2,
   keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }
@@ -14,6 +15,8 @@ daily_observed_area(polygon, day_start, day_end, numcores = 2,
 \item{-}{day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD}
 
 \item{-}{day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD}
+
+\item{-}{propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)}
 
 \item{-}{numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()}
 
@@ -45,8 +48,9 @@ Understanding the recent and long-term daily weather is critical for making in-s
 This API opens the weather attributes that matter most to agriculture.
 }
 \examples{
-\dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Kenya", level = 0, download = T),
-                               day_start = '2014-04-28',day_end = '2015-05-01')}
+\dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = F),
+                               ,day_start = '2018-04-28'
+                               ,day_end = '2018-05-01')}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/observations/geolocation

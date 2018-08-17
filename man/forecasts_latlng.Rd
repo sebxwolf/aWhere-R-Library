@@ -43,6 +43,8 @@ Max Humidity, Relative Humidity, Solar Radiation, Average Wind Speed, Max Windsp
 of Sky Covered by Clouds, and Percentage of Clear Sky for the location specified by latitude and longitude.
 Default units are returned by the API. Latitude and longitude must be in decimal degrees.
 
+Note that when block_size = 1 the fields min/max relative humidity and min/max wind will be NA
+
 The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
 and allows retrieval and integration of data across all different time ranges long term normals,
 daily observed, current weather, and forecasts. These APIs are designed for efficiency,
