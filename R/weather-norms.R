@@ -74,7 +74,6 @@ weather_norms_fields <- function(field_id
   checkPropertiesEndpoint('weather_norms',propertiesToInclude)
 
   ##############################################################################
-  dataList <- list()
 
   # Create query
 
@@ -243,7 +242,6 @@ weather_norms_latlng <- function(latitude
   aWhereAPI:::checkPropertiesEndpoint('weather_norms',propertiesToInclude)
 
   ##############################################################################
-  dataList <- list()
 
   # Create query
 
@@ -380,11 +378,12 @@ weather_norms_latlng <- function(latitude
 #' @import jsonlite
 #' @import raster
 #' @import foreach
+#' @import rgeos
 #'
 #' @return data.frame of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{weather_norms_latlng(polygon = polygon = raster::getData('GADM', country = "Kenya", level = 0, download = T)
+#' \dontrun{weather_norms_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T)
 #'                               ,monthday_start = '02-01'
 #'                               ,monthday_end = '03-10'
 #'                               ,year_start = 2008
@@ -408,10 +407,10 @@ weather_norms_area <- function(polygon
                                ,tokenToUse = awhereEnv75247$token) {
 
   #Checking Input Parameters
-  aWhereAPI:::checkCredentials(keyToUse,secretToUse,tokenToUse)
-  aWhereAPI:::checkNormsStartEndDates(monthday_start,monthday_end)
-  aWhereAPI:::checkNormsYearsToRequest(year_start,year_end,monthday_start,monthday_end,exclude_years)
-  aWhereAPI:::checkPropertiesEndpoint('weather_norms',propertiesToInclude)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkNormsStartEndDates(monthday_start,monthday_end)
+  checkNormsYearsToRequest(year_start,year_end,monthday_start,monthday_end,exclude_years)
+  checkPropertiesEndpoint('weather_norms',propertiesToInclude)
 
   ##############################################################################
 
@@ -423,6 +422,7 @@ weather_norms_area <- function(polygon
     })
   }
 
+  cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
   ## Create grid of lat/lon points within given polygon
   ## aWhere grid is spaced at .08333 decimal degrees resolution,
   ## so .08 should guarantee a grid point in each aWhere grid cell
@@ -435,110 +435,39 @@ weather_norms_area <- function(polygon
   colnames(grid) <- c("lon", "lat")
 
   ## Calculate GridX and GridY for each calculated grid point
-  grid$gridx <- aWhereAPI:::getGridX(grid$lon)
-  grid$gridy <- aWhereAPI:::getGridY(grid$lat)
+  grid$gridx <- getGridX(grid$lon)
+  grid$gridy <- getGridY(grid$lat)
 
   ## Keep a only unique GridX/GridY pairings
   grid <- unique(grid[,c("gridx", "gridy")])
 
   ## Calculate lat and lon for each GridX/GridY
-  grid$lon <- aWhereAPI:::getLongitude(grid$gridx)
-  grid$lat <- aWhereAPI:::getLatitude(grid$gridy)
+  grid$lon <- getLongitude(grid$gridx)
+  grid$lat <- getLatitude(grid$gridy)
+
+  cat(paste0('This query will require ',nrow(grid),' API Calls \n'))
 
 
+  cat(paste0('Requesting data using parallal API calls\n'))
   doParallel::registerDoParallel(cores=numcores)
 
   norms <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
 
-    dataList <- list()
 
-    # Create query
+    return(weather_norms_latlng(latitude = grid$lat[j]
+                               ,longitude = grid$lon[j]
+                               ,monthday_start = monthday_start
+                               ,monthday_end = monthday_end
+                               ,year_start = year_start
+                               ,year_end = year_end
+                               ,propertiesToInclude = propertiesToInclude
+                               ,exclude_years =  exclude_years
+                               ,includeFeb29thData = includeFeb29thData
+                               ,keyToUse = keyToUse
+                               ,secretToUse = secretToUse
+                               ,tokenToUse = tokenToUse))
 
-    urlAddress <- "https://api.awhere.com/v2/weather"
 
-    strBeg <- paste0('/locations')
-    strCoord <- paste0('/',grid$lat[j],',',grid$lon[j])
-    strType <- paste0('/norms')
-
-    if (monthday_start != '' & monthday_end != '') {
-      strMonthsDays <- paste0('/',monthday_start,',',monthday_end)
-    } else if (monthday_end != '') {
-      strMonthsDays <- paste0('/',monthday_start,',',monthday_start)
-    } else {
-      strMonthsDays <- ''
-    }
-
-    if (length(exclude_years) != 0) {
-      strexclude_years <- paste0('?excludeYears=',toString(exclude_years))
-    } else {
-      strexclude_years <- ''
-    }
-
-    if (propertiesToInclude[1] != '') {
-      if (strexclude_years == '') {
-        propertiesString <- paste0('?properties=',paste0(propertiesToInclude,collapse = ','))
-      } else {
-        propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
-      }
-    } else {
-      propertiesString <- ''
-    }
-
-    strYearsType <- paste0('/years')
-    strYears <- paste0('/',year_start,',',year_end)
-    url <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,strYears,strexclude_years,propertiesString)
-
-    doWeatherGet <- TRUE
-    while (doWeatherGet == TRUE) {
-      postbody = ''
-      request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                           httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
-      a <- suppressMessages(httr::content(request, as = "text"))
-
-      if (grepl('API Access Expired',a)) {
-        if(exists("awhereEnv75247")) {
-          if(tokenToUse == awhereEnv75247$token) {
-            get_token(keyToUse,secretToUse)
-            tokenToUse <- awhereEnv75247$token
-          } else {
-            stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-          }
-        } else {
-          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-        }
-      } else {
-        aWhereAPI:::checkStatusCode(request)
-        doWeatherGet <- FALSE
-      }
-    }
-
-    #The JSONLITE Serializer properly handles the JSON conversion
-    x <- jsonlite::fromJSON(a,flatten = TRUE)
-
-    data <- data.table::as.data.table(x[[1]])
-
-    #Get rid of leap yearData
-    if (includeFeb29thData == FALSE) {
-      data <- data[day != '02-29',]
-    }
-
-    varNames <- colnames(data)
-    #This removes the non-data info returned with the JSON object
-    data[,grep('_links',varNames) := NULL]
-    data[,grep('.units',varNames) := NULL]
-
-    colnames(data) <- gsub("location.", "", colnames(data))
-    currentNames <- data.table::copy(colnames(data))
-
-    data$gridx <- grid$gridx[j]
-    data$gridy <- grid$gridy[j]
-
-    data.table::setcolorder(data,c(currentNames[c(1:3)], 'gridy', 'gridx', currentNames[c(4:length(currentNames))]))
-
-    aWhereAPI:::checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years,includeFeb29thData)
-
-    return(as.data.frame(data))
   }
 
   norms <- data.table::rbindlist(norms)
