@@ -370,6 +370,7 @@ daily_observed_latlng <- function(latitude
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)
 #' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()
 #'                    If you receive an error regarding the speed you are making calls, reduce this number
+#' @param - bypassNumCallCheck: set to TRUE to avoid prompting the user to confirm that they want to begin making API calls
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -396,6 +397,7 @@ daily_observed_area <- function(polygon
                                 ,day_end
                                 ,propertiesToInclude = ''
                                 ,numcores = 2
+                                ,bypassNumCallCheck = FALSE
                                 ,keyToUse = awhereEnv75247$uid
                                 ,secretToUse = awhereEnv75247$secret
                                 ,tokenToUse = awhereEnv75247$token) {
@@ -413,7 +415,7 @@ daily_observed_area <- function(polygon
   cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
   grid <- create_awhere_grid(polygon)
 
-  verify_api_calls(grid)
+  verify_api_calls(grid,bypassNumCallCheck)
 
   cat(paste0('Requesting data using parallal API calls\n'))
   doParallel::registerDoParallel(cores=numcores)
