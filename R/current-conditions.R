@@ -70,13 +70,22 @@ current_conditions_fields <- function(field_id
     a <- suppressMessages(httr::content(request, as = "text"))
 
     if (grepl('API Access Expired',a)) {
-      get_token(keyToUse,secretToUse)
+      if(exists("awhereEnv75247")) {
+        if(tokenToUse == awhereEnv75247$token) {
+          get_token(keyToUse,secretToUse)
+          tokenToUse <- awhereEnv75247$token
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
+      } else {
+        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+      }
     } else {
-      checkStatusCode(request)
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
-  
+
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
 
@@ -119,7 +128,7 @@ current_conditions_fields <- function(field_id
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
-#' 
+#'
 #' @return data.table of requested data for dates requested
 #'
 #' @import httr
@@ -164,16 +173,25 @@ current_conditions_latlng <- function(latitude
     a <- suppressMessages(httr::content(request, as = "text"))
 
     if (grepl('API Access Expired',a)) {
-      get_token(keyToUse,secretToUse)
+      if(exists("awhereEnv75247")) {
+        if(tokenToUse == awhereEnv75247$token) {
+          get_token(keyToUse,secretToUse)
+          tokenToUse <- awhereEnv75247$token
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
+      } else {
+        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+      }
     } else {
-      checkStatusCode(request)
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
   x <- jsonlite::fromJSON(a,flatten = TRUE)
-  
+
   data <- data.table::as.data.table(data.frame(as.list(unlist(x)),stringsAsFactors = FALSE))
 
   varNames <- colnames(data)

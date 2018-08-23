@@ -9,7 +9,8 @@ agronomic_norms_latlng(latitude, longitude, month_day_start, month_day_end,
   accumulation_start_date = "", gdd_method = "standard",
   gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30,
   includeFeb29thData = TRUE, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{latitude: the latitude of the requested location (double, required)}

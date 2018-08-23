@@ -167,12 +167,7 @@ agronomic_norms_fields <- function(field_id
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    if (grepl('API Access Expired',a)) {
-      get_token(keyToUse,secretToUse)
-    } else {
-      checkStatusCode(request)
-      doWeatherGet <- FALSE
-    }
+    doWeatherGet <- check_JSON(a)
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
@@ -375,12 +370,7 @@ agronomic_norms_latlng <- function(latitude
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    if (grepl('API Access Expired',a)) {
-      get_token(keyToUse,secretToUse)
-    } else {
-      checkStatusCode(request)
-      doWeatherGet <- FALSE
-    }
+    doWeatherGet <- check_JSON(a)
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion

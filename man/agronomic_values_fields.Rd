@@ -8,7 +8,8 @@ agronomic_values_fields(field_id, day_start, day_end,
   propertiesToInclude = "", accumulation_start_date = "",
   gdd_method = "standard", gdd_base_temp = 10, gdd_min_boundary = 10,
   gdd_max_boundary = 30, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.

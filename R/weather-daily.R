@@ -145,12 +145,7 @@ daily_observed_fields <- function(field_id
 
       a <- suppressMessages(httr::content(request, as = "text"))
 
-      if (grepl('API Access Expired',a)) {
-        get_token(keyToUse,secretToUse)
-      } else {
-        checkStatusCode(request)
-        doWeatherGet <- FALSE
-      }
+      doWeatherGet <- check_JSON(a)
     }
 
     #The JSONLITE Serializer properly handles the JSON conversion
@@ -316,12 +311,7 @@ daily_observed_latlng <- function(latitude
 
       a <- suppressMessages(httr::content(request, as = "text"))
 
-      if (grepl('API Access Expired',a)) {
-        get_token(keyToUse,secretToUse)
-      } else {
-        checkStatusCode(request)
-        doWeatherGet <- FALSE
-      }
+      doWeatherGet <- check_JSON(a)
     }
 
     #The JSONLITE Serializer properly handles the JSON conversion
@@ -348,4 +338,99 @@ daily_observed_latlng <- function(latitude
   checkDataReturn_daily(allWeath,day_start,day_end)
 
   return(as.data.frame(allWeath))
+}
+
+
+
+#' @title daily_observed_area
+#'
+#' @description
+#' \code{daily_observed_area} pulls historical weather data from aWhere's API for a provided polygon
+#'
+#' @details
+#' This function returns weather data on Min/Max Temperature, Precipitation,
+#' Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
+#' Morning Max Windspeed, and Average Windspeed for the polygon passed to the function.
+#' Default units are returned by the API. The polygon should be either a SpatialPolygons object or
+#' a well-known text character string.
+#'
+#' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
+#' and allows retrieval and integration of data across all different time ranges, long term normals,
+#' daily observed, current weather, and forecasts. These APIs are designed for efficiency,
+#' allowing you to customize the responses to return just the attributes you need.
+#'
+#' Understanding the recent and long-term daily weather is critical for making in-season decisions.
+#' This API opens the weather attributes that matter most to agriculture.
+#'
+#' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
+#'
+#' @param - polygon: either a SpatialPolygons object or a well-known text string
+#' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)
+#' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()
+#'                    If you receive an error regarding the speed you are making calls, reduce this number
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#'
+#' @import httr
+#' @import data.table
+#' @import lubridate
+#' @import jsonlite
+#' @import foreach
+#'
+#' @return data.frame of requested data for dates requested
+#'
+#'
+#' @examples
+#' \dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T),
+#'                                ,day_start = '2018-04-28'
+#'                                ,day_end = '2018-05-01')}
+
+#' @export
+
+
+daily_observed_area <- function(polygon
+                                ,day_start
+                                ,day_end
+                                ,propertiesToInclude = ''
+                                ,numcores = 2
+                                ,keyToUse = awhereEnv75247$uid
+                                ,secretToUse = awhereEnv75247$secret
+                                ,tokenToUse = awhereEnv75247$token) {
+
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidStartEndDates(day_start,day_end)
+
+  ## If polygon is WKT, convert to SpatialPolygons class
+  if(class(polygon) == "character") {
+    tryCatch({polygon <- rgeos::readWKT(polygon)}, error = function(e) {
+      stop(e)
+    })
+  }
+
+  cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
+  grid <- create_awhere_grid(polygon)
+
+  verify_api_calls(grid)
+
+  cat(paste0('Requesting data using parallal API calls\n'))
+  doParallel::registerDoParallel(cores=numcores)
+
+  observed <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
+
+    return(daily_observed_latlng(latitude = grid$lat[j],
+                                 longitude = grid$lon[j],
+                                 day_start = day_start,
+                                 day_end = day_end,
+                                 propertiesToInclude = propertiesToInclude,
+                                 keyToUse = keyToUse,
+                                 secretToUse = secretToUse,
+                                 tokenToUse = tokenToUse))
+
+  }
+
+  observed <- data.table::rbindlist(observed)
+  return(as.data.frame(observed))
 }

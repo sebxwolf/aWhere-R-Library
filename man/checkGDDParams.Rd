@@ -4,7 +4,8 @@
 \alias{checkGDDParams}
 \title{Check Valid GDD Params}
 \usage{
-checkGDDParams(gdd_method, gdd_base_temp, gdd_min_boundary, gdd_max_boundary)
+checkGDDParams(gdd_method, gdd_base_temp, gdd_min_boundary,
+  gdd_max_boundary)
 }
 \arguments{
 \item{-}{gdd_method: There are variety of equations available for calculating growing degree-days.

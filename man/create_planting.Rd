@@ -7,7 +7,8 @@
 create_planting(field_id, crop, planting_date, proj_yield_amount = "",
   proj_yield_units = "", proj_harvest_date = "", yield_amount = "",
   yield_units = "", harvest_date = "", keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: an ID of your choosing (string)}
@@ -67,8 +68,8 @@ This script creates a planting in a field location in the aWhere platform. By se
 and agronomics for that location in all the other APIs. The planting ID corresponds to a planting within a field.
 }
 \examples{
-\dontrun{create_planting(field_id='field_test',crop='corn', planting_date='2015-10-25', proj_yield_amount='100', 
-                         proj_yield_units='Bushels', proj_harvest_date='2016-02-01', yield_amount='110', 
+\dontrun{create_planting(field_id='field_test',crop='corn', planting_date='2015-10-25', proj_yield_amount='100',
+                         proj_yield_units='Bushels', proj_harvest_date='2016-02-01', yield_amount='110',
                          yield_units='Bushels', harvest_date='2016-02-01')
 }
 }

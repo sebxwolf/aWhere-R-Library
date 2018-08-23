@@ -4,8 +4,9 @@
 \alias{daily_observed_fields}
 \title{daily_observed_fields}
 \usage{
-daily_observed_fields(field_id, day_start, day_end, propertiesToInclude = "",
-  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+daily_observed_fields(field_id, day_start, day_end,
+  propertiesToInclude = "", keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }
 \arguments{

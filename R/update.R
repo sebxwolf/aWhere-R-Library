@@ -4,20 +4,20 @@
 #' \code{update_field} To update details (Farm ID or FieldName) of a particular location in the aWhere API.
 #'
 #' @details
-#' Fields are the easiest way to manage locations in the aWhere APIs, providing an easy reference 
-#' for tracking weather, agronomics, models, and progress over growing seasons. Once a field is 
+#' Fields are the easiest way to manage locations in the aWhere APIs, providing an easy reference
+#' for tracking weather, agronomics, models, and progress over growing seasons. Once a field is
 #' registered, plantings can also be registered for that field with specific information about the
 #' crop planted at that location, the date of planting, and other optional information.
 #'
-#' Occasionally, you may need to update the details of your field. At this time, only the farm ID, 
-#' field Name, and number of acres can be updated using this function. Field details can only be 
+#' Occasionally, you may need to update the details of your field. At this time, only the farm ID,
+#' field Name, and number of acres can be updated using this function. Field details can only be
 #' updated one variable at a time, for one field at a time. If you need to update multiple fields or
 #' multiple variables associated with a field, please pass commands sequentially.
 #'
 #' @param - field_id: the unique field ID for the field you want to update (character string) (required)
-#' @param - variable_update: the variable that needs to be updated, either "farmId", "name", or "acres" 
+#' @param - variable_update: the variable that needs to be updated, either "farmId", "name", or "acres"
 #'                           (character string) (required)
-#' @param - value_update: the new value for variable_update, to replace the existing value. The existing 
+#' @param - value_update: the new value for variable_update, to replace the existing value. The existing
 #'                        value can be found using get_fields("field_id") (character string) (required)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -57,10 +57,19 @@ update_field <- function(field_id
     # Re formating the response recieved from API
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    if (any(grepl('API Access Expired',a)) == TRUE) {
-      get_token(keyToUse,secretToUse)
+    if (grepl('API Access Expired',a)) {
+      if(exists("awhereEnv75247")) {
+        if(tokenToUse == awhereEnv75247$token) {
+          get_token(keyToUse,secretToUse)
+          tokenToUse <- awhereEnv75247$token
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
+      } else {
+        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+      }
     } else {
-      checkStatusCode(request)
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
@@ -208,15 +217,24 @@ update_planting <- function(field_id
                            httr::add_headers(Authorization = paste0("Bearer ", tokenToUse)))
 
     a <- suppressMessages(httr::content(request, as = "text"))
-    
+
     if (grepl('API Access Expired',a)) {
-      get_token(keyToUse,secretToUse)
+      if(exists("awhereEnv75247")) {
+        if(tokenToUse == awhereEnv75247$token) {
+          get_token(keyToUse,secretToUse)
+          tokenToUse <- awhereEnv75247$token
+        } else {
+          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+        }
+      } else {
+        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
+      }
     } else {
-      checkStatusCode(request)
+      aWhereAPI:::checkStatusCode(request)
       doWeatherGet <- FALSE
     }
   }
-  
+
   cat(paste0('Operation Complete'))
 }
 

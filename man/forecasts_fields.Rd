@@ -6,7 +6,8 @@
 \usage{
 forecasts_fields(field_id, day_start = as.character(Sys.Date()),
   day_end = "", block_size = 1, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
@@ -40,6 +41,8 @@ Min/Max Temperature, Precipitation Amount, Chance of Precipitation,
 Max Humidity, Relative Humidity, Solar Radiation, Average Wind Speed, Max Windspeed, Percentage
 of Sky Covered by Clouds, and Percentage of Clear Sky for the field id specified.
 Default units are returned by the API.
+
+Note that when block_size = 1 the fields min/max relative humidity and min/max wind will be NA
 
 The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
 and allows retrieval and integration of data across all different time ranges long term normals,
