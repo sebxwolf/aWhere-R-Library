@@ -4,10 +4,9 @@
 \alias{daily_observed_area}
 \title{daily_observed_area}
 \usage{
-daily_observed_area(polygon, day_start, day_end,
-  propertiesToInclude = "", numcores = 2,
-  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
-  tokenToUse = awhereEnv75247$token)
+daily_observed_area(polygon, day_start, day_end, propertiesToInclude = "",
+  numcores = 2, bypassNumCallCheck = FALSE, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{polygon: either a SpatialPolygons object or a well-known text string}
@@ -18,7 +17,10 @@ daily_observed_area(polygon, day_start, day_end,
 
 \item{-}{propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)}
 
-\item{-}{numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()}
+\item{-}{numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()
+If you receive an error regarding the speed you are making calls, reduce this number}
+
+\item{-}{bypassNumCallCheck: set to TRUE to avoid prompting the user to confirm that they want to begin making API calls}
 
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
@@ -48,7 +50,7 @@ Understanding the recent and long-term daily weather is critical for making in-s
 This API opens the weather attributes that matter most to agriculture.
 }
 \examples{
-\dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = F),
+\dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T),
                                ,day_start = '2018-04-28'
                                ,day_end = '2018-05-01')}
 }

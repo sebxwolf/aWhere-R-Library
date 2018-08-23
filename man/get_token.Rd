@@ -16,7 +16,7 @@ token will be saved in a local locked environment in addition to being returned
 by the function. Defaults to \code{TRUE} to avoid breaking existing code.}
 }
 \value{
-List with three elements:#' 
+List with three elements:#'
 error: logical indicating whether there was an error
 error_message: \code{NULL} if error is \code{FALSE}, a character error message otherwise
 token: aWhere API access token value
@@ -25,7 +25,7 @@ token: aWhere API access token value
 \code{get_token} gets Access Token for V2 aWhere API
 }
 \details{
-This script provides an aWhere access token for the current session of the API. Information for the key and secret in this 
+This script provides an aWhere access token for the current session of the API. Information for the key and secret in this
 function can be found on a user's account at developer.awhere.com, under the apps.
 }
 \examples{

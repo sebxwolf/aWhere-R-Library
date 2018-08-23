@@ -6,8 +6,7 @@
 \usage{
 daily_observed_latlng(latitude, longitude, day_start, day_end,
   propertiesToInclude = "", keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret,
-  tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{latitude: the latitude of the requested location (double)}

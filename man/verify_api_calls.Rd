@@ -4,7 +4,7 @@
 \alias{verify_api_calls}
 \title{Verify User Wants Make API Calls}
 \usage{
-verify_api_calls(grid)
+verify_api_calls(grid, bypassNumCallCheck)
 }
 \arguments{
 \item{-}{grid: data frame returned from create_awhere_grid}

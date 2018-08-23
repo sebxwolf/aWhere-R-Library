@@ -4,8 +4,8 @@
 \alias{checkNormsYearsToRequest}
 \title{Check Years to Request for Norms}
 \usage{
-checkNormsYearsToRequest(year_start, year_end, month_day_start,
-  month_day_end, exclude_years)
+checkNormsYearsToRequest(year_start, year_end, month_day_start, month_day_end,
+  exclude_years)
 }
 \arguments{
 \item{-}{year_start: the starting year (inclusive) of the range of years for which
