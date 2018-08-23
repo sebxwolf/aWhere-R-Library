@@ -145,7 +145,7 @@ daily_observed_fields <- function(field_id
 
       a <- suppressMessages(httr::content(request, as = "text"))
 
-      doWeatherGet <- check_JSON(a)
+      doWeatherGet <- check_JSON(a,request)
     }
 
     #The JSONLITE Serializer properly handles the JSON conversion
@@ -311,7 +311,7 @@ daily_observed_latlng <- function(latitude
 
       a <- suppressMessages(httr::content(request, as = "text"))
 
-      doWeatherGet <- check_JSON(a)
+      doWeatherGet <- check_JSON(a,request)
     }
 
     #The JSONLITE Serializer properly handles the JSON conversion
