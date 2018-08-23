@@ -400,18 +400,27 @@ weather_norms_area <- function(polygon
   norms <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
 
 
-    return(weather_norms_latlng(latitude = grid$lat[j]
-                               ,longitude = grid$lon[j]
-                               ,monthday_start = monthday_start
-                               ,monthday_end = monthday_end
-                               ,year_start = year_start
-                               ,year_end = year_end
-                               ,propertiesToInclude = propertiesToInclude
-                               ,exclude_years =  exclude_years
-                               ,includeFeb29thData = includeFeb29thData
-                               ,keyToUse = keyToUse
-                               ,secretToUse = secretToUse
-                               ,tokenToUse = tokenToUse))
+    t <- weather_norms_latlng(latitude = grid$lat[j]
+                              ,longitude = grid$lon[j]
+                              ,monthday_start = monthday_start
+                              ,monthday_end = monthday_end
+                              ,year_start = year_start
+                              ,year_end = year_end
+                              ,propertiesToInclude = propertiesToInclude
+                              ,exclude_years =  exclude_years
+                              ,includeFeb29thData = includeFeb29thData
+                              ,keyToUse = keyToUse
+                              ,secretToUse = secretToUse
+                              ,tokenToUse = tokenToUse)
+
+    currentNames <- colnames(t)
+
+    t$gridy <- grid$gridy[j]
+    t$gridx <- grid$gridx[j]
+
+    data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
+
+    return(t)
 
 
   }

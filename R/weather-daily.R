@@ -422,14 +422,23 @@ daily_observed_area <- function(polygon
 
   observed <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
 
-    return(daily_observed_latlng(latitude = grid$lat[j],
-                                 longitude = grid$lon[j],
-                                 day_start = day_start,
-                                 day_end = day_end,
-                                 propertiesToInclude = propertiesToInclude,
-                                 keyToUse = keyToUse,
-                                 secretToUse = secretToUse,
-                                 tokenToUse = tokenToUse))
+    t <- daily_observed_latlng(latitude = grid$lat[j],
+                               longitude = grid$lon[j],
+                               day_start = day_start,
+                               day_end = day_end,
+                               propertiesToInclude = propertiesToInclude,
+                               keyToUse = keyToUse,
+                               secretToUse = secretToUse,
+                               tokenToUse = tokenToUse)
+
+    currentNames <- colnames(t)
+
+    t$gridy <- grid$gridy[j]
+    t$gridx <- grid$gridx[j]
+
+    data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
+
+    return(t)
 
   }
 
