@@ -4,9 +4,9 @@
 \alias{weather_norms_area}
 \title{weather_norms_area}
 \usage{
-weather_norms_area(polygon, monthday_start, monthday_end, year_start,
-  year_end, propertiesToInclude = "", exclude_years = NULL,
-  includeFeb29thData = TRUE, numcores = 2,
+weather_norms_area(polygon, monthday_start, monthday_end, year_start, year_end,
+  propertiesToInclude = "", exclude_years = NULL,
+  includeFeb29thData = TRUE, numcores = 2, bypassNumCallCheck = FALSE,
   keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }
@@ -39,7 +39,10 @@ summary statistics are calculated via the calendar date and 3 years are required
 to generate a value, data from this date is more likely to be NA.  ALlows user
 to drop this data to avoid later problems (defaults to TRUE)}
 
-\item{-}{numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()}
+\item{-}{numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores().
+If you receive an error regarding the speed you are making calls, reduce this number}
+
+\item{-}{bypassNumCallCheck: set to TRUE to avoid prompting the user to confirm that they want to begin making API calls}
 
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
@@ -65,7 +68,7 @@ allow you to compare this year or previous years to the long-term normals, calcu
 the average of those weather conditions on that day in that location over the years specified.
 }
 \examples{
-\dontrun{weather_norms_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = F)
+\dontrun{weather_norms_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T)
                               ,monthday_start = '02-01'
                               ,monthday_end = '03-10'
                               ,year_start = 2008

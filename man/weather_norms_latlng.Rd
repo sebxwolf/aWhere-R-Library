@@ -7,8 +7,7 @@
 weather_norms_latlng(latitude, longitude, monthday_start, monthday_end,
   year_start, year_end, propertiesToInclude = "", exclude_years = NULL,
   includeFeb29thData = TRUE, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret,
-  tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{latitude: the latitude of the requested location (double, required)}

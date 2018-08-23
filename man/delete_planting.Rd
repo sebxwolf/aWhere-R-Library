@@ -5,8 +5,7 @@
 \title{Delete Planting}
 \usage{
 delete_planting(field_id, planting_id, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret,
-  tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the ID of the field for which you want to delete an associated planting (string)}
