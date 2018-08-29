@@ -145,7 +145,7 @@ daily_observed_fields <- function(field_id
 
       a <- suppressMessages(httr::content(request, as = "text"))
 
-      doWeatherGet <- check_JSON(a)
+      doWeatherGet <- check_JSON(a,request)
     }
 
     #The JSONLITE Serializer properly handles the JSON conversion
@@ -311,7 +311,7 @@ daily_observed_latlng <- function(latitude
 
       a <- suppressMessages(httr::content(request, as = "text"))
 
-      doWeatherGet <- check_JSON(a)
+      doWeatherGet <- check_JSON(a,request)
     }
 
     #The JSONLITE Serializer properly handles the JSON conversion
@@ -422,14 +422,23 @@ daily_observed_area <- function(polygon
 
   observed <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
 
-    return(daily_observed_latlng(latitude = grid$lat[j],
-                                 longitude = grid$lon[j],
-                                 day_start = day_start,
-                                 day_end = day_end,
-                                 propertiesToInclude = propertiesToInclude,
-                                 keyToUse = keyToUse,
-                                 secretToUse = secretToUse,
-                                 tokenToUse = tokenToUse))
+    t <- daily_observed_latlng(latitude = grid$lat[j],
+                               longitude = grid$lon[j],
+                               day_start = day_start,
+                               day_end = day_end,
+                               propertiesToInclude = propertiesToInclude,
+                               keyToUse = keyToUse,
+                               secretToUse = secretToUse,
+                               tokenToUse = tokenToUse)
+
+    currentNames <- colnames(t)
+
+    t$gridy <- grid$gridy[j]
+    t$gridx <- grid$gridx[j]
+
+    data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
+
+    return(t)
 
   }
 

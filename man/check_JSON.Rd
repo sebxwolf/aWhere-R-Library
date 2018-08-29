@@ -4,7 +4,7 @@
 \alias{check_JSON}
 \title{Check JSON Object}
 \usage{
-check_JSON(jsonObject)
+check_JSON(jsonObject, request)
 }
 \arguments{
 \item{-}{JSON object returned from aWhere API}

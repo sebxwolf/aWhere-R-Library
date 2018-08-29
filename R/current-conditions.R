@@ -69,21 +69,7 @@ current_conditions_fields <- function(field_id
     # Make request
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    if (grepl('API Access Expired',a)) {
-      if(exists("awhereEnv75247")) {
-        if(tokenToUse == awhereEnv75247$token) {
-          get_token(keyToUse,secretToUse)
-          tokenToUse <- awhereEnv75247$token
-        } else {
-          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-        }
-      } else {
-        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-      }
-    } else {
-      aWhereAPI:::checkStatusCode(request)
-      doWeatherGet <- FALSE
-    }
+    doWeatherGet <- check_JSON(a,request)
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
@@ -172,21 +158,7 @@ current_conditions_latlng <- function(latitude
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    if (grepl('API Access Expired',a)) {
-      if(exists("awhereEnv75247")) {
-        if(tokenToUse == awhereEnv75247$token) {
-          get_token(keyToUse,secretToUse)
-          tokenToUse <- awhereEnv75247$token
-        } else {
-          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-        }
-      } else {
-        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-      }
-    } else {
-      aWhereAPI:::checkStatusCode(request)
-      doWeatherGet <- FALSE
-    }
+    doWeatherGet <- check_JSON(a,request)
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion

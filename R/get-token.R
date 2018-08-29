@@ -132,7 +132,7 @@ load_credentials <- function(path_to_credentials) {
 #' @param - JSON object returned from aWhere API
 #' @return boolean for whether another query should be made
 
-check_JSON <- function(jsonObject) {
+check_JSON <- function(jsonObject, request) {
   if (grepl('API Access Expired',jsonObject)) {
     if(exists("awhereEnv75247")) {
       if(tokenToUse == awhereEnv75247$token) {
