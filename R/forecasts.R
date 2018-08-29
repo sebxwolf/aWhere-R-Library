@@ -55,10 +55,10 @@ forecasts_fields <- function(field_id
                              ,secretToUse = awhereEnv75247$secret
                              ,tokenToUse = awhereEnv75247$token) {
 
-  aWhereAPI:::checkCredentials(keyToUse,secretToUse,tokenToUse)
-  aWhereAPI:::checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
-  aWhereAPI:::checkValidStartEndDatesForecast(day_start,day_end)
-  aWhereAPI:::checkForecastParams(day_start,block_size)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
+  checkValidStartEndDatesForecast(day_start,day_end)
+  checkForecastParams(day_start,block_size)
 
   #Create Query
   urlAddress <- "https://api.awhere.com/v2/weather"
@@ -104,6 +104,8 @@ forecasts_fields <- function(field_id
 
   #This removes the non-data info returned with the JSON object
   data[,grep('.units',varNames) := NULL]
+  
+  data[,c('soilTemperatures','soilMoisture') := NULL]
 
   currentNames <- data.table::copy(colnames(data))
   data[,field_id  := field_id]
@@ -113,7 +115,7 @@ forecasts_fields <- function(field_id
     data[,c("relativeHumidity.max", "relativeHumidity.min", "wind.max", "wind.min") := NULL]
   }
 
-  aWhereAPI:::checkDataReturn_forecasts(data,day_start,day_end,block_size)
+  checkDataReturn_forecasts(data,day_start,day_end,block_size)
 
   return(as.data.frame(data))
 }
@@ -175,10 +177,10 @@ forecasts_latlng <- function(latitude
                              ,secretToUse = awhereEnv75247$secret
                              ,tokenToUse = awhereEnv75247$token) {
 
-  aWhereAPI:::checkCredentials(keyToUse,secretToUse,tokenToUse)
-  aWhereAPI:::checkValidLatLong(latitude,longitude)
-  aWhereAPI:::checkValidStartEndDatesForecast(day_start,day_end)
-  aWhereAPI:::checkForecastParams(day_start,block_size)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidLatLong(latitude,longitude)
+  checkValidStartEndDatesForecast(day_start,day_end)
+  checkForecastParams(day_start,block_size)
 
   #Create Query
   urlAddress <- "https://api.awhere.com/v2/weather"
@@ -218,6 +220,8 @@ forecasts_latlng <- function(latitude
 
   #This removes the non-data info returned with the JSON object
   data[,grep('.units',varNames) := NULL]
+  
+  data[,c('soilTemperatures','soilMoisture') := NULL]
 
   currentNames <- data.table::copy(colnames(data))
   data[,latitude  := latitude]
@@ -228,7 +232,7 @@ forecasts_latlng <- function(latitude
     data[,c("relativeHumidity.max", "relativeHumidity.min", "wind.max", "wind.min") := NULL]
   }
 
-  aWhereAPI:::checkDataReturn_forecasts(data,day_start,day_end,block_size)
+  checkDataReturn_forecasts(data,day_start,day_end,block_size)
 
   return(as.data.frame(data))
 }
