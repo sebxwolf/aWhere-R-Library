@@ -19,6 +19,8 @@ create_awhere_grid <- function(polygon) {
     tryCatch({polygon <- rgeos::readWKT(polygon)}, error = function(e) {
       stop(e)
     })
+  } else if (class(polygon) == 'Extent') {
+    polygon <- as(polygon, 'SpatialPolygons')
   }
 
   ## Buffer polygon by 0.5 degrees to make sure we capture all valid grid cells
