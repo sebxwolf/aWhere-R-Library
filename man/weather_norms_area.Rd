@@ -11,9 +11,7 @@ weather_norms_area(polygon, monthday_start, monthday_end, year_start, year_end,
   tokenToUse = awhereEnv75247$token)
 }
 \arguments{
-\item{-}{latitude: the latitude of the requested location (double, required)}
-
-\item{-}{longitude: the longitude of the requested locations (double, required)}
+\item{-}{polygon: either a SpatialPolygons object, well-known text string, or extent from raster package}
 
 \item{-}{monthday_start: character string of the first month and day for which you want to retrieve data,
 in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)}
