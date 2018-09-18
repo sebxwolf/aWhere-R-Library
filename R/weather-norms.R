@@ -320,8 +320,7 @@ weather_norms_latlng <- function(latitude
 #'
 #' @references http://developer.awhere.com/api/reference/weather/norms
 #'
-#' @param - latitude: the latitude of the requested location (double, required)
-#' @param - longitude: the longitude of the requested locations (double, required)
+#' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
 #' @param - monthday_start: character string of the first month and day for which you want to retrieve data,
 #'                          in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)
 #' @param - monthday_end: character string of the last month and day for which you want to retrieve data,

@@ -364,7 +364,7 @@ daily_observed_latlng <- function(latitude
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'
-#' @param - polygon: either a SpatialPolygons object or a well-known text string
+#' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)

@@ -9,7 +9,7 @@ daily_observed_area(polygon, day_start, day_end, propertiesToInclude = "",
   secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
 }
 \arguments{
-\item{-}{polygon: either a SpatialPolygons object or a well-known text string}
+\item{-}{polygon: either a SpatialPolygons object, well-known text string, or extent from raster package}
 
 \item{-}{day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD}
 
