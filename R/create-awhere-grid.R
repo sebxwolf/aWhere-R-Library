@@ -10,6 +10,10 @@
 #' so spacing a new grid at every .08 degrees should guarantee
 #' a grid point in each aWhere grid cell.
 #'
+#' @import rgeos
+#' @import raster
+#' @import sp
+#'
 #' @param - polygon: either a SpatialPolygons data type object or a character string of valid WKT
 
 create_awhere_grid <- function(polygon) {
