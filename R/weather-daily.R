@@ -380,6 +380,7 @@ daily_observed_latlng <- function(latitude
 #' @import lubridate
 #' @import jsonlite
 #' @import foreach
+#' @import rgeos
 #'
 #' @return data.frame of requested data for dates requested
 #'
