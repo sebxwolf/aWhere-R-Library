@@ -52,14 +52,15 @@ If you receive an error regarding the speed you are making calls, reduce this nu
 data.frame of requested data for dates requested
 }
 \description{
-\code{weather_norms_area} pulls long term norm weather data from aWhere's API based on latitude & longitude
+\code{weather_norms_area} pulls long term norm weather data from aWhere's API based on spatial polygon or extent
 }
 \details{
 This function allows you to calculate the averages for weather attributes
 across any range of years for which data are available.  The data pulled includes
 meanTemp, maxTemp, minTemp, precipitation average, solar radiation average,
 minHumidity, maxHumidity, maxWind and averageWind, along with the standard deviations
-for these variables.  The data pulled is for the latitude & longitude identified.
+for these variables.  The polygon should be either a SpatialPolygons object or
+a well-known text character string or an extent.
 
 The data returned in this function
 allow you to compare this year or previous years to the long-term normals, calculated as

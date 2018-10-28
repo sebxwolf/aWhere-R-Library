@@ -345,14 +345,14 @@ daily_observed_latlng <- function(latitude
 #' @title daily_observed_area
 #'
 #' @description
-#' \code{daily_observed_area} pulls historical weather data from aWhere's API for a provided polygon
+#' \code{daily_observed_area} pulls historical weather data from aWhere's API for a provided polygon or extent
 #'
 #' @details
 #' This function returns weather data on Min/Max Temperature, Precipitation,
 #' Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
 #' Morning Max Windspeed, and Average Windspeed for the polygon passed to the function.
 #' Default units are returned by the API. The polygon should be either a SpatialPolygons object or
-#' a well-known text character string.
+#' a well-known text character string or an extent.
 #'
 #' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
 #' and allows retrieval and integration of data across all different time ranges, long term normals,
@@ -380,6 +380,7 @@ daily_observed_latlng <- function(latitude
 #' @import lubridate
 #' @import jsonlite
 #' @import foreach
+#' @import doParallel
 #' @import rgeos
 #'
 #' @return data.frame of requested data for dates requested
@@ -388,7 +389,8 @@ daily_observed_latlng <- function(latitude
 #' @examples
 #' \dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T),
 #'                                ,day_start = '2018-04-28'
-#'                                ,day_end = '2018-05-01')}
+#'                                ,day_end = '2018-05-01'
+#'                                ,numcores = 2)}
 
 #' @export
 
@@ -406,13 +408,6 @@ daily_observed_area <- function(polygon
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDates(day_start,day_end)
 
-  ## If polygon is WKT, convert to SpatialPolygons class
-  if(class(polygon) == "character") {
-    tryCatch({polygon <- rgeos::readWKT(polygon)}, error = function(e) {
-      stop(e)
-    })
-  }
-
   cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
   grid <- create_awhere_grid(polygon)
 
@@ -423,14 +418,14 @@ daily_observed_area <- function(polygon
 
   observed <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
 
-    t <- daily_observed_latlng(latitude = grid$lat[j],
-                               longitude = grid$lon[j],
-                               day_start = day_start,
-                               day_end = day_end,
-                               propertiesToInclude = propertiesToInclude,
-                               keyToUse = keyToUse,
-                               secretToUse = secretToUse,
-                               tokenToUse = tokenToUse)
+    t <- daily_observed_latlng(latitude = grid$lat[j]
+                               ,longitude = grid$lon[j]
+                               ,day_start = day_start
+                               ,day_end = day_end
+                               ,propertiesToInclude = propertiesToInclude
+                               ,keyToUse = keyToUse
+                               ,secretToUse = secretToUse
+                               ,tokenToUse = tokenToUse)
 
     currentNames <- colnames(t)
 

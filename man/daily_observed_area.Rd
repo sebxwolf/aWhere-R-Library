@@ -32,14 +32,14 @@ If you receive an error regarding the speed you are making calls, reduce this nu
 data.frame of requested data for dates requested
 }
 \description{
-\code{daily_observed_area} pulls historical weather data from aWhere's API for a provided polygon
+\code{daily_observed_area} pulls historical weather data from aWhere's API for a provided polygon or extent
 }
 \details{
 This function returns weather data on Min/Max Temperature, Precipitation,
 Min/Max Humidity, Solar Radiation, and Maximum Wind Speed,
 Morning Max Windspeed, and Average Windspeed for the polygon passed to the function.
 Default units are returned by the API. The polygon should be either a SpatialPolygons object or
-a well-known text character string.
+a well-known text character string or an extent.
 
 The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
 and allows retrieval and integration of data across all different time ranges, long term normals,

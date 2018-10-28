@@ -404,3 +404,175 @@ agronomic_norms_latlng <- function(latitude
   return(as.data.frame(data))
 }
 
+
+#' @title agronomic_norms_area
+#'
+#' @description
+#' \code{agronomic_norms_area} pulls long term norm weather data from aWhere's API based on either spatial polygon or extent
+#'
+#' @details
+#' This function allows you to calculate the averages for agronomic attributes
+#' across any range of years for which data are available.  The data pulled includes norms for
+#' growing degree days (GDDs), potential evapotranspiration (PET), Precipitation over
+#' potential evapotranspiration (P/PET), accumulated GDDs, accumulated precipitation,
+#' accumulated PET, and accumulated P/PET, along with the standard deviations
+#' for these variables.  The data pulled is for the polygon or extent.  The polygon should be either
+#' a SpatialPolygons object or a well-known text character string or an extent.
+#' Default units are returned by the API.
+#'
+#' The data returned in this function
+#' allow you to compare this year or previous years to the long-term normals, calculated as
+#' the average of those agronomic conditions on that day in that location over the years specified.
+#'
+#' @references http://developer.awhere.com/api/reference/weather/norms
+#'
+#' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
+#' @param - month_day_start: character string of the first month and day for which you want to retrieve data,
+#'                          in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)
+#' @param - month_day_end: character string of the last month and day for which you want to retrieve data,
+#'                          in the form: MM-DD.  This is the end of your date range. e.g. '07-01' (July 1) (required)
+#' @param - year_start: character string of the starting year (inclusive) of the range of years for which
+#'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
+#' @param - year_end: character string of the last year (inclusive) of the range of years for which
+#'                     you're calculating norms, in the form YYYY. e.g., 2015 (required)
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)
+#' @param - exclude_year: Year or years which you'd like to exclude from
+#'                        your range of years on which to calculate norms. To exclude
+#'                        multiple years, provide a vector of years. You must include
+#'                       at least three years of data with which to calculate the norms. (numeric, optional)
+#' @param - accumulation_start_date: Allows the user to start counting accumulations from
+#'                                 before the specified start date (or before the
+#'                                 planting date if using the most recent planting).
+#'                                 Use this parameter to specify the date from which
+#'                                 you wish to start counting, in the form: YYYY-MM-DD.
+#'                                 The daily values object
+#'                                 will still only return the days between the start
+#'                                 and end date. This date must come before the start date. (optional)
+#' @param - gdd_method: There are variety of equations available for calculating growing degree-days.
+#'                     Valid entries are: 'standard', 'modifiedstandard', 'min-temp-cap', 'min-temp-constant'
+#'                     See the API documentation for a description of each method.  The standard
+#'                     method will be used if none is specified. (character - optional)
+#' @param - gdd_base_temp: The base temp to use for the any of the GDD equations. The default value of 10 will
+#'                       be used if none is specified. (optional)
+#' @param - gdd_min_boundary: The minimum boundary to use in the selected GDD equation.
+#'                           The behavior of this value is different depending on the equation you're using
+#'                           The default value of 10 will be used if none is specified. (optional)
+#' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
+#'                          behavior of this value is different depending on the equation you're using.
+#'                          The default value of 30 will be used if none is specified. (optional)
+#' @param - includeFeb29thData: Whether to keep data from Feb 29th on leap years.  Because weather/agronomics
+#'                              summary statistics are calculated via the calendar date and 3 years are required
+#'                              to generate a value, data from this date is more likely to be NA.  ALlows user
+#'                              to drop this data to avoid later problems (defaults to TRUE)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores().
+#'                    If you receive an error regarding the speed you are making calls, reduce this number
+#' @param - bypassNumCallCheck: set to TRUE to avoid prompting the user to confirm that they want to begin making API calls
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#'
+#' @import httr
+#' @import data.table
+#' @import lubridate
+#' @import jsonlite
+#' @import raster
+#' @import foreach
+#' @import doParallel
+#' @import rgeos
+#'
+#' @return data.frame of requested data for dates requested
+#'
+#' @examples
+#' \dontrun{agronomic_norms_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T)
+#'                               ,month_day_start = '02-01'
+#'                               ,month_day_end = '03-10'
+#'                               ,year_start = 2008
+#'                               ,year_end = 2015
+#'                               ,exclude_years =  c(2010,2011)
+#'                               ,accumulation_start_date = ''
+#'                               ,gdd_method = 'standard'
+#'                               ,gdd_base_temp = 10
+#'                               ,gdd_min_boundary = 10
+#'                               ,gdd_max_boundary = 30
+#'                               ,numcores = 2)}
+
+#' @export
+
+
+agronomic_norms_area <- function(polygon
+                                ,month_day_start
+                                ,month_day_end
+                                ,year_start
+                                ,year_end
+                                ,propertiesToInclude = ''
+                                ,exclude_years = NULL
+                                ,accumulation_start_date = ''
+                                ,gdd_method = 'standard'
+                                ,gdd_base_temp = 10
+                                ,gdd_min_boundary = 10
+                                ,gdd_max_boundary = 30
+                                ,includeFeb29thData = TRUE
+                                ,numcores = 2
+                                ,bypassNumCallCheck = FALSE
+                                ,keyToUse = awhereEnv75247$uid
+                                ,secretToUse = awhereEnv75247$secret
+                                ,tokenToUse = awhereEnv75247$token) {
+
+  #Checking Input Parameters
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkNormsStartEndDates(monthday_start,monthday_end)
+  checkNormsYearsToRequest(year_start,year_end,monthday_start,monthday_end,exclude_years)
+  checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
+  checkAccumulationStartDateNorms(accumulation_start_date,month_day_start)
+  checkPropertiesEndpoint('agronomics',propertiesToInclude)
+  ##############################################################################
+
+  cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
+  grid <- create_awhere_grid(polygon)
+
+  verify_api_calls(grid,bypassNumCallCheck)
+
+  cat(paste0('Requesting data using parallal API calls\n'))
+  doParallel::registerDoParallel(cores=numcores)
+
+  norms <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
+
+
+    t <- agronomic_norms_latlng(latitude = grid$lat[j]
+                                ,longitude = grid$lon[j]
+                                ,month_day_start = month_day_start
+                                ,month_day_end = month_day_end
+                                ,year_start = year_start
+                                ,year_end = year_end
+                                ,propertiesToInclude = propertiesToInclude
+                                ,exclude_years =  exclude_years
+                                ,accumulation_start_date = accumulation_start_date
+                                ,gdd_method = gdd_method
+                                ,gdd_base_temp = gdd_base_temp
+                                ,gdd_min_boundary = gdd_min_boundary
+                                ,gdd_max_boundary = gdd_max_boundary
+                                ,includeFeb29thData = includeFeb29thData
+                                ,keyToUse = keyToUse
+                                ,secretToUse = secretToUse
+                                ,tokenToUse = tokenToUse)
+
+    currentNames <- colnames(t)
+
+    t$gridy <- grid$gridy[j]
+    t$gridx <- grid$gridx[j]
+
+    data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
+
+    return(t)
+
+
+  }
+
+  norms <- data.table::rbindlist(norms)
+
+  return(as.data.frame(norms))
+}
+
