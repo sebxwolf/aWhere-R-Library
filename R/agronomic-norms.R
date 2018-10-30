@@ -22,9 +22,9 @@
 #'
 #' @param - field_id: the field_id associated with the location for which you want to pull data.
 #' Field IDs are created using the create_field function. (string)
-#' @param - monthday_start: character string of the first month and day for which you want to retrieve data,
+#' @param - month_day_start: character string of the first month and day for which you want to retrieve data,
 #'                          in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)
-#' @param - monthday_end: character string of the last month and day for which you want to retrieve data,
+#' @param - month_day_end: character string of the last month and day for which you want to retrieve data,
 #'                          in the form: MM-DD.  This is the end of your date range. e.g. '07-01' (July 1) (required)
 #' @param - year_start: character string of the starting year (inclusive) of the range of years for which
 #'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
@@ -224,9 +224,9 @@ agronomic_norms_fields <- function(field_id
 #'
 #' @param - latitude: the latitude of the requested location (double, required)
 #' @param - longitude: the longitude of the requested locations (double, required)
-#' @param - monthday_start: character string of the first month and day for which you want to retrieve data,
+#' @param - month_day_start: character string of the first month and day for which you want to retrieve data,
 #'                          in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)
-#' @param - monthday_end: character string of the last month and day for which you want to retrieve data,
+#' @param - month_day_end: character string of the last month and day for which you want to retrieve data,
 #'                          in the form: MM-DD.  This is the end of your date range. e.g. '07-01' (July 1) (required)
 #' @param - year_start: character string of the starting year (inclusive) of the range of years for which
 #'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
@@ -524,7 +524,7 @@ agronomic_norms_area <- function(polygon
   #Checking Input Parameters
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkNormsStartEndDates(monthday_start,monthday_end)
-  checkNormsYearsToRequest(year_start,year_end,monthday_start,monthday_end,exclude_years)
+  checkNormsYearsToRequest(year_start,year_end,month_day_start,month_day_end,exclude_years)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
   checkAccumulationStartDateNorms(accumulation_start_date,month_day_start)
   checkPropertiesEndpoint('agronomics',propertiesToInclude)

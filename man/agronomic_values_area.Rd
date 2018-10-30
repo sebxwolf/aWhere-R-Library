@@ -77,7 +77,7 @@ The polygon should be either a SpatialPolygons object or a well-known text chara
 \dontrun{agronomic_values_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T),
                                ,day_start = '2018-04-28'
                                ,day_end = '2018-05-01'
-                               ,numCores = 2)}
+                               ,numcores = 2)}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/observations/geolocation

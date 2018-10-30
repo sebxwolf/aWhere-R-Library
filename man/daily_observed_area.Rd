@@ -52,7 +52,8 @@ This API opens the weather attributes that matter most to agriculture.
 \examples{
 \dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T),
                                ,day_start = '2018-04-28'
-                               ,day_end = '2018-05-01')}
+                               ,day_end = '2018-05-01'
+                               ,numcores = 2)}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/observations/geolocation
