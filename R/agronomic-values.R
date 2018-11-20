@@ -172,9 +172,7 @@ agronomic_values_fields <- function(field_id
 #' Accumulated values allow growers to easily identify how the weather has been over the season.
 #' Both sets of data are commonly used on small and large farms alike.  This is a very flexible API
 #' that supports a wide variety of configurations to get exactly the data you want as efficiently as
-#' possible. It's also designed to work with the Fields and Plantings system to reduce the amount of input.
-#' While a planting is not required to use this API, creating a Planting for your Fields will allow you
-#' to get the most out of the aWhere platform.
+#' possible.
 #'
 #' @references http://developer.awhere.com/api/reference/agronomics/values
 #'
@@ -307,5 +305,132 @@ agronomic_values_latlng <- function(latitude
   checkDataReturn_daily(data,day_start,day_end)
 
   return(as.data.frame(data))
+}
+
+#' @title agronomic_values_area
+#'
+#' @description
+#' \code{agronomic_values_area} pulls agronomic data from aWhere's API based on spatial polygon or extent
+#'
+#' @details
+#' This function returns agronomic data on GDDs, potential evapotranspiration (PET), Precipitation over
+#' potential evapotranspiration (P/PET), accumulated GDDs, accumulated precipitation, accumulated PET, and
+#' accumulated P/PET.  Default units are returned by the API.
+#'
+#' Agronomic Values are calculated numbers that can be used to show the agronomic status of a field or crop.
+#' These figures can be used, for example, to track and predict plant growth or identify water stress.
+#' Accumulated values allow growers to easily identify how the weather has been over the season.
+#' Both sets of data are commonly used on small and large farms alike.  This is a very flexible API
+#' that supports a wide variety of configurations to get exactly the data you want as efficiently as
+#' possible.
+#'
+#' The polygon should be either a SpatialPolygons object or a well-known text character string or an extent.
+#'
+#' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
+#'
+#' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
+#' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)
+#' @param - accumulation_start_date: Allows the user to start counting accumulations from
+#'                                 before the specified start date (or before the
+#'                                 planting date if using the most recent planting).
+#'                                 Use this parameter to specify the date from which
+#'                                 you wish to start counting, in the form: YYYY-MM-DD.
+#'                                 The daily values object
+#'                                 will still only return the days between the start
+#'                                 and end date. This date must come before the start date. (optional)
+#' @param - gdd_method: There are variety of equations available for calculating growing degree-days.
+#'                     Valid entries are: 'standard', 'modifiedstandard', 'min-temp-cap', 'min-temp-constant'
+#'                     See the API documentation for a description of each method.  The standard
+#'                     method will be used if none is specified. (character - optional)
+#' @param - gdd_base_temp: The base temp to use for the any of the GDD equations. The default value of 10 will
+#'                       be used if none is specified. (optional)
+#' @param - gdd_min_boundary: The minimum boundary to use in the selected GDD equation.
+#'                           The behavior of this value is different depending on the equation you're using
+#'                           The default value of 10 will be used if none is specified. (optional)
+#' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
+#'                          behavior of this value is different depending on the equation you're using.
+#'                          The default value of 30 will be used if none is specified. (optional)#' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()
+#'                    If you receive an error regarding the speed you are making calls, reduce this number
+#' @param - bypassNumCallCheck: set to TRUE to avoid prompting the user to confirm that they want to begin making API calls
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#'
+#' @import httr
+#' @import data.table
+#' @import lubridate
+#' @import jsonlite
+#' @import foreach
+#' @import doParallel
+#' @import rgeos
+#'
+#' @return data.frame of requested data for dates requested
+#'
+#'
+#' @examples
+#' \dontrun{agronomic_values_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T),
+#'                                ,day_start = '2018-04-28'
+#'                                ,day_end = '2018-05-01'
+#'                                ,numcores = 2)}
+
+#' @export
+
+
+agronomic_values_area <- function(polygon
+                                ,day_start
+                                ,day_end
+                                ,propertiesToInclude = ''
+                                ,accumulation_start_date = ''
+                                ,gdd_method = 'standard'
+                                ,gdd_base_temp = 10
+                                ,gdd_min_boundary = 10
+                                ,gdd_max_boundary = 30
+                                ,numcores = 2
+                                ,bypassNumCallCheck = FALSE
+                                ,keyToUse = awhereEnv75247$uid
+                                ,secretToUse = awhereEnv75247$secret
+                                ,tokenToUse = awhereEnv75247$token) {
+
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidStartEndDatesAgronomics(day_start,day_end)
+  checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
+  checkAccumulationStartDate(accumulation_start_date)
+  checkPropertiesEndpoint('agronomics',propertiesToInclude)
+
+  cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
+  grid <- create_awhere_grid(polygon)
+
+  verify_api_calls(grid,bypassNumCallCheck)
+
+  cat(paste0('Requesting data using parallal API calls\n'))
+  doParallel::registerDoParallel(cores=numcores)
+
+  observed <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
+
+    t <- agronomic_values_latlng(latitude = grid$lat[j]
+                                 ,longitude = grid$lon[j]
+                                 ,day_start = day_start
+                                 ,day_end = day_end
+                                 ,propertiesToInclude = propertiesToInclude
+                                 ,keyToUse = keyToUse
+                                 ,secretToUse = secretToUse
+                                 ,tokenToUse = tokenToUse)
+
+    currentNames <- colnames(t)
+
+    t$gridy <- grid$gridy[j]
+    t$gridx <- grid$gridx[j]
+
+    data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
+
+    return(t)
+
   }
+
+  observed <- data.table::rbindlist(observed)
+  return(as.data.frame(observed))
+}
+
 

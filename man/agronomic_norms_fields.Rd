@@ -15,10 +15,10 @@ agronomic_norms_fields(field_id, month_day_start, month_day_end, year_start,
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
 Field IDs are created using the create_field function. (string)}
 
-\item{-}{monthday_start: character string of the first month and day for which you want to retrieve data,
+\item{-}{month_day_start: character string of the first month and day for which you want to retrieve data,
 in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)}
 
-\item{-}{monthday_end: character string of the last month and day for which you want to retrieve data,
+\item{-}{month_day_end: character string of the last month and day for which you want to retrieve data,
 in the form: MM-DD.  This is the end of your date range. e.g. '07-01' (July 1) (required)}
 
 \item{-}{year_start: character string of the starting year (inclusive) of the range of years for which
