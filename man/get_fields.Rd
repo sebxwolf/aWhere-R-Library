@@ -5,7 +5,8 @@
 \title{Get Fields}
 \usage{
 get_fields(field_id = "", keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: Either a field id to retrieve information for that specific field

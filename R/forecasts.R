@@ -18,7 +18,10 @@
 #' daily observed, current weather, and forecasts. These APIs are designed for efficiency,
 #' allowing you to customize the responses to return just the attributes you need.
 #'
-#'
+#' Note about dates: The system does not adjust for any difference in dates between the location of the user
+#'           and where data is being requested from.  It is the responsibility of the user to ensure a valid
+#'           date range is specified given any differences in timezone.  These differences can have implications
+#'           for whether a given date should be requested from the daily_observed functions or the forecast functions
 #'
 #' @references http://developer.awhere.com/api/forecast-weather-api
 #'
@@ -30,6 +33,8 @@
 #'                  Defaults to system date + 7 if left blank. (optional)
 #' @param - block_size: Integer value that corresponds to the number of hours to include in each time block.
 #'                     Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)
+#' @param - useLocalTime: whether the data specified is the date specified at the location where data is
+#'                        being requested from or at UTC = 0.  Default is TRUE
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -51,6 +56,7 @@ forecasts_fields <- function(field_id
                              ,day_start = as.character(Sys.Date())
                              ,day_end = ''
                              ,block_size = 1
+                             ,useLocalTime = TRUE
                              ,keyToUse = awhereEnv75247$uid
                              ,secretToUse = awhereEnv75247$secret
                              ,tokenToUse = awhereEnv75247$token) {
@@ -76,8 +82,9 @@ forecasts_fields <- function(field_id
   }
 
   blockString <- paste0('?blockSize=',block_size)
+  localTimeString <- paste0('&useLocalTime=',useLocalTime)
 
-  url <- paste0(urlAddress, strBeg, strCoord, strType, strDates,blockString)
+  url <- paste0(urlAddress, strBeg, strCoord, strType, strDates,blockString,localTimeString)
 
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
@@ -104,7 +111,7 @@ forecasts_fields <- function(field_id
 
   #This removes the non-data info returned with the JSON object
   data[,grep('.units',varNames) := NULL]
-  
+
   data[,c('soilTemperatures','soilMoisture') := NULL]
 
   currentNames <- data.table::copy(colnames(data))
@@ -140,6 +147,11 @@ forecasts_fields <- function(field_id
 #' daily observed, current weather, and forecasts. These APIs are designed for efficiency,
 #' allowing you to customize the responses to return just the attributes you need.
 #'
+#' Note about dates: The system does not adjust for any difference in dates between the location of the user
+#'           and where data is being requested from.  It is the responsibility of the user to ensure a valid
+#'           date range is specified given any differences in timezone.  These differences can have implications
+#'           for whether a given date should be requested from the daily_observed functions or the forecast functions
+#'
 #' @references http://developer.awhere.com/api/reference/weather/forecasts/geolocation
 #'
 #' @param - latitude: the latitude of the requested location (double)
@@ -150,6 +162,8 @@ forecasts_fields <- function(field_id
 #'                  Defaults to system date + 7 if left blank. (optional)
 #' @param - block_size: Integer value that corresponds to the number of hours to include in each time block.
 #'                     Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)
+#' @param - useLocalTime: whether the data specified is the date specified at the location where data is
+#'                        being requested from or at UTC = 0.  Default is TRUE
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -173,6 +187,7 @@ forecasts_latlng <- function(latitude
                              ,day_start = as.character(Sys.Date())
                              ,day_end = ''
                              ,block_size = 1
+                             ,useLocalTime = TRUE
                              ,keyToUse = awhereEnv75247$uid
                              ,secretToUse = awhereEnv75247$secret
                              ,tokenToUse = awhereEnv75247$token) {
@@ -190,9 +205,9 @@ forecasts_latlng <- function(latitude
   strType <- paste0('/forecasts')
   strDates <- paste0('/',day_start,',',day_end)
   blockString <- paste0('?blockSize=',block_size)
+  localTimeString <- paste0('&useLocalTime=',useLocalTime)
 
-
-  url <- paste0(urlAddress, strBeg, strCoord, strType, strDates,blockString)
+  url <- paste0(urlAddress, strBeg, strCoord, strType, strDates,blockString,localTimeString)
 
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
@@ -220,7 +235,7 @@ forecasts_latlng <- function(latitude
 
   #This removes the non-data info returned with the JSON object
   data[,grep('.units',varNames) := NULL]
-  
+
   data[,c('soilTemperatures','soilMoisture') := NULL]
 
   currentNames <- data.table::copy(colnames(data))

@@ -6,7 +6,8 @@
 \usage{
 create_field(field_id, latitude, longitude, farm_id, field_name = "",
   acres = "", keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: an ID of your choosing (string)}

@@ -5,8 +5,9 @@
 \title{forecasts_fields}
 \usage{
 forecasts_fields(field_id, day_start = as.character(Sys.Date()),
-  day_end = "", block_size = 1, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  day_end = "", block_size = 1, useLocalTime = TRUE,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
@@ -20,6 +21,9 @@ Defaults to system date + 7 if left blank. (optional)}
 
 \item{-}{block_size: Integer value that corresponds to the number of hours to include in each time block.
 Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)}
+
+\item{-}{useLocalTime: whether the data specified is the date specified at the location where data is
+being requested from or at UTC = 0.  Default is TRUE}
 
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
@@ -47,6 +51,11 @@ The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain
 and allows retrieval and integration of data across all different time ranges long term normals,
 daily observed, current weather, and forecasts. These APIs are designed for efficiency,
 allowing you to customize the responses to return just the attributes you need.
+
+Note about dates: The system does not adjust for any difference in dates between the location of the user
+          and where data is being requested from.  It is the responsibility of the user to ensure a valid
+          date range is specified given any differences in timezone.  These differences can have implications
+          for whether a given date should be requested from the daily_observed functions or the forecast functions
 }
 \examples{
 \dontrun{forecasts_fields(field_id = 'field_test', day_start = as.character(Sys.Date()), block_size = 12)

@@ -17,6 +17,11 @@
 #' While a planting is not required to use this API, creating a Planting for your Fields will allow you
 #' to get the most out of the aWhere platform.
 #'
+#' Note about dates: The system does not adjust for any difference in dates between the location of the user
+#'           and where data is being requested from.  It is the responsibility of the user to ensure a valid
+#'           date range is specified given any differences in timezone.  These differences can have implications
+#'           for whether a given date should be requested from the daily_observed functions or the forecast functions
+#'
 #' @references http://developer.awhere.com/api/reference/agronomics/values
 #'
 #' @param - field_id: the field_id associated with the location for which you want to pull data.
@@ -174,6 +179,11 @@ agronomic_values_fields <- function(field_id
 #' that supports a wide variety of configurations to get exactly the data you want as efficiently as
 #' possible.
 #'
+#' Note about dates: The system does not adjust for any difference in dates between the location of the user
+#'           and where data is being requested from.  It is the responsibility of the user to ensure a valid
+#'           date range is specified given any differences in timezone.  These differences can have implications
+#'           for whether a given date should be requested from the daily_observed functions or the forecast functions
+#'
 #' @references http://developer.awhere.com/api/reference/agronomics/values
 #'
 #' @param - latitude: the latitude of the requested location (double)
@@ -325,6 +335,14 @@ agronomic_values_latlng <- function(latitude
 #' possible.
 #'
 #' The polygon should be either a SpatialPolygons object or a well-known text character string or an extent.
+#'
+#' Note about dates: The system does not adjust for any difference in dates between the location of the user
+#'           and where data is being requested from.  It is the responsibility of the user to ensure a valid
+#'           date range is specified given any differences in timezone.  These differences can have implications
+#'           for whether a given date should be requested from the daily_observed functions or the forecast functions.
+#'           Furthermore, because this function can take as input locations that may be in different timezones, it is
+#'           the responsibility of the user to either ensure that the date range specified is valid for all relevant
+#'           locations or to break the query into pieces.
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'

@@ -133,7 +133,9 @@ load_credentials <- function(path_to_credentials) {
 #' @return boolean for whether another query should be made
 
 check_JSON <- function(jsonObject, request) {
-  if (grepl('API Access Expired',jsonObject)) {
+  aWhereAPI:::checkStatusCode(request)
+  
+  if (any(grepl('API Access Expired',jsonObject))) {
     if(exists("awhereEnv75247")) {
       if(tokenToUse == awhereEnv75247$token) {
         get_token(keyToUse,secretToUse)
@@ -147,7 +149,6 @@ check_JSON <- function(jsonObject, request) {
       stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
     }
   } else {
-    aWhereAPI:::checkStatusCode(request)
     doWeatherGet <- FALSE
   }
 

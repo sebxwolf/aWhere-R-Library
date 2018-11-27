@@ -4,9 +4,10 @@
 \alias{daily_observed_area}
 \title{daily_observed_area}
 \usage{
-daily_observed_area(polygon, day_start, day_end, propertiesToInclude = "",
-  numcores = 2, bypassNumCallCheck = FALSE, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+daily_observed_area(polygon, day_start, day_end,
+  propertiesToInclude = "", numcores = 2, bypassNumCallCheck = FALSE,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{polygon: either a SpatialPolygons object, well-known text string, or extent from raster package}
@@ -48,6 +49,14 @@ allowing you to customize the responses to return just the attributes you need.
 
 Understanding the recent and long-term daily weather is critical for making in-season decisions.
 This API opens the weather attributes that matter most to agriculture.
+
+Note about dates: The system does not adjust for any difference in dates between the location of the user
+          and where data is being requested from.  It is the responsibility of the user to ensure a valid
+          date range is specified given any differences in timezone.  These differences can have implications
+          for whether a given date should be requested from the daily_observed functions or the forecast functions.
+          Furthermore, because this function can take as input locations that may be in different timezones, it is
+          the responsibility of the user to either ensure that the date range specified is valid for all relevant
+          locations or to break the query into pieces.
 }
 \examples{
 \dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T),

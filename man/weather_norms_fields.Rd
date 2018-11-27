@@ -7,7 +7,8 @@
 weather_norms_fields(field_id, monthday_start, monthday_end, year_start,
   year_end, propertiesToInclude = "", exclude_years = NULL,
   includeFeb29thData = TRUE, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
@@ -59,6 +60,11 @@ for these variables.  The data pulled is for the field id identified.
 The data returned in this function
 allow you to compare this year or previous years to the long-term normals, calculated as
 the average of those weather conditions on that day in that location over the years specified.
+
+Note about dates: The system does not adjust for any difference in dates between the location of the user
+          and where data is being requested from.  It is the responsibility of the user to ensure a valid
+          date range is specified given any differences in timezone.  These differences can have implications
+          for whether a given date should be requested from the daily_observed functions or the forecast functions
 }
 \examples{
 \dontrun{weather_norms_fields(field_id = "field_test"

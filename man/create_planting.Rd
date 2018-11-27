@@ -7,7 +7,8 @@
 create_planting(field_id, crop, planting_date, proj_yield_amount = "",
   proj_yield_units = "", proj_harvest_date = "", yield_amount = "",
   yield_units = "", harvest_date = "", keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: an ID of your choosing (string)}
