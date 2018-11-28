@@ -1,9 +1,8 @@
 Meta
-doc
 .Rproj.user
 .Rhistory
 .RData
 .Rbuidignore
 .Ruserdata
 *.rds
-doc/
+/doc
