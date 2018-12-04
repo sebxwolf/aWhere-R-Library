@@ -58,21 +58,7 @@ get_fields <- function(field_id = ''
 
     a <- suppressMessages(httr::content(request))
 
-    if (grepl('API Access Expired',a)) {
-      if(exists("awhereEnv75247")) {
-        if(tokenToUse == awhereEnv75247$token) {
-          get_token(keyToUse,secretToUse)
-          tokenToUse <- awhereEnv75247$token
-        } else {
-          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-        }
-      } else {
-        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-      }
-    } else {
-      aWhereAPI:::checkStatusCode(request)
-      doWeatherGet <- FALSE
-    }
+    doWeatherGet <- check_JSON(a,request)
   }
 
   ## Create & fill data frame
@@ -193,21 +179,7 @@ get_planting <- function(field_id
 
     a <- suppressMessages(httr::content(request))
 
-    if (grepl('API Access Expired',a)) {
-      if(exists("awhereEnv75247")) {
-        if(tokenToUse == awhereEnv75247$token) {
-          get_token(keyToUse,secretToUse)
-          tokenToUse <- awhereEnv75247$token
-        } else {
-          stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-        }
-      } else {
-        stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
-      }
-    } else {
-      aWhereAPI:::checkStatusCode(request)
-      doWeatherGet <- FALSE
-    }
+    doWeatherGet <- check_JSON(a,request)
   }
 
   ## Create & fill data frame
@@ -309,7 +281,7 @@ get_job <- function(job_id
 
     a <- suppressMessages(httr::content(request))
 
-    if (grepl('API Access Expired',a)) {
+    if (any(grepl('API Access Expired',a))) {
       if(exists("awhereEnv75247")) {
         if(tokenToUse == awhereEnv75247$token) {
           get_token(keyToUse,secretToUse)

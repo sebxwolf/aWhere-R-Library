@@ -8,7 +8,8 @@ agronomic_values_fields(field_id, day_start, day_end,
   propertiesToInclude = "", accumulation_start_date = "",
   gdd_method = "standard", gdd_base_temp = 10, gdd_min_boundary = 10,
   gdd_max_boundary = 30, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
@@ -70,6 +71,11 @@ that supports a wide variety of configurations to get exactly the data you want 
 possible. It's also designed to work with the Fields and Plantings system to reduce the amount of input.
 While a planting is not required to use this API, creating a Planting for your Fields will allow you
 to get the most out of the aWhere platform.
+
+Note about dates: The system does not adjust for any difference in dates between the location of the user
+          and where data is being requested from.  It is the responsibility of the user to ensure a valid
+          date range is specified given any differences in timezone.  These differences can have implications
+          for whether a given date should be requested from the daily_observed functions or the forecast functions
 }
 \examples{
 \dontrun{agronomic_values_fields(field_id = "field_test"

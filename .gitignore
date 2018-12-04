@@ -4,3 +4,4 @@
 .Rbuidignore
 .Ruserdata
 *.rds
+doc/

@@ -6,7 +6,8 @@
 \usage{
 daily_observed_latlng(latitude, longitude, day_start, day_end,
   propertiesToInclude = "", keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{latitude: the latitude of the requested location (double)}
@@ -44,6 +45,11 @@ allowing you to customize the responses to return just the attributes you need.
 
 Understanding the recent and long-term daily weather is critical for making in-season decisions.
 This API opens the weather attributes that matter most to agriculture.
+
+Note about dates: The system does not adjust for any difference in dates between the location of the user
+          and where data is being requested from.  It is the responsibility of the user to ensure a valid
+          date range is specified given any differences in timezone.  These differences can have implications
+          for whether a given date should be requested from the daily_observed functions or the forecast functions
 }
 \examples{
 \dontrun{daily_observed_latlng(latitude = 39.8282

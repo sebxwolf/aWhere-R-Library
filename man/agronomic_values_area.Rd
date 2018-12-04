@@ -4,11 +4,12 @@
 \alias{agronomic_values_area}
 \title{agronomic_values_area}
 \usage{
-agronomic_values_area(polygon, day_start, day_end, propertiesToInclude = "",
-  accumulation_start_date = "", gdd_method = "standard",
-  gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30,
-  numcores = 2, bypassNumCallCheck = FALSE, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+agronomic_values_area(polygon, day_start, day_end,
+  propertiesToInclude = "", accumulation_start_date = "",
+  gdd_method = "standard", gdd_base_temp = 10, gdd_min_boundary = 10,
+  gdd_max_boundary = 30, numcores = 2, bypassNumCallCheck = FALSE,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{polygon: either a SpatialPolygons object, well-known text string, or extent from raster package}
@@ -72,6 +73,14 @@ that supports a wide variety of configurations to get exactly the data you want 
 possible.
 
 The polygon should be either a SpatialPolygons object or a well-known text character string or an extent.
+
+Note about dates: The system does not adjust for any difference in dates between the location of the user
+          and where data is being requested from.  It is the responsibility of the user to ensure a valid
+          date range is specified given any differences in timezone.  These differences can have implications
+          for whether a given date should be requested from the daily_observed functions or the forecast functions.
+          Furthermore, because this function can take as input locations that may be in different timezones, it is
+          the responsibility of the user to either ensure that the date range specified is valid for all relevant
+          locations or to break the query into pieces.
 }
 \examples{
 \dontrun{agronomic_values_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T),

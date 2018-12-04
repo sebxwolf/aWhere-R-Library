@@ -17,12 +17,16 @@
 #' Understanding the recent and long-term daily weather is critical for making in-season decisions.
 #' This API opens the weather attributes that matter most to agriculture.
 #'
+#' Note about dates: The system does not adjust for any difference in dates between the location of the user
+#'           and where data is being requested from.  It is the responsibility of the user to ensure a valid
+#'           date range is specified given any differences in timezone.  These differences can have implications
+#'           for whether a given date should be requested from the daily_observed functions or the forecast functions
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations
 #'
 #' @param - field_id: the field_id associated with the location for which you want to pull data.
 #' Field IDs are created using the create_field function.(string)
-#' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD.
 #' @param - day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -193,6 +197,11 @@ daily_observed_fields <- function(field_id
 #' Understanding the recent and long-term daily weather is critical for making in-season decisions.
 #' This API opens the weather attributes that matter most to agriculture.
 #'
+#' Note about dates: The system does not adjust for any difference in dates between the location of the user
+#'           and where data is being requested from.  It is the responsibility of the user to ensure a valid
+#'           date range is specified given any differences in timezone.  These differences can have implications
+#'           for whether a given date should be requested from the daily_observed functions or the forecast functions
+#'
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'
 #' @param - latitude: the latitude of the requested location (double)
@@ -340,8 +349,6 @@ daily_observed_latlng <- function(latitude
   return(as.data.frame(allWeath))
 }
 
-
-
 #' @title daily_observed_area
 #'
 #' @description
@@ -361,6 +368,14 @@ daily_observed_latlng <- function(latitude
 #'
 #' Understanding the recent and long-term daily weather is critical for making in-season decisions.
 #' This API opens the weather attributes that matter most to agriculture.
+#'
+#' Note about dates: The system does not adjust for any difference in dates between the location of the user
+#'           and where data is being requested from.  It is the responsibility of the user to ensure a valid
+#'           date range is specified given any differences in timezone.  These differences can have implications
+#'           for whether a given date should be requested from the daily_observed functions or the forecast functions.
+#'           Furthermore, because this function can take as input locations that may be in different timezones, it is
+#'           the responsibility of the user to either ensure that the date range specified is valid for all relevant
+#'           locations or to break the query into pieces.
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'

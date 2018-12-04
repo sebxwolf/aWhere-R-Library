@@ -4,10 +4,11 @@
 \alias{weather_norms_area}
 \title{weather_norms_area}
 \usage{
-weather_norms_area(polygon, monthday_start, monthday_end, year_start, year_end,
-  propertiesToInclude = "", exclude_years = NULL,
-  includeFeb29thData = TRUE, numcores = 2, bypassNumCallCheck = FALSE,
-  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+weather_norms_area(polygon, monthday_start, monthday_end, year_start,
+  year_end, propertiesToInclude = "", exclude_years = NULL,
+  includeFeb29thData = TRUE, numcores = 2,
+  bypassNumCallCheck = FALSE, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }
 \arguments{
@@ -65,6 +66,14 @@ a well-known text character string or an extent.
 The data returned in this function
 allow you to compare this year or previous years to the long-term normals, calculated as
 the average of those weather conditions on that day in that location over the years specified.
+
+Note about dates: The system does not adjust for any difference in dates between the location of the user
+          and where data is being requested from.  It is the responsibility of the user to ensure a valid
+          date range is specified given any differences in timezone.  These differences can have implications
+          for whether a given date should be requested from the daily_observed functions or the forecast functions.
+          Furthermore, because this function can take as input locations that may be in different timezones, it is
+          the responsibility of the user to either ensure that the date range specified is valid for all relevant
+          locations or to break the query into pieces.
 }
 \examples{
 \dontrun{weather_norms_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T)

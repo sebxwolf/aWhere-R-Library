@@ -20,7 +20,7 @@ The first step in using the aWhere API is to create your account and your first 
 
 ```{r getData, include = FALSE} 
 library(aWhereAPI)
-aWhereAPI::load_credentials("credentials.txt")
+aWhereAPI::load_credentials("credentials_trial.txt")
 
 obs_startdate <- as.character(Sys.Date() - 30)
 obs_enddate <- as.character(Sys.Date() - 1)
@@ -41,7 +41,7 @@ Once loaded, he first step when using the R package will always be to request a 
 
 
 ```{r getToken1}
-aWhereAPI::load_credentials("credentials.txt")
+aWhereAPI::load_credentials("credentials_trial.txt")
 ```
 
 It is also possible to use the ```get_token(uid = "ABCDEFG", secret = "123456")``` function to similar effect.

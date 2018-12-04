@@ -4,12 +4,13 @@
 \alias{agronomic_norms_fields}
 \title{agronomic_norms_fields}
 \usage{
-agronomic_norms_fields(field_id, month_day_start, month_day_end, year_start,
-  year_end, propertiesToInclude = "", exclude_years = NULL,
+agronomic_norms_fields(field_id, month_day_start, month_day_end,
+  year_start, year_end, propertiesToInclude = "", exclude_years = NULL,
   accumulation_start_date = "", gdd_method = "standard",
   gdd_base_temp = 10, gdd_min_boundary = 10, gdd_max_boundary = 30,
   includeFeb29thData = TRUE, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret, tokenToUse = awhereEnv75247$token)
+  secretToUse = awhereEnv75247$secret,
+  tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
@@ -88,6 +89,11 @@ Default units are returned by the API.
 The data returned in this function
 allow you to compare this year or previous years to the long-term normals, calculated as
 the average of those agronomic conditions on that day in that location over the years specified.
+
+Note about dates: The system does not adjust for any difference in dates between the location of the user
+          and where data is being requested from.  It is the responsibility of the user to ensure a valid
+          date range is specified given any differences in timezone.  These differences can have implications
+          for whether a given date should be requested from the daily_observed functions or the forecast functions
 }
 \examples{
 \dontrun{agronomic_norms_fields(field_id = 'field_test'

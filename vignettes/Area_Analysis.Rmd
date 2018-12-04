@@ -21,7 +21,7 @@ library(aWhereAPI)
 library(dplyr)
 
 # load credentials to access aWhere API
-aWhereAPI::load_credentials("credentials.txt")
+aWhereAPI::load_credentials("credentials_trial.txt")
 ```
 
 
@@ -165,17 +165,19 @@ ggplot2::ggplot() + ggplot2::geom_polygon(data = plot_data,
 
 If you'd like to do some slightly more advanced plotting, you can overlay the grid cells on a Google Maps image by installing the `ggmap` package. Here is some sample code to get started (you will need to manually alter the zoom level to fit your data):
 ```{r ggmapPlot, results=TRUE}
-## Calculate the geographic center of the data pulled from the API
-data_center <- c(mean(min(plot_data$longitude), max(plot_data$longitude)), 
-                 mean(min(plot_data$latitude), max(plot_data$latitude)))
-
-## The ggmap function returns an image based off the center and zoom level.
+## The ggmap function for stamen maps uses a bounding box to request the image.
 ## You can then plot over the top off it with any ggplot function as normally used.
-ggmap::ggmap(ggmap::get_googlemap(center = data_center,scale = 1,zoom = 9)) + 
+ggmap::ggmap(ggmap::get_stamenmap(bbox = c(left = min(plot_data$longitude)
+                                           ,right = max(plot_data$longitude)
+                                           ,bottom = min(plot_data$latitude)
+                                           ,top = max(plot_data$latitude))
+                                  ,type = 'toner-hybrid')) + 
   ggplot2::geom_polygon(data = plot_data, ggplot2::aes(x = longitude, 
                                                        y = latitude, 
                                                        group = id, 
-                                                       fill = diff)) + 
+                                                       fill = diff)
+                        ,alpha = .2) + 
   ggplot2::scale_fill_gradient(low = "red", high = "green")
+
 
 ```

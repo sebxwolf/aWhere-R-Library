@@ -4,15 +4,16 @@
 \alias{daily_observed_fields}
 \title{daily_observed_fields}
 \usage{
-daily_observed_fields(field_id, day_start, day_end, propertiesToInclude = "",
-  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+daily_observed_fields(field_id, day_start, day_end,
+  propertiesToInclude = "", keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }
 \arguments{
 \item{-}{field_id: the field_id associated with the location for which you want to pull data.
 Field IDs are created using the create_field function.(string)}
 
-\item{-}{day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD}
+\item{-}{day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD.}
 
 \item{-}{day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD}
 
@@ -43,6 +44,11 @@ allowing you to customize the responses to return just the attributes you need.
 
 Understanding the recent and long-term daily weather is critical for making in-season decisions.
 This API opens the weather attributes that matter most to agriculture.
+
+Note about dates: The system does not adjust for any difference in dates between the location of the user
+          and where data is being requested from.  It is the responsibility of the user to ensure a valid
+          date range is specified given any differences in timezone.  These differences can have implications
+          for whether a given date should be requested from the daily_observed functions or the forecast functions
 }
 \examples{
 \dontrun{daily_observed_fields(field_id = 'field_test'
