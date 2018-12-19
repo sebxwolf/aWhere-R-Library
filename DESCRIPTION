@@ -23,7 +23,8 @@ Imports:
     lubridate,
     raster,
     rgeos,
-    sp
+    sp,
+    doParallel
 Suggests: 
     testthat, 
     knitr, 
