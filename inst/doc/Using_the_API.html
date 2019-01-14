@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+<title>Using the API</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Using the API</h1>
+
+
+
+<div id="getting-started-using-the-api" class="section level2">
+<h2>Getting Started using the API</h2>
+<p>The first step in using the aWhere API is to create your account and your first app. Doing this will provide you with your key and secret, which are necessary for hitting the various endpoints in the API. Information and steps on creating your account and retreiving your key and secret can be found on the aWhere Developer Portal website here: <a href="http://developer.awhere.com/api/get-started" class="uri">http://developer.awhere.com/api/get-started</a>. A default key/secret has been provided with this package to get you going but has limited data access and will expire.</p>
+<p>Once you have your account/app set up, you are ready to start using the aWhere API package. To start using the package in your R session, load it using the <code>library(aWhereAPI)</code> command.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(aWhereAPI)</code></pre></div>
+<p>Once loaded, he first step when using the R package will always be to request a token using the <code>load_credentials()</code> function. This function creates a unique token tied to your app, and gives your app authorization to retreive data from the aWhere API. This function points to a text file that contains two strings: your key and your secret each on separate lines. There must also be one blank line afterward. aWhere API tokens expire after one hour, however after the first time running the <code>get_token()</code> function in a given R session, the R package will automatically handle getting a new token upon expiration.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aWhereAPI<span class="op">::</span><span class="kw">load_credentials</span>(<span class="st">&quot;credentials_trial.txt&quot;</span>)</code></pre></div>
+<p>It is also possible to use the <code>get_token(uid = &quot;ABCDEFG&quot;, secret = &quot;123456&quot;)</code> function to similar effect.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aWhereAPI<span class="op">::</span><span class="kw">get_token</span>(<span class="dt">uid =</span> <span class="st">&quot;ABCDEFG&quot;</span>, <span class="dt">secret =</span> <span class="st">&quot;123456&quot;</span>)</code></pre></div>
+</div>
+<div id="awhere-fields" class="section level2">
+<h2>aWhere Fields</h2>
+<p>The aWhere API offers many different endpoints to accessing a variety of agronomic and weather related information. The first category of endpoints deals with Fields and Plantings. In these endpoints users store specific fields and associated agronomic planting information and retrieve information using the names associated with each field activity/named field. More specifically, fields are objects tied to your app that contain extra information besides a simple latitude/longitude. Latitude and longitude are of course included, but only when initially creating the Field. Creating a Field allows the user to include information such as the name, farmid, and the size of the field. More information on the Fields endpoint can be found here: <a href="http://developer.awhere.com/api/reference/fields-plantings" class="uri">http://developer.awhere.com/api/reference/fields-plantings</a>.</p>
+<p>There are two ways of specifying a location when using the aWhere API. The first way is using latitude and longitude information that can be passed directly to the API to return data for the specific location.</p>
+<div id="create-a-field" class="section level4">
+<h4>Create a Field</h4>
+<p>Using the aWhere R package to create a field is extremely simple and can be done using the <code>create_field()</code> function. For example: <code>create_field(field_id = &quot;1&quot;, latitude = 40, longitude = -90, farm_id = &quot;My Farm&quot;, field_name = &quot;Field 1&quot;, acres = 30)</code>. Creating a field with the information you specify will make your field accessible through many different API endpoints.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aWhereAPI<span class="op">::</span><span class="kw">create_field</span>(<span class="dt">field_id =</span> <span class="st">&quot;1&quot;</span>, <span class="dt">latitude =</span> <span class="dv">40</span>, 
+                        <span class="dt">longitude =</span> <span class="op">-</span><span class="dv">90</span>, <span class="dt">farm_id =</span> <span class="st">&quot;My Farm&quot;</span>, 
+                        <span class="dt">field_name =</span> <span class="st">&quot;Field 1&quot;</span>, <span class="dt">acres =</span> <span class="dv">30</span>)
+
+aWhereAPI<span class="op">::</span><span class="kw">create_field</span>(<span class="dt">field_id =</span> <span class="st">&quot;2&quot;</span>, <span class="dt">latitude =</span> <span class="dv">40</span>, 
+                        <span class="dt">longitude =</span> <span class="op">-</span><span class="dv">90</span>, <span class="dt">farm_id =</span> <span class="st">&quot;My Other Farm&quot;</span>, 
+                        <span class="dt">field_name =</span> <span class="st">&quot;Field A&quot;</span>, <span class="dt">acres =</span> <span class="dv">35</span>)</code></pre></div>
+</div>
+<div id="get-a-list-of-fields" class="section level4">
+<h4>Get a List of Fields</h4>
+<p>Once you have created a field in the API, you can easily return the information associated with that field. Or, if you have multiple fields a list of all fields associated with your account can also be returned. To return a list of fields use the <code>get_fields()</code> function either running it without passing any parameters to get all fields associated with your account, or passing in the field_id of the single field you’d like to get information on. For example: <code>get_fields()</code> will return all fields, while <code>get_fields(field_id = &quot;1&quot;)</code> will return only the information about field_id “1”.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aWhereAPI<span class="op">::</span><span class="kw">get_fields</span>()</code></pre></div>
+<pre><code>##        fieldName Acres        farmId fieldId Latitude Longitude
+## 1 My First Field   100         farm1  field1  39.8282  -98.5795
+## 2        Field 1    30       My_Farm       1  40.0000  -90.0000
+## 3        Field A    35 My_Other_Farm       2  40.0000  -90.0000</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aWhereAPI<span class="op">::</span><span class="kw">get_fields</span>(<span class="dt">field_id =</span> <span class="st">&quot;1&quot;</span>)</code></pre></div>
+<pre><code>##   fieldName acres latitude longitude  farmId field_id
+## 1   Field 1    30       40       -90 My_Farm        1</code></pre>
+</div>
+<div id="update-a-field" class="section level4">
+<h4>Update a Field</h4>
+<p>Once a field has been created, it is possible to update some of the field’s data, specifically the name or farmid. To update either one of these, use the <code>update_field()</code> function. For example: <code>update_field(field_id = &quot;1&quot;, variable_update = &quot;name&quot;, value_update = &quot;Old Field 1&quot;)</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aWhereAPI<span class="op">::</span><span class="kw">update_field</span>(<span class="dt">field_id =</span> <span class="st">&quot;1&quot;</span>, 
+                        <span class="dt">variable_update =</span> <span class="st">&quot;name&quot;</span>, 
+                        <span class="dt">value_update =</span> <span class="st">&quot;Old Field 1&quot;</span>)</code></pre></div>
+<pre><code>## Operation Complete</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aWhereAPI<span class="op">::</span><span class="kw">get_fields</span>(<span class="dt">field_id =</span> <span class="st">&quot;1&quot;</span>)</code></pre></div>
+<pre><code>##     fieldName acres latitude longitude  farmId field_id
+## 1 Old Field 1    30       40       -90 My_Farm        1</code></pre>
+</div>
+<div id="deleting-a-field" class="section level4">
+<h4>Deleting a Field</h4>
+<p>If for some reason you need to delete a field from your account, you are able to do so using the <code>delete_field()</code> function. To do so, simply pass in the field_id of the field you wish to delete: <code>delete_field(field_id = &quot;1&quot;)</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aWhereAPI<span class="op">::</span><span class="kw">delete_field</span>(<span class="dt">field_id =</span> <span class="st">&quot;1&quot;</span>)</code></pre></div>
+<pre><code>## Operation Complete</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aWhereAPI<span class="op">::</span><span class="kw">get_fields</span>()</code></pre></div>
+<pre><code>##        fieldName Acres        farmId fieldId Latitude Longitude
+## 1 My First Field   100         farm1  field1  39.8282  -98.5795
+## 2        Field A    35 My_Other_Farm       2  40.0000  -90.0000</code></pre>
+</div>
+</div>
+<div id="weather" class="section level2">
+<h2>Weather</h2>
+<p>The group of aWhere Weather API endpoints allows the user access to aWhere’s unique weather dataset including daily observations, long-term normals, and forecast data. The Weather endpoints can be accessed either by latitude/longitude coordinates or by using the Fields associated with a user’s account. The API R package provides separate functions for field-based requests and location-based requests. It is important to make sure you are using the correct one, otherwise you will run into errors when requesting data.</p>
+<div id="daily-observed-weather" class="section level4">
+<h4>Daily Observed Weather</h4>
+<p>The daily observations endpoint allows weather data retrieval for the past 30 months of data for a variety of important weather attributes. These include maximum and minimum temperature, precipitation amount, solar radiation, maximum and minimum relative humidity, and morning maximum, daily maximum, and daily mean wind speeds. Measurement are returned in metric units. More information on the daily weather observations endpoint can be found here: <a href="http://developer.awhere.com/api/reference/weather/observations" class="uri">http://developer.awhere.com/api/reference/weather/observations</a>.</p>
+<p>The relevant R functions for the daily observed weather data are: <code>daily_observed_latlng()</code> and <code>daily_observed_fields()</code>. Both of these functions require a specified start date and end date for the data you wish to pull. The location-based function will also require a latitude and longitude coordinate, while the fields-based function will require a valid field_id. Possible function calls to retrieve data for the last 30 days would take the following forms: <code>daily_observed_latlng(latitude = 40, longitude = -90, day_start = &quot;2018-10-29&quot;, day_end = &quot;2018-11-27&quot;)</code> <code>daily_observed_fields(field_id = &quot;1&quot;, day_start = &quot;2018-10-29&quot;, day_end = &quot;2018-11-27&quot;)</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">obs_startdate &lt;-<span class="st"> </span><span class="kw">as.character</span>(<span class="kw">Sys.Date</span>() <span class="op">-</span><span class="st"> </span><span class="dv">30</span>)
+obs_enddate &lt;-<span class="st"> </span><span class="kw">as.character</span>(<span class="kw">Sys.Date</span>() <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)
+
+observed &lt;-<span class="st"> </span>aWhereAPI<span class="op">::</span><span class="kw">daily_observed_latlng</span>(<span class="dt">latitude =</span> <span class="dv">40</span>, 
+                                             <span class="dt">longitude =</span> <span class="op">-</span><span class="dv">90</span>, 
+                                             <span class="dt">day_start =</span> obs_startdate, 
+                                             <span class="dt">day_end =</span> obs_enddate)
+
+<span class="co"># take a look at the first 6 rows of location, date, and temperature data</span>
+<span class="kw">head</span>(observed[,<span class="kw">c</span>(<span class="st">'latitude'</span>, <span class="st">'longitude'</span>, <span class="st">'date'</span>,
+                 <span class="st">'temperatures.min'</span>,<span class="st">'temperatures.max'</span>)])</code></pre></div>
+<pre><code>##   latitude longitude       date temperatures.min temperatures.max
+## 1       40       -90 2018-10-29             1.58            18.42
+## 2       40       -90 2018-10-30            10.18            24.33
+## 3       40       -90 2018-10-31             9.52            15.91
+## 4       40       -90 2018-11-01             4.72            10.63
+## 5       40       -90 2018-11-02             0.69            10.98
+## 6       40       -90 2018-11-03             2.15            11.54</code></pre>
+</div>
+<div id="weather-forecasts" class="section level4">
+<h4>Weather Forecasts</h4>
+<p>In addition to daily weather observations, aWhere also provides access to weather forecasts up to 7 days into the future. Forecast data is broken into forecast blocks and the temporal length of these blocks can be specified by the user. Simply put, the block size is the number of hours of data included in a single record of data. In order to retrieve daily forecasts, the block size will be set to 24. Hourly forecasts can also be retrieved by using a block size of 1. The different block sizes available are 1, 2, 3, 4, 6, 8, 12, and 24. More information on the forecast endpoint can be found here: <a href="http://developer.awhere.com/api/reference/weather/forecast" class="uri">http://developer.awhere.com/api/reference/weather/forecast</a>.</p>
+<p>Forecast data includes many different attributes: forecasted text weather conditions (e.g. “Sunny Day”, “Clear Night”), temperatures, precipitation chance and amount, cloud cover, sunshine, solar radiation, maximum and minimum relative humidity, dew point, and mean, maximum, and minimum wind speeds. Like the observed data, there are two different R functions for retrieving forecast data, one for locations and one for fields.</p>
+<p>To retrieve the daily forecast data for the next 7 days (8 if you’d like to include the current date), R function calls should follow these formats: <code>forecasts_latlng(latitude = 40, longitude = -90, day_start = &quot;2018-11-28&quot;, day_end = &quot;2018-12-05&quot;, block_size = 24)</code> <code>forecasts_fields(field_id = &quot;1&quot;, day_start = &quot;2018-11-28&quot;, day_end = &quot;2018-12-05&quot;, block_size = 24)</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">for_startdate &lt;-<span class="st"> </span><span class="kw">as.character</span>(<span class="kw">Sys.Date</span>())
+for_enddate &lt;-<span class="st"> </span><span class="kw">as.character</span>(<span class="kw">Sys.Date</span>() <span class="op">+</span><span class="st"> </span><span class="dv">7</span>)
+
+dailyforecast &lt;-<span class="st"> </span>aWhereAPI<span class="op">::</span><span class="kw">forecasts_latlng</span>(<span class="dt">latitude =</span> <span class="dv">40</span>, 
+                                             <span class="dt">longitude =</span> <span class="op">-</span><span class="dv">90</span>, 
+                                             <span class="dt">day_start =</span> for_startdate, 
+                                             <span class="dt">day_end =</span> for_enddate, 
+                                             <span class="dt">block_size =</span> <span class="dv">24</span>)
+
+<span class="co"># take a look at the first 6 rows of the daily forecast location,</span>
+<span class="co"># starting/ending times, and sky cloud cover data </span>
+<span class="kw">head</span>(dailyforecast[,<span class="kw">c</span>(<span class="st">'latitude'</span>,<span class="st">'longitude'</span>,
+                      <span class="st">'startTime'</span>,<span class="st">'endTime'</span>,<span class="st">'sky.cloudCover'</span>)])</code></pre></div>
+<pre><code>##   latitude longitude                 startTime                   endTime sky.cloudCover
+## 1       40       -90 2018-11-28T00:00:00-06:00 2018-11-28T23:59:59-06:00          63.25
+## 2       40       -90 2018-11-29T00:00:00-06:00 2018-11-29T23:59:59-06:00          80.50
+## 3       40       -90 2018-11-30T00:00:00-06:00 2018-11-30T23:59:59-06:00          98.50
+## 4       40       -90 2018-12-01T00:00:00-06:00 2018-12-01T23:59:59-06:00          65.75
+## 5       40       -90 2018-12-02T00:00:00-06:00 2018-12-02T23:59:59-06:00          96.50
+## 6       40       -90 2018-12-03T00:00:00-06:00 2018-12-03T23:59:59-06:00          97.25</code></pre>
+<p>Hourly forecast data could be retrieved by changing the block_size parameter to 1 instead of 24: <code>forecasts_latlng(latitude = 40, longitude = -90, day_start = &quot;2018-11-28&quot;, day_end = &quot;2018-12-05&quot;, block_size = 1)</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hourlyforecast &lt;-<span class="st"> </span>aWhereAPI<span class="op">::</span><span class="kw">forecasts_latlng</span>(<span class="dt">latitude =</span> <span class="dv">40</span>, 
+                                              <span class="dt">longitude =</span> <span class="op">-</span><span class="dv">90</span>, 
+                                              <span class="dt">day_start =</span> for_startdate, 
+                                              <span class="dt">day_end =</span> for_enddate, 
+                                              <span class="dt">block_size =</span> <span class="dv">1</span>)
+
+<span class="co"># take a look at the first 6 rows of the hourly forecast location,</span>
+<span class="co"># starting/ending times, and sky cloud cover data </span>
+<span class="kw">head</span>(hourlyforecast[,<span class="kw">c</span>(<span class="st">'latitude'</span>,<span class="st">'longitude'</span>,
+                      <span class="st">'startTime'</span>,<span class="st">'endTime'</span>,<span class="st">'sky.cloudCover'</span>)])</code></pre></div>
+<pre><code>##   latitude longitude                 startTime                   endTime sky.cloudCover
+## 1       40       -90 2018-11-28T00:00:00-06:00 2018-11-28T00:59:59-06:00             17
+## 2       40       -90 2018-11-28T01:00:00-06:00 2018-11-28T01:59:59-06:00             17
+## 3       40       -90 2018-11-28T02:00:00-06:00 2018-11-28T02:59:59-06:00             17
+## 4       40       -90 2018-11-28T03:00:00-06:00 2018-11-28T03:59:59-06:00              1
+## 5       40       -90 2018-11-28T04:00:00-06:00 2018-11-28T04:59:59-06:00              1
+## 6       40       -90 2018-11-28T05:00:00-06:00 2018-11-28T05:59:59-06:00              1</code></pre>
+</div>
+<div id="historical-weather-norms" class="section level4">
+<h4>Historical Weather Norms</h4>
+<p>To provide a longer date range of access to our historical weather data, the Historical Weather Norms API endpoint returns averages and standard deviations of our weather attributes. These values are useful for comparing recent weather events and data to their long-term averages. Using the Weather Norms endpoint requires a slightly different use of dates when retrieving data. Rather than passing in a date, e.g. “2018-06-30”, we pass in month and day combinations, e.g. “06-30”. Using this in the relevant R functions is how a user would return the long-term normals for June 30th.</p>
+<p>Like the two above endpoints, the weather norms data has a location-based function, <code>weather_norms_latlng()</code> and a field-based function, <code>weather_norms_fields()</code>. There are also two parameters that must be included in the function call: year_start and year_end. These two parameters are used to specify the range of years you would like included in the long-term normals calculations. You must have at least 3 years included to run the calculations. Examples of the two are as follows: <code>weather_norms_latlng(latitude = 40, longitude = -90, monthday_start = &quot;06-01&quot;, monthday_end = &quot;06-30&quot;, year_start = 2006, year_end = 2017)</code> <code>weather_norms_fields(field_id = &quot;1&quot;, monthday_start = &quot;06-01&quot;, monthday_end = &quot;06-30&quot;, year_start = 2006, year_end = 2017)</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">norms &lt;-<span class="st"> </span>aWhereAPI<span class="op">::</span><span class="kw">weather_norms_latlng</span>(<span class="dt">latitude =</span> <span class="dv">40</span>, 
+                                         <span class="dt">longitude =</span> <span class="op">-</span><span class="dv">90</span>, 
+                                         <span class="dt">monthday_start =</span> <span class="st">&quot;06-01&quot;</span>, 
+                                         <span class="dt">monthday_end =</span> <span class="st">&quot;06-30&quot;</span>, 
+                                         <span class="dt">year_start =</span> <span class="dv">2006</span>, 
+                                         <span class="dt">year_end =</span> <span class="dv">2017</span>)
+
+<span class="co"># take a look at the first 6 rows of the long-term normal data</span>
+<span class="co"># location, date, max precipitation, and average precipitation</span>
+<span class="kw">head</span>(norms[,<span class="kw">c</span>(<span class="st">'latitude'</span>,<span class="st">'longitude'</span>,<span class="st">'day'</span>,
+              <span class="st">'maxTemp.average'</span>,<span class="st">'precipitation.average'</span>)])</code></pre></div>
+<pre><code>##   latitude longitude   day maxTemp.average precipitation.average
+## 1       40       -90 06-01        25.66667             7.2410683
+## 2       40       -90 06-02        27.29833             3.3206007
+## 3       40       -90 06-03        26.54667             9.6951429
+## 4       40       -90 06-04        27.23750            10.3041492
+## 5       40       -90 06-05        27.83000             0.9078049
+## 6       40       -90 06-06        27.59250             1.6667421</code></pre>
+</div>
+</div>
+<div id="assigning-and-exporting-data" class="section level2">
+<h2>Assigning and Exporting Data</h2>
+<p>If you would like to save data that you’ve pulled from the aWhere API and either continue to use it in R, or export it and use it in another program outside of R, we’ll need to assign the data from the API to an R variable: Using a variable name, in this case <code>observed</code>, and R’s assignment operator <code>&lt;-</code>, we can assign the data from the API call into this new variable like so: <code>observed &lt;- daily_observed_latlng(latitude = 40, longitude = -90, day_start = &quot;2018-10-29&quot;, day_end = &quot;2018-11-27&quot;)</code>.</p>
+<p>Now we can simply reference the <code>observed</code> variable to perform operations on the data or to simply see what it looks like:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># take a look at the first 6 rows of location, date, and temperature data</span>
+<span class="kw">head</span>(observed[,<span class="kw">c</span>(<span class="st">'latitude'</span>, <span class="st">'longitude'</span>, <span class="st">'date'</span>,
+                 <span class="st">'temperatures.min'</span>,<span class="st">'temperatures.max'</span>)])</code></pre></div>
+<pre><code>##   latitude longitude       date temperatures.min temperatures.max
+## 1       40       -90 2018-10-29             1.58            18.42
+## 2       40       -90 2018-10-30            10.18            24.33
+## 3       40       -90 2018-10-31             9.52            15.91
+## 4       40       -90 2018-11-01             4.72            10.63
+## 5       40       -90 2018-11-02             0.69            10.98
+## 6       40       -90 2018-11-03             2.15            11.54</code></pre>
+<p>Assigning data you pull from the API to a variable within R will keep you from having to requery the API in your analyses.</p>
+<p>Now that we have data in this <code>observed</code> variable, we can also use it to save the data to a variety of different formats. A comprehensive guide to importing and exporting data with R can be found here: <a href="https://cran.r-project.org/doc/manuals/r-release/R-data.pdf" class="uri">https://cran.r-project.org/doc/manuals/r-release/R-data.pdf</a>.</p>
+<p>We’ll use a CSV (comma-separated values) file for our export example. CSV files are extremely common and can be easily handled by most applications. To save our observed data into an CSV file the following command will work, substituting in your file path: <code>write.csv(observed, file = &quot;/path/to/file/observed.csv&quot;, row.names = F)</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">write.csv</span>(observed, <span class="dt">file =</span> <span class="st">&quot;testFile.csv&quot;</span>, <span class="dt">row.names =</span> F)</code></pre></div>
+<p>Now that the data has been saved to a CSV, we can read it back in just as easily:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">obs_csv &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">file =</span> <span class="st">&quot;testFile.csv&quot;</span>, <span class="dt">header =</span> T, 
+                    <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p>To make sure the two data frames are equal, we can take a look at the top few rows for each of them:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># take a look at the first 6 rows of location, date, and temperature </span>
+
+<span class="co"># for the orignal data frame</span>
+<span class="kw">head</span>(observed[,<span class="kw">c</span>(<span class="st">'latitude'</span>, <span class="st">'longitude'</span>, <span class="st">'date'</span>,
+                 <span class="st">'temperatures.min'</span>,<span class="st">'temperatures.max'</span>)])</code></pre></div>
+<pre><code>##   latitude longitude       date temperatures.min temperatures.max
+## 1       40       -90 2018-10-29             1.58            18.42
+## 2       40       -90 2018-10-30            10.18            24.33
+## 3       40       -90 2018-10-31             9.52            15.91
+## 4       40       -90 2018-11-01             4.72            10.63
+## 5       40       -90 2018-11-02             0.69            10.98
+## 6       40       -90 2018-11-03             2.15            11.54</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># for the CSV data </span>
+<span class="kw">head</span>(obs_csv[,<span class="kw">c</span>(<span class="st">'latitude'</span>, <span class="st">'longitude'</span>, <span class="st">'date'</span>,
+                 <span class="st">'temperatures.min'</span>,<span class="st">'temperatures.max'</span>)])</code></pre></div>
+<pre><code>##   latitude longitude       date temperatures.min temperatures.max
+## 1       40       -90 2018-10-29             1.58            18.42
+## 2       40       -90 2018-10-30            10.18            24.33
+## 3       40       -90 2018-10-31             9.52            15.91
+## 4       40       -90 2018-11-01             4.72            10.63
+## 5       40       -90 2018-11-02             0.69            10.98
+## 6       40       -90 2018-11-03             2.15            11.54</code></pre>
+<p>You can also use the <code>all.equal</code> function to see if the two data frames are equivalent:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">all.equal</span>(observed, obs_csv)</code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
