@@ -149,10 +149,14 @@ agronomic_values_fields <- function(field_id
   }
 
   varNames <- colnames(data)
+
   suppressWarnings(data[,grep('_links',varNames) := NULL])
   suppressWarnings(data[,grep('.units',varNames) := NULL])
+  suppressWarnings(data[,grep('latitude',varNames) := NULL])
+  suppressWarnings(data[,grep('longitude',varNames) := NULL])
 
   currentNames <- data.table::copy(colnames(data))
+
   data[,field_id  := field_id]
   data.table::setcolorder(data,c('field_id',currentNames))
 
@@ -304,12 +308,17 @@ agronomic_values_latlng <- function(latitude
   }
 
   varNames <- colnames(data)
+
   suppressWarnings(data[,grep('_links',varNames) := NULL])
   suppressWarnings(data[,grep('.units',varNames) := NULL])
+  suppressWarnings(data[,grep('latitude',varNames) := NULL])
+  suppressWarnings(data[,grep('longitude',varNames) := NULL])
 
   currentNames <- data.table::copy(colnames(data))
+
   data[,latitude  := latitude]
   data[,longitude := longitude]
+
   data.table::setcolorder(data,c('latitude','longitude',currentNames))
 
   checkDataReturn_daily(data,day_start,day_end)

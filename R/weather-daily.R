@@ -160,19 +160,22 @@ daily_observed_fields <- function(field_id
     dataList[[i]] <- data
   }
 
-  allWeath <- rbindlist(dataList)
+  data <- rbindlist(dataList)
 
-  varNames <- colnames(allWeath)
+  varNames <- colnames(data)
 
   #This removes the non-data info returned with the JSON object
-  allWeath[,grep('_links',varNames) := NULL]
-  allWeath[,grep('.units',varNames) := NULL]
+  suppressWarnings(data[,grep('_links',varNames) := NULL])
+  suppressWarnings(data[,grep('.units',varNames) := NULL])
+  suppressWarnings(data[,grep('latitude',varNames) := NULL])
+  suppressWarnings(data[,grep('longitude',varNames) := NULL])
 
-  currentNames <- data.table::copy(colnames(allWeath))
-  allWeath[,field_id  := field_id]
-  data.table::setcolorder(allWeath,c('field_id',currentNames))
+  currentNames <- data.table::copy(colnames(data))
 
-  checkDataReturn_daily(allWeath,day_start,day_end)
+  data[,field_id  := field_id]
+  data.table::setcolorder(data,c('field_id',currentNames))
+
+  checkDataReturn_daily(data,day_start,day_end)
 
   return(as.data.frame(allWeath))
 }
@@ -266,7 +269,7 @@ daily_observed_latlng <- function(latitude
   if(remainder > 0) {
     loops <- loops + 1
   }
-  i <- 1
+
 
   dataList <- list()
 
@@ -331,20 +334,25 @@ daily_observed_latlng <- function(latitude
     dataList[[i]] <- data
 
   }
-  allWeath <- rbindlist(dataList)
 
-  varNames <- colnames(allWeath)
+  data <- rbindlist(dataList)
+
+  varNames <- colnames(data)
 
   #This removes the non-data info returned with the JSON object
-  allWeath[,grep('_links',varNames) := NULL]
-  allWeath[,grep('.units',varNames) := NULL]
+  suppressWarnings(data[,grep('_links',varNames) := NULL])
+  suppressWarnings(data[,grep('.units',varNames) := NULL])
+  suppressWarnings(data[,grep('latitude',varNames) := NULL])
+  suppressWarnings(data[,grep('longitude',varNames) := NULL])
 
-  currentNames <- data.table::copy(colnames(allWeath))
-  allWeath[,latitude  := latitude]
-  allWeath[,longitude := longitude]
-  data.table::setcolorder(allWeath,c('latitude','longitude',currentNames))
+  currentNames <- data.table::copy(colnames(data))
 
-  checkDataReturn_daily(allWeath,day_start,day_end)
+  data[,latitude  := latitude]
+  data[,longitude := longitude]
+
+  data.table::setcolorder(data,c('latitude','longitude',currentNames))
+
+  checkDataReturn_daily(data,day_start,day_end)
 
   return(as.data.frame(allWeath))
 }

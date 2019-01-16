@@ -110,9 +110,10 @@ forecasts_fields <- function(field_id
   varNames <- colnames(data)
 
   #This removes the non-data info returned with the JSON object
-  data[,grep('.units',varNames) := NULL]
-
-  data[,c('soilTemperatures','soilMoisture') := NULL]
+  suppressWarnings(data[,grep('.units',varNames) := NULL])
+  suppressWarnings(data[,c('soilTemperatures','soilMoisture') := NULL])
+  suppressWarnings(data[,grep('latitude',varNames) := NULL])
+  suppressWarnings(data[,grep('longitude',varNames) := NULL])
 
   currentNames <- data.table::copy(colnames(data))
   data[,field_id  := field_id]
@@ -235,12 +236,15 @@ forecasts_latlng <- function(latitude
 
   #This removes the non-data info returned with the JSON object
   data[,grep('.units',varNames) := NULL]
-
   data[,c('soilTemperatures','soilMoisture') := NULL]
+  suppressWarnings(data[,grep('latitude',varNames) := NULL])
+  suppressWarnings(data[,grep('longitude',varNames) := NULL])
 
   currentNames <- data.table::copy(colnames(data))
+
   data[,latitude  := latitude]
   data[,longitude := longitude]
+
   data.table::setcolorder(data,c('latitude','longitude',currentNames))
 
   if(block_size == 1) {

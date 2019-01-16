@@ -140,11 +140,15 @@ weather_norms_fields <- function(field_id
   }
 
   varNames <- colnames(data)
+
   #This removes the non-data info returned with the JSON object
-  data[,grep('_links',varNames) := NULL]
-  data[,grep('.units',varNames) := NULL]
+  suppressWarnings(data[,grep('_links',varNames) := NULL])
+  suppressWarnings(data[,grep('.units',varNames) := NULL])
+  suppressWarnings(data[,grep('latitude',varNames) := NULL])
+  suppressWarnings(data[,grep('longitude',varNames) := NULL])
 
   currentNames <- data.table::copy(colnames(data))
+
   data[,field_id  := field_id]
   data.table::setcolorder(data,c('field_id',currentNames))
 
@@ -297,13 +301,18 @@ weather_norms_latlng <- function(latitude
   }
 
   varNames <- colnames(data)
-  #This removes the non-data info returned with the JSON object
-  data[,grep('_links',varNames) := NULL]
-  data[,grep('.units',varNames) := NULL]
 
-  currentNames <- data.table::copy(colnames(data))
+  #This removes the non-data info returned with the JSON object
+  suppressWarnings(data[,grep('_links',varNames) := NULL])
+  suppressWarnings(data[,grep('.units',varNames) := NULL])
+  suppressWarnings(data[,grep('latitude',varNames) := NULL])
+  suppressWarnings(data[,grep('longitude',varNames) := NULL])
+
   data[,latitude  := latitude]
   data[,longitude := longitude]
+
+  currentNames <- data.table::copy(colnames(data))
+
   data.table::setcolorder(data,c('latitude','longitude',currentNames))
 
   aWhereAPI:::checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years,includeFeb29thData)
