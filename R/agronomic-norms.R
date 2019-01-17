@@ -116,86 +116,200 @@ agronomic_norms_fields <- function(field_id
   checkAccumulationStartDateNorms(accumulation_start_date,month_day_start)
   checkPropertiesEndpoint('agronomics',propertiesToInclude)
 
+  # Create Logic of API Request
+  numObsReturned <- 120
+  calculateAPIRequests <- TRUE
+  continueRequestingData <- TRUE
 
-  # Create query
+  yearsToInclude <- setdiff(seq(year_start,year_end,1),exclude_years)
 
-  urlAddress <- "https://api.awhere.com/v2/agronomics"
+  dataList <- list()
 
-  strBeg <- paste0('/fields')
-  strCoord <- paste0('/',field_id)
-  strType <- paste0('/agronomicnorms')
+  # loop through, making requests in chunks of size numObsReturned
+  while (continueRequestingData == TRUE | calculateAPIRequests == TRUE) {
 
-  if (month_day_start != '' & month_day_end != '') {
-    strMonthsDays <- paste0('/',month_day_start,',',month_day_end)
-  } else if (month_day_end != '') {
-    strMonthsDays <- paste0('/',month_day_start,',',month_day_start)
-  } else {
-    strMonthsDays <- ''
+    #If this clause is triggered the progression of API calls will be
+    #calculated.  After each API call the return will be checked for an error
+    #indicating that the request was too large.  If that occurs this loop will
+    #be reenentered to calculate using the smaller return size
+
+    ############################################################################
+    if (calculateAPIRequests == TRUE) {
+
+      calculateAPIRequests <- FALSE
+
+      #We need to consider whether a year year is present to determine if Fe
+      #29th data will be returned
+      includesLeapYear <- any(is.leapyear(yearsToInclude))
+
+      if (includesLeapYear == TRUE) {
+
+        yearPrefix <- paste0(yearsToInclude[is.leapyear(yearsToInclude)][1],'-')
+
+      } else {
+
+        yearPrefix <- paste0(yearsToInclude[1],'-')
+
+      }
+
+      day_start <- ymd(paste0(yearPrefix
+                              ,month_day_start))
+
+      day_end <- ymd(paste0(yearPrefix
+                            ,month_day_end))
+
+
+      temp <- plan_APICalls(day_start
+                            ,day_end
+                            ,numObsReturned)
+      allDates <- temp[[1]]
+      loops <- temp[[2]]
+
+      #remove the years
+      allDates <-  gsub(pattern = yearPrefix,replacement = '',x = allDates,fixed = TRUE)
+    }
+
+    #This for loop will make the API requests as calculated from above
+    ############################################################################
+    for (i in 1:loops) {
+
+      starting = numObsReturned*(i-1)+1
+      ending = numObsReturned*i
+      monthday_start_toUse <- allDates[starting]
+      monthday_end_toUse <- allDates[ending]
+
+      if(is.na(monthday_end_toUse)) {
+        tempDates <- allDates[c(starting:length(allDates))]
+        monthday_start_toUse <- tempDates[1]
+        monthday_end_toUse   <- tempDates[length(tempDates)]
+      }
+
+
+      ##############################################################################
+
+      # Create query
+      urlAddress <- "https://api.awhere.com/v2/agronomics"
+
+      strBeg <- paste0('/fields')
+      strCoord <- paste0('/',field_id)
+      strType <- paste0('/agronomicnorms')
+
+      strMonthsDays <- paste0('/',monthday_start_toUse,',',monthday_end_toUse)
+
+      returnedAmount <- as.integer(difftime(lubridate::ymd(paste0(yearPrefix,monthday_end_toUse))
+                                            ,lubridate::ymd(paste0(yearPrefix,monthday_start_toUse))
+                                            ,units = 'days')) + 1L
+
+      if (returnedAmount > numObsReturned) {
+        returnedAmount <- numObsReturned
+      }
+
+      limitString <- paste0('?limit=',returnedAmount)
+
+      if (length(exclude_years) != 0) {
+        strexclude_years <- paste0('&excludeYears=',toString(exclude_years))
+      } else {
+        strexclude_years <- ''
+      }
+
+      if (propertiesToInclude[1] != '') {
+        propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+      } else {
+        propertiesString <- ''
+      }
+
+      strYearsType <- paste0('/years')
+      strYears <- paste0('/',year_start,',',year_end)
+
+
+      if (accumulation_start_date != '') {
+        strAccumulation <- paste0('&accumulationStartDay=',accumulation_start_date)
+      } else {
+        strAccumulation <- ''
+      }
+
+      gdd_methodString       <- paste0('&gddMethod=',gdd_method)
+      gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
+      gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
+      gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
+
+      url <- paste0(urlAddress
+                    ,strBeg
+                    ,strCoord
+                    ,strType
+                    ,strMonthsDays
+                    ,strYearsType
+                    ,strYears
+                    ,limitString
+                    ,gdd_methodString
+                    ,gdd_base_tempString
+                    ,gdd_min_boundaryString
+                    ,gdd_max_boundaryString
+                    ,strexclude_years
+                    ,strAccumulation
+                    ,propertiesString)
+
+      doWeatherGet <- TRUE
+      while (doWeatherGet == TRUE) {
+        postbody = ''
+        request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
+                             httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
+
+        a <- suppressMessages(httr::content(request, as = "text"))
+
+        temp <- check_JSON(a,request)
+        doWeatherGet <- temp[[1]]
+
+        #The temp[[2]] will only not be NA when the limit param is too large.
+        if(!is.na(temp[[2]] == TRUE)) {
+          numObsReturned <- temp[[2]]
+          goodReturn <- FALSE
+
+          break
+        } else {
+          goodReturn <- TRUE
+        }
+
+        rm(temp)
+      }
+
+
+      if (goodReturn == TRUE) {
+        #The JSONLITE Serializer properly handles the JSON conversion
+        x <- jsonlite::fromJSON(a,flatten = TRUE)
+
+        if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == FALSE) {
+          data <- as.data.table(x[[1]])
+        } else if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == TRUE) {
+          data <- as.data.table(x[[2]])
+        } else {
+          data <- as.data.table(x[[3]])
+        }
+
+        dataList[[length(dataList) + 1]] <- data
+      } else {
+        #This will break out of the current loop of making API requests so that
+        #the logic of the API requests can be recalculated
+
+        calculateAPIRequests <- TRUE
+      }
+    }
+    continueRequestingData <- FALSE
   }
 
-  if (accumulation_start_date != '') {
-    strAccumulation <- paste0('&accumulationStartDay=',accumulation_start_date)
-  } else {
-    strAccumulation <- ''
-  }
-
-  if (length(exclude_years) != 0) {
-    strexclude_years <- paste0('&excludeYears=',toString(exclude_years))
-  } else {
-    strexclude_years <- ''
-  }
-
-  gdd_methodString      <- paste0('?gddMethod=',gdd_method)
-  gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
-  gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
-  gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
-
-  if (propertiesToInclude[1] != '') {
-    propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
-  } else {
-    propertiesString <- ''
-  }
-
-  strYearsType <- paste0('/years')
-  strYears <- paste0('/',year_start,',',year_end)
-  url <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,
-                    strYears,gdd_methodString,gdd_base_tempString,gdd_min_boundaryString,
-                    gdd_max_boundaryString,strexclude_years,strAccumulation,propertiesString)
-
-  doWeatherGet <- TRUE
-  while (doWeatherGet == TRUE) {
-    postbody = ''
-    request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
-    a <- suppressMessages(httr::content(request, as = "text"))
-
-    doWeatherGet <- check_JSON(a,request)
-  }
-
-  #The JSONLITE Serializer properly handles the JSON conversion
-  x <- jsonlite::fromJSON(a,flatten = TRUE)
-
-  if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == FALSE) {
-    data <- as.data.table(x[[1]])
-  } else if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == TRUE) {
-    data <- as.data.table(x[[2]])
-  } else {
-    data <- as.data.table(x[[3]])
-  }
+  data <- unique(rbindlist(dataList))
 
   #Get rid of leap yearData
   if (includeFeb29thData == FALSE) {
     data <- data[day != '02-29',]
   }
 
-  varNames <- colnames(data)
-  #This removes the non-data info returned with the JSON object
-  suppressWarnings(data[,grep('_links',varNames) := NULL])
-  suppressWarnings(data[,grep('.units',varNames) := NULL])
+  data <- removeUnnecessaryColumns(data)
 
   currentNames <- data.table::copy(colnames(data))
+
   data[,field_id  := field_id]
+
   data.table::setcolorder(data,c('field_id',currentNames))
 
   checkDataReturn_norms(data,month_day_start,month_day_end,year_start,year_end,exclude_years,includeFeb29thData)
@@ -325,84 +439,201 @@ agronomic_norms_latlng <- function(latitude
   checkAccumulationStartDateNorms(accumulation_start_date,month_day_start)
   checkPropertiesEndpoint('agronomics',propertiesToInclude)
 
-  # Create query
+  # Create Logic of API Request
+  numObsReturned <- 120
+  calculateAPIRequests <- TRUE
+  continueRequestingData <- TRUE
 
-  urlAddress <- "https://api.awhere.com/v2/agronomics"
+  yearsToInclude <- setdiff(seq(year_start,year_end,1),exclude_years)
 
-  strBeg <- paste0('/locations')
-  strCoord <- paste0('/',latitude,',',longitude)
-  strType <- paste0('/agronomicnorms')
+  dataList <- list()
 
-  if (month_day_end != '') {
-    strMonthsDays <- paste0('/',month_day_start,',',month_day_end)
-  } else {
-    strMonthsDays <- paste0('/',month_day_start,',',month_day_start)
+  # loop through, making requests in chunks of size numObsReturned
+  while (continueRequestingData == TRUE | calculateAPIRequests == TRUE) {
+
+    #If this clause is triggered the progression of API calls will be
+    #calculated.  After each API call the return will be checked for an error
+    #indicating that the request was too large.  If that occurs this loop will
+    #be reenentered to calculate using the smaller return size
+
+    ############################################################################
+    if (calculateAPIRequests == TRUE) {
+
+      calculateAPIRequests <- FALSE
+
+      #We need to consider whether a year year is present to determine if Fe
+      #29th data will be returned
+      includesLeapYear <- any(is.leapyear(yearsToInclude))
+
+      if (includesLeapYear == TRUE) {
+
+        yearPrefix <- paste0(yearsToInclude[is.leapyear(yearsToInclude)][1],'-')
+
+      } else {
+
+        yearPrefix <- paste0(yearsToInclude[1],'-')
+
+      }
+
+      day_start <- ymd(paste0(yearPrefix
+                              ,month_day_start))
+
+      day_end <- ymd(paste0(yearPrefix
+                            ,month_day_end))
+
+
+      temp <- plan_APICalls(day_start
+                            ,day_end
+                            ,numObsReturned)
+      allDates <- temp[[1]]
+      loops <- temp[[2]]
+
+      #remove the years
+      allDates <-  gsub(pattern = yearPrefix,replacement = '',x = allDates,fixed = TRUE)
+    }
+
+    #This for loop will make the API requests as calculated from above
+    ############################################################################
+    for (i in 1:loops) {
+
+      starting = numObsReturned*(i-1)+1
+      ending = numObsReturned*i
+      monthday_start_toUse <- allDates[starting]
+      monthday_end_toUse <- allDates[ending]
+
+      if(is.na(monthday_end_toUse)) {
+        tempDates <- allDates[c(starting:length(allDates))]
+        monthday_start_toUse <- tempDates[1]
+        monthday_end_toUse   <- tempDates[length(tempDates)]
+      }
+
+
+      ##############################################################################
+
+      # Create query
+      urlAddress <- "https://api.awhere.com/v2/agronomics"
+
+      strBeg <- paste0('/locations')
+      strCoord <- paste0('/',latitude,',',longitude)
+      strType <- paste0('/agronomicnorms')
+
+      strMonthsDays <- paste0('/',monthday_start_toUse,',',monthday_end_toUse)
+
+      returnedAmount <- as.integer(difftime(lubridate::ymd(paste0(yearPrefix,monthday_end_toUse))
+                                            ,lubridate::ymd(paste0(yearPrefix,monthday_start_toUse))
+                                            ,units = 'days')) + 1L
+
+      if (returnedAmount > numObsReturned) {
+        returnedAmount <- numObsReturned
+      }
+
+      limitString <- paste0('?limit=',returnedAmount)
+
+      if (length(exclude_years) != 0) {
+        strexclude_years <- paste0('&excludeYears=',toString(exclude_years))
+      } else {
+        strexclude_years <- ''
+      }
+
+      if (propertiesToInclude[1] != '') {
+        propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+      } else {
+        propertiesString <- ''
+      }
+
+      strYearsType <- paste0('/years')
+      strYears <- paste0('/',year_start,',',year_end)
+
+
+      if (accumulation_start_date != '') {
+        strAccumulation <- paste0('&accumulationStartDay=',accumulation_start_date)
+      } else {
+        strAccumulation <- ''
+      }
+
+      gdd_methodString       <- paste0('&gddMethod=',gdd_method)
+      gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
+      gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
+      gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
+
+      url <- paste0(urlAddress
+                    ,strBeg
+                    ,strCoord
+                    ,strType
+                    ,strMonthsDays
+                    ,strYearsType
+                    ,strYears
+                    ,limitString
+                    ,gdd_methodString
+                    ,gdd_base_tempString
+                    ,gdd_min_boundaryString
+                    ,gdd_max_boundaryString
+                    ,strexclude_years
+                    ,strAccumulation
+                    ,propertiesString)
+
+      doWeatherGet <- TRUE
+      while (doWeatherGet == TRUE) {
+        postbody = ''
+        request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
+                             httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
+
+        a <- suppressMessages(httr::content(request, as = "text"))
+
+        temp <- check_JSON(a,request)
+        doWeatherGet <- temp[[1]]
+
+        #The temp[[2]] will only not be NA when the limit param is too large.
+        if(!is.na(temp[[2]] == TRUE)) {
+          numObsReturned <- temp[[2]]
+          goodReturn <- FALSE
+
+          break
+        } else {
+          goodReturn <- TRUE
+        }
+
+        rm(temp)
+      }
+
+
+      if (goodReturn == TRUE) {
+        #The JSONLITE Serializer properly handles the JSON conversion
+        x <- jsonlite::fromJSON(a,flatten = TRUE)
+
+        if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == FALSE) {
+          data <- as.data.table(x[[1]])
+        } else if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == TRUE) {
+          data <- as.data.table(x[[2]])
+        } else {
+          data <- as.data.table(x[[3]])
+        }
+
+        dataList[[length(dataList) + 1]] <- data
+      } else {
+        #This will break out of the current loop of making API requests so that
+        #the logic of the API requests can be recalculated
+
+        calculateAPIRequests <- TRUE
+      }
+    }
+    continueRequestingData <- FALSE
   }
 
-  if (accumulation_start_date != '') {
-    strAccumulation <- paste0('&accumulationStartDay=',accumulation_start_date)
-  } else {
-    strAccumulation <- ''
-  }
-
-  if (length(exclude_years) != 0) {
-    strexclude_years <- paste0('&excludeYears=',toString(exclude_years))
-  } else {
-    strexclude_years <- ''
-  }
-
-  gdd_methodString       <- paste0('?gddMethod=',gdd_method)
-  gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
-  gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
-  gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
-
-  if (propertiesToInclude[1] != '') {
-    propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
-  } else {
-    propertiesString <- ''
-  }
-
-  strYearsType <- paste0('/years')
-  strYears <- paste0('/',year_start,',',year_end)
-  url <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,
-                    strYears,gdd_methodString,gdd_base_tempString,gdd_min_boundaryString,
-                    gdd_max_boundaryString,strexclude_years,strAccumulation,propertiesString)
-
-  doWeatherGet <- TRUE
-  while (doWeatherGet == TRUE) {
-    postbody = ''
-    request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
-    a <- suppressMessages(httr::content(request, as = "text"))
-
-    doWeatherGet <- check_JSON(a,request)
-  }
-
-  #The JSONLITE Serializer properly handles the JSON conversion
-  x <- jsonlite::fromJSON(a,flatten = TRUE)
-
-  if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == FALSE) {
-    data <- as.data.table(x[[1]])
-  } else if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == TRUE) {
-    data <- as.data.table(x[[2]])
-  } else {
-    data <- as.data.table(x[[3]])
-  }
+  data <- unique(rbindlist(dataList))
 
   #Get rid of leap yearData
   if (includeFeb29thData == FALSE) {
     data <- data[day != '02-29',]
   }
 
-  varNames <- colnames(data)
-  #This removes the non-data info returned with the JSON object
-  suppressWarnings(data[,grep('_links',varNames) := NULL])
-  suppressWarnings(data[,grep('.units',varNames) := NULL])
+  data <- removeUnnecessaryColumns(data)
 
   currentNames <- data.table::copy(colnames(data))
+
   data[,latitude  := latitude]
   data[,longitude := longitude]
+
   data.table::setcolorder(data,c('latitude','longitude',currentNames))
 
   checkDataReturn_norms(data,month_day_start,month_day_end,year_start,year_end,exclude_years,includeFeb29thData)
@@ -537,7 +768,7 @@ agronomic_norms_area <- function(polygon
 
   #Checking Input Parameters
   checkCredentials(keyToUse,secretToUse,tokenToUse)
-  checkNormsStartEndDates(monthday_start,monthday_end)
+  checkNormsStartEndDates(month_day_start,month_day_end)
   checkNormsYearsToRequest(year_start,year_end,month_day_start,month_day_end,exclude_years)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
   checkAccumulationStartDateNorms(accumulation_start_date,month_day_start)

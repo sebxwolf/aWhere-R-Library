@@ -27,7 +27,9 @@ you're calculating norms, in the form YYYY. e.g., 2008 (required)}
 \item{-}{year_end: character string of the last year (inclusive) of the range of years for which
 you're calculating norms, in the form YYYY. e.g., 2015 (required)}
 
-\item{-}{propertiesToInclude: character vector of properties to retrieve from API.  Valid values are meanTemp, maxTemp, minTemp, precipitation, solar, maxHumidity, minHumidity, dailyMaxWind (optional)}
+\item{-}{propertiesToInclude: character vector of properties to retrieve from API.
+Valid values are meanTemp, maxTemp, minTemp, precipitation,
+solar, maxHumidity, minHumidity, dailyMaxWind (optional)}
 
 \item{-}{exclude_year: Year or years which you'd like to exclude from
  your range of years on which to calculate norms. To exclude

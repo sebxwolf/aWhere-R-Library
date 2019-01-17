@@ -8,7 +8,7 @@
 
 verify_api_calls <- function(grid,bypassNumCallCheck) {
   if (bypassNumCallCheck == FALSE) {
-    cat(paste0('This query will require ',nrow(grid),' API Calls \n'))
+    cat(paste0('This query will require data from ',nrow(grid),' locations \n'))
     makeAPICalls <- readline("Do you wish to proceed? Type yes to begin API calls: ")
 
     if (tolower(makeAPICalls) != 'yes') {

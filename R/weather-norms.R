@@ -31,7 +31,9 @@
 #'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
 #' @param - year_end: character string of the last year (inclusive) of the range of years for which
 #'                     you're calculating norms, in the form YYYY. e.g., 2015 (required)
-#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are meanTemp, maxTemp, minTemp, precipitation, solar, maxHumidity, minHumidity, dailyMaxWind (optional)
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.
+#'                               Valid values are meanTemp, maxTemp, minTemp, precipitation,
+#'                               solar, maxHumidity, minHumidity, dailyMaxWind (optional)
 #' @param - exclude_year: Year or years which you'd like to exclude from
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
@@ -78,77 +80,180 @@ weather_norms_fields <- function(field_id
   checkNormsYearsToRequest(year_start,year_end,monthday_start,monthday_end,exclude_years)
   checkPropertiesEndpoint('weather_norms',propertiesToInclude)
 
-  ##############################################################################
+  # Create Logic of API Request
+  numObsReturned <- 120
+  calculateAPIRequests <- TRUE
+  continueRequestingData <- TRUE
 
-  # Create query
+  yearsToInclude <- setdiff(seq(year_start,year_end,1),exclude_years)
 
-  urlAddress <- "https://api.awhere.com/v2/weather"
+  dataList <- list()
 
-  strBeg <- paste0('/fields')
-  strCoord <- paste0('/',field_id)
-  strType <- paste0('/norms')
+  # loop through, making requests in chunks of size numObsReturned
+  while (continueRequestingData == TRUE | calculateAPIRequests == TRUE) {
 
-  if (monthday_start != '' & monthday_end != '') {
-    strMonthsDays <- paste0('/',monthday_start,',',monthday_end)
-  } else if (monthday_end != '') {
-    strMonthsDays <- paste0('/',monthday_start,',',monthday_start)
-  } else {
-    strMonthsDays <- ''
-  }
+    #If this clause is triggered the progression of API calls will be
+    #calculated.  After each API call the return will be checked for an error
+    #indicating that the request was too large.  If that occurs this loop will
+    #be reenentered to calculate using the smaller return size
 
-  if (length(exclude_years) != 0) {
-    strexclude_years <- paste0('?excludeYears=',toString(exclude_years))
-  } else {
-    strexclude_years <- ''
-  }
+    ############################################################################
+    if (calculateAPIRequests == TRUE) {
 
-  if (propertiesToInclude[1] != '') {
-    if (strexclude_years == '') {
-      propertiesString <- paste0('?properties=',paste0(propertiesToInclude,collapse = ','))
-    } else {
-      propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+      calculateAPIRequests <- FALSE
+
+      #We need to consider whether a year year is present to determine if Fe
+      #29th data will be returned
+      includesLeapYear <- any(is.leapyear(yearsToInclude))
+
+      if (includesLeapYear == TRUE) {
+
+        yearPrefix <- paste0(yearsToInclude[is.leapyear(yearsToInclude)][1],'-')
+
+      } else {
+
+        yearPrefix <- paste0(yearsToInclude[1],'-')
+
+      }
+
+      day_start <- ymd(paste0(yearPrefix
+                              ,monthday_start))
+
+      day_end <- ymd(paste0(yearPrefix
+                            ,monthday_end))
+
+
+      temp <- plan_APICalls(day_start
+                            ,day_end
+                            ,numObsReturned)
+      allDates <- temp[[1]]
+      loops <- temp[[2]]
+
+      #remove the years
+      allDates <-  gsub(pattern = yearPrefix,replacement = '',x = allDates,fixed = TRUE)
     }
-  } else {
-    propertiesString <- ''
+
+    #This for loop will make the API requests as calculated from above
+    ############################################################################
+    for (i in 1:loops) {
+
+      starting = numObsReturned*(i-1)+1
+      ending = numObsReturned*i
+      monthday_start_toUse <- allDates[starting]
+      monthday_end_toUse <- allDates[ending]
+
+      if(is.na(monthday_end_toUse)) {
+        tempDates <- allDates[c(starting:length(allDates))]
+        monthday_start_toUse <- tempDates[1]
+        monthday_end_toUse   <- tempDates[length(tempDates)]
+      }
+
+
+      ##############################################################################
+
+      # Create query
+
+      urlAddress <- "https://api.awhere.com/v2/weather"
+
+      strBeg <- paste0('/fields')
+      strCoord <- paste0('/',field_id)
+      strType <- paste0('/norms')
+
+      strMonthsDays <- paste0('/',monthday_start_toUse,',',monthday_end_toUse)
+
+      returnedAmount <- as.integer(difftime(lubridate::ymd(paste0(yearPrefix,monthday_end_toUse))
+                                            ,lubridate::ymd(paste0(yearPrefix,monthday_start_toUse))
+                                            ,units = 'days')) + 1L
+
+      if (returnedAmount > numObsReturned) {
+        returnedAmount <- numObsReturned
+      }
+
+      limitString <- paste0('?limit=',returnedAmount)
+
+      if (length(exclude_years) != 0) {
+        strexclude_years <- paste0('&excludeYears=',toString(exclude_years))
+      } else {
+        strexclude_years <- ''
+      }
+
+      if (propertiesToInclude[1] != '') {
+        propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+      } else {
+        propertiesString <- ''
+      }
+
+      strYearsType <- paste0('/years')
+      strYears <- paste0('/',year_start,',',year_end)
+
+      url <- paste0(urlAddress
+                    ,strBeg
+                    ,strCoord
+                    ,strType
+                    ,strMonthsDays
+                    ,strYearsType
+                    ,strYears
+                    ,limitString
+                    ,strexclude_years
+                    ,propertiesString)
+
+      doWeatherGet <- TRUE
+      while (doWeatherGet == TRUE) {
+        postbody = ''
+        request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
+                             httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
+
+        a <- suppressMessages(httr::content(request, as = "text"))
+
+        temp <- check_JSON(a,request)
+        doWeatherGet <- temp[[1]]
+
+        #The temp[[2]] will only not be NA when the limit param is too large.
+        if(!is.na(temp[[2]] == TRUE)) {
+          numObsReturned <- temp[[2]]
+          goodReturn <- FALSE
+
+          break
+        } else {
+          goodReturn <- TRUE
+        }
+
+        rm(temp)
+      }
+
+      if (goodReturn == TRUE) {
+        #The JSONLITE Serializer properly handles the JSON conversion
+        x <- jsonlite::fromJSON(a,flatten = TRUE)
+
+        data <- data.table::as.data.table(x[[1]])
+
+        dataList[[length(dataList) + 1]] <- data
+      } else {
+        #This will break out of the current loop of making API requests so that
+        #the logic of the API requests can be recalculated
+
+        calculateAPIRequests <- TRUE
+      }
+    }
+    continueRequestingData <- FALSE
   }
 
-
-  strYearsType <- paste0('/years')
-  strYears <- paste0('/',year_start,',',year_end)
-  url <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,strYears,strexclude_years,propertiesString)
-
-  doWeatherGet <- TRUE
-  while (doWeatherGet == TRUE) {
-    postbody = ''
-    request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-    # Make request
-
-    a <- suppressMessages(httr::content(request, as = "text"))
-
-    doWeatherGet <- check_JSON(a,request)
-  }
-
-  #The JSONLITE Serializer properly handles the JSON conversion
-  x <- jsonlite::fromJSON(a,flatten = TRUE)
-
-  data <- data.table::as.data.table(x$norms)
+  data <- unique(rbindlist(dataList))
 
   #Get rid of leap yearData
   if (includeFeb29thData == FALSE) {
     data <- data[day != '02-29',]
   }
 
-  varNames <- colnames(data)
-  #This removes the non-data info returned with the JSON object
-  data[,grep('_links',varNames) := NULL]
-  data[,grep('.units',varNames) := NULL]
+  data <- removeUnnecessaryColumns(data)
 
   currentNames <- data.table::copy(colnames(data))
+
   data[,field_id  := field_id]
+
   data.table::setcolorder(data,c('field_id',currentNames))
 
-  checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years,includeFeb29thData)
+  aWhereAPI:::checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years,includeFeb29thData)
 
   return(as.data.frame(data))
 }
@@ -186,7 +291,9 @@ weather_norms_fields <- function(field_id
 #'                     you're calculating norms, in the form YYYY. e.g., 2008 (required)
 #' @param - year_end: character string of the last year (inclusive) of the range of years for which
 #'                     you're calculating norms, in the form YYYY. e.g., 2015 (required)
-#' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are meanTemp, maxTemp, minTemp, precipitation, solar, maxHumidity, minHumidity, dailyMaxWind (optional)
+#' @param - propertiesToInclude: character vector of properties to retrieve from API.
+#'                               Valid values are meanTemp, maxTemp, minTemp, precipitation,
+#'                               solar, maxHumidity, minHumidity, dailyMaxWind (optional)
 #' @param - exclude_year: Year or years which you'd like to exclude from
 #'                        your range of years on which to calculate norms. To exclude
 #'                        multiple years, provide a vector of years. You must include
@@ -231,82 +338,187 @@ weather_norms_latlng <- function(latitude
                                  ,tokenToUse = awhereEnv75247$token) {
 
   #Checking Input Parameters
-  aWhereAPI:::checkCredentials(keyToUse,secretToUse,tokenToUse)
-  aWhereAPI:::checkValidLatLong(latitude,longitude)
-  aWhereAPI:::checkNormsStartEndDates(monthday_start,monthday_end)
-  aWhereAPI:::checkNormsYearsToRequest(year_start,year_end,monthday_start,monthday_end,exclude_years)
-  aWhereAPI:::checkPropertiesEndpoint('weather_norms',propertiesToInclude)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidLatLong(latitude,longitude)
+  checkNormsStartEndDates(monthday_start,monthday_end)
+  checkNormsYearsToRequest(year_start,year_end,monthday_start,monthday_end,exclude_years)
+  checkPropertiesEndpoint('weather_norms',propertiesToInclude)
 
-  ##############################################################################
+  # Create Logic of API Request
+  numObsReturned <- 120
+  calculateAPIRequests <- TRUE
+  continueRequestingData <- TRUE
 
-  # Create query
+  yearsToInclude <- setdiff(seq(year_start,year_end,1),exclude_years)
 
-  urlAddress <- "https://api.awhere.com/v2/weather"
+  dataList <- list()
 
-  strBeg <- paste0('/locations')
-  strCoord <- paste0('/',latitude,',',longitude)
-  strType <- paste0('/norms')
+  # loop through, making requests in chunks of size numObsReturned
+  while (continueRequestingData == TRUE | calculateAPIRequests == TRUE) {
 
-  if (monthday_start != '' & monthday_end != '') {
-    strMonthsDays <- paste0('/',monthday_start,',',monthday_end)
-  } else if (monthday_end != '') {
-    strMonthsDays <- paste0('/',monthday_start,',',monthday_start)
-  } else {
-    strMonthsDays <- ''
-  }
+    #If this clause is triggered the progression of API calls will be
+    #calculated.  After each API call the return will be checked for an error
+    #indicating that the request was too large.  If that occurs this loop will
+    #be reenentered to calculate using the smaller return size
 
-  if (length(exclude_years) != 0) {
-    strexclude_years <- paste0('?excludeYears=',toString(exclude_years))
-  } else {
-    strexclude_years <- ''
-  }
+    ############################################################################
+    if (calculateAPIRequests == TRUE) {
 
-  if (propertiesToInclude[1] != '') {
-    if (strexclude_years == '') {
-      propertiesString <- paste0('?properties=',paste0(propertiesToInclude,collapse = ','))
-    } else {
-      propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+      calculateAPIRequests <- FALSE
+
+      #We need to consider whether a year year is present to determine if Fe
+      #29th data will be returned
+      includesLeapYear <- any(is.leapyear(yearsToInclude))
+
+      if (includesLeapYear == TRUE) {
+
+        yearPrefix <- paste0(yearsToInclude[is.leapyear(yearsToInclude)][1],'-')
+
+      } else {
+
+        yearPrefix <- paste0(yearsToInclude[1],'-')
+
+      }
+
+      day_start <- ymd(paste0(yearPrefix
+                             ,monthday_start))
+
+      day_end <- ymd(paste0(yearPrefix
+                           ,monthday_end))
+
+
+      temp <- plan_APICalls(day_start
+                            ,day_end
+                            ,numObsReturned)
+      allDates <- temp[[1]]
+      loops <- temp[[2]]
+
+      #remove the years
+      allDates <-  gsub(pattern = yearPrefix,replacement = '',x = allDates,fixed = TRUE)
     }
-  } else {
-    propertiesString <- ''
+
+    #This for loop will make the API requests as calculated from above
+    ############################################################################
+    for (i in 1:loops) {
+
+      starting = numObsReturned*(i-1)+1
+      ending = numObsReturned*i
+      monthday_start_toUse <- allDates[starting]
+      monthday_end_toUse <- allDates[ending]
+
+      if(is.na(monthday_end_toUse)) {
+        tempDates <- allDates[c(starting:length(allDates))]
+        monthday_start_toUse <- tempDates[1]
+        monthday_end_toUse   <- tempDates[length(tempDates)]
+      }
+
+
+      ##############################################################################
+
+      # Create query
+
+      urlAddress <- "https://api.awhere.com/v2/weather"
+
+      strBeg <- paste0('/locations')
+      strCoord <- paste0('/',latitude,',',longitude)
+      strType <- paste0('/norms')
+
+      strMonthsDays <- paste0('/',monthday_start_toUse,',',monthday_end_toUse)
+
+      returnedAmount <- as.integer(difftime(lubridate::ymd(paste0(yearPrefix,monthday_end_toUse))
+                                            ,lubridate::ymd(paste0(yearPrefix,monthday_start_toUse))
+                                            ,units = 'days')) + 1L
+
+      if (returnedAmount > numObsReturned) {
+        returnedAmount <- numObsReturned
+      }
+
+      limitString <- paste0('?limit=',returnedAmount)
+
+      if (length(exclude_years) != 0) {
+        strexclude_years <- paste0('&excludeYears=',toString(exclude_years))
+      } else {
+        strexclude_years <- ''
+      }
+
+      if (propertiesToInclude[1] != '') {
+        propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+      } else {
+        propertiesString <- ''
+      }
+
+      strYearsType <- paste0('/years')
+      strYears <- paste0('/',year_start,',',year_end)
+
+      url <- paste0(urlAddress
+                    ,strBeg
+                    ,strCoord
+                    ,strType
+                    ,strMonthsDays
+                    ,strYearsType
+                    ,strYears
+                    ,limitString
+                    ,strexclude_years
+                    ,propertiesString)
+
+      doWeatherGet <- TRUE
+      while (doWeatherGet == TRUE) {
+        postbody = ''
+        request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
+                             httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
+
+        a <- suppressMessages(httr::content(request, as = "text"))
+
+        temp <- check_JSON(a,request)
+        doWeatherGet <- temp[[1]]
+
+        #The temp[[2]] will only not be NA when the limit param is too large.
+        if(!is.na(temp[[2]] == TRUE)) {
+          numObsReturned <- temp[[2]]
+          goodReturn <- FALSE
+
+          break
+        } else {
+          goodReturn <- TRUE
+        }
+
+        rm(temp)
+      }
+
+      if (goodReturn == TRUE) {
+        #The JSONLITE Serializer properly handles the JSON conversion
+        x <- jsonlite::fromJSON(a,flatten = TRUE)
+
+        data <- data.table::as.data.table(x[[1]])
+
+        dataList[[length(dataList) + 1]] <- data
+      } else {
+        #This will break out of the current loop of making API requests so that
+        #the logic of the API requests can be recalculated
+
+        calculateAPIRequests <- TRUE
+      }
+    }
+    continueRequestingData <- FALSE
   }
 
-  strYearsType <- paste0('/years')
-  strYears <- paste0('/',year_start,',',year_end)
-  url <- paste0(urlAddress, strBeg, strCoord, strType, strMonthsDays, strYearsType,strYears,strexclude_years,propertiesString)
-
-  doWeatherGet <- TRUE
-  while (doWeatherGet == TRUE) {
-    postbody = ''
-    request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                         httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
-    a <- suppressMessages(httr::content(request, as = "text"))
-
-    doWeatherGet <- check_JSON(a,request)
-  }
-
-  #The JSONLITE Serializer properly handles the JSON conversion
-  x <- jsonlite::fromJSON(a,flatten = TRUE)
-
-  data <- data.table::as.data.table(x[[1]])
+  data <- unique(rbindlist(dataList))
 
   #Get rid of leap yearData
   if (includeFeb29thData == FALSE) {
     data <- data[day != '02-29',]
   }
 
-  varNames <- colnames(data)
-  #This removes the non-data info returned with the JSON object
-  data[,grep('_links',varNames) := NULL]
-  data[,grep('.units',varNames) := NULL]
+  data <- removeUnnecessaryColumns(data)
 
   currentNames <- data.table::copy(colnames(data))
+
   data[,latitude  := latitude]
   data[,longitude := longitude]
+
   data.table::setcolorder(data,c('latitude','longitude',currentNames))
 
-  aWhereAPI:::checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years,includeFeb29thData)
+  checkDataReturn_norms(data,monthday_start,monthday_end,year_start,year_end,exclude_years,includeFeb29thData)
 
   return(as.data.frame(data))
 }
