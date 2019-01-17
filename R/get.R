@@ -58,7 +58,7 @@ get_fields <- function(field_id = ''
 
     a <- suppressMessages(httr::content(request))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   ## Create & fill data frame
@@ -179,7 +179,7 @@ get_planting <- function(field_id
 
     a <- suppressMessages(httr::content(request))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   ## Create & fill data frame

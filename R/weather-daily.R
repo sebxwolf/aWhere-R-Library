@@ -43,8 +43,8 @@
 #'
 #' @examples
 #' \dontrun{daily_observed_fields(field_id = 'field_test'
-#'                                ,day_start = '2018-04-28'
-#'                                ,day_end = '2018-05-01')}
+#'                                ,day_start = '2018-10-28'
+#'                                ,day_end = '2018-12-01')}
 
 #' @export
 daily_observed_fields <- function(field_id
@@ -61,114 +61,132 @@ daily_observed_fields <- function(field_id
   checkPropertiesEndpoint('weather',propertiesToInclude)
 
 
-  ## Create Request
-  #Calculate number of loops needed if requesting more than 120 days
+  # Create Logic of API Request
   numObsReturned <- 120
-
-  if (day_start != '' & day_end != '') {
-    numOfDays <- as.numeric(difftime(lubridate::ymd(day_end), lubridate::ymd(day_start), units = 'days'))
-    allDates <- seq(as.Date(lubridate::ymd(day_start)),as.Date(lubridate::ymd(day_end)), by="days")
-
-    loops <- ((length(allDates))) %/% numObsReturned
-    remainder <- ((length(allDates))) %% numObsReturned
-
-  } else if (day_start != '') {
-
-    numOfDays <- 1
-    allDates <- lubridate::ymd(day_start)
-    loops <- 1
-    remainder <- 0
-  } else {
-    numOfDays <- 1
-    allDates <- ''
-    loops <- 1
-    remainder <- 0
-  }
-
-  if(remainder > 0) {
-    loops <- loops + 1
-  }
-  i <- 1
+  calculateAPIRequests <- TRUE
+  continueRequestingData <- TRUE
 
   dataList <- list()
 
   # loop through, making requests in chunks of size numObsReturned
+  while (continueRequestingData == TRUE | calculateAPIRequests == TRUE) {
 
-  for (i in 1:loops) {
+    #If this clause is triggered the progression of API calls will be
+    #calculated.  After each API call the return will be checked for an error
+    #indicating that the request was too large.  If that occurs this loop will
+    #be reenentered to calculate using the smaller return size
 
-    starting = numObsReturned*(i-1)+1
-    ending = numObsReturned*i
+    ############################################################################
+    if (calculateAPIRequests == TRUE) {
 
-    if(paste(allDates,sep = '',collapse ='') != '') {
-      day_start_toUse <- allDates[starting]
-      day_end_toUse <- allDates[ending]
-      if(is.na(day_end_toUse)) {
-        tempDates <- allDates[c(starting:length(allDates))]
-        day_start_toUse <- tempDates[1]
-        day_end_toUse <- tempDates[length(tempDates)]
+      calculateAPIRequests <- FALSE
+      temp <- plan_APICalls(day_start
+                            ,day_end
+                            ,numObsReturned)
+      allDates <- temp[[1]]
+      loops <- temp[[2]]
+    }
+
+    #This for loop will make the API requests as calculated from above
+    ############################################################################
+
+    for (i in 1:loops) {
+
+      starting = numObsReturned*(i-1)+1
+      ending = numObsReturned*i
+
+      if(paste(allDates,sep = '',collapse ='') != '') {
+        day_start_toUse <- allDates[starting]
+        day_end_toUse <- allDates[ending]
+        if(is.na(day_end_toUse)) {
+          tempDates <- allDates[c(starting:length(allDates))]
+          day_start_toUse <- tempDates[1]
+          day_end_toUse <- tempDates[length(tempDates)]
+        }
+      }
+
+
+      # Create query
+
+      urlAddress <- "https://api.awhere.com/v2/weather"
+
+      strBeg <- paste0('/fields')
+      strCoord <- paste0('/',field_id)
+      strType <- paste0('/observations')
+
+      if(paste(allDates,sep = '',collapse ='') != '') {
+        strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
+
+        returnedAmount <- as.integer(difftime(lubridate::ymd(day_end_toUse),lubridate::ymd(day_start_toUse),units = 'days')) + 1L
+        if (returnedAmount > numObsReturned) {
+          returnedAmount <- numObsReturned
+        }
+        limitString <- paste0('?limit=',returnedAmount)
+
+      } else {
+        strDates <- ''
+        limitString <- paste0('?limit=',numObsReturned)
+      }
+
+      if (propertiesToInclude[1] != '') {
+        propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+      } else {
+        propertiesString <- ''
+      }
+
+      url <- paste0(urlAddress
+                    ,strBeg
+                    ,strCoord
+                    ,strType
+                    ,strDates
+                    ,limitString
+                    ,propertiesString)
+
+      doWeatherGet <- TRUE
+
+      while (doWeatherGet == TRUE) {
+        postbody = ''
+        request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
+                             httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
+
+        a <- suppressMessages(httr::content(request, as = "text"))
+
+        temp <- check_JSON(a,request)
+        doWeatherGet <- temp[[1]]
+
+        #The temp[[2]] will only not be NA when the limit param is too large.
+        if(!is.na(temp[[2]] == TRUE)) {
+          numObsReturned <- temp[[2]]
+          goodReturn <- FALSE
+
+          break
+        } else {
+          goodReturn <- TRUE
+        }
+
+        rm(temp)
+      }
+
+      if (goodReturn == TRUE) {
+        #The JSONLITE Serializer properly handles the JSON conversion
+        x <- jsonlite::fromJSON(a,flatten = TRUE)
+
+        data <- data.table::as.data.table(x[[1]])
+
+        dataList[[length(dataList) + 1]] <- data
+      } else {
+        #This will break out of the current loop of making API requests so that
+        #the logic of the API requests can be recalculated
+
+        calculateAPIRequests <- TRUE
       }
     }
-
-
-    # Create query
-
-    urlAddress <- "https://api.awhere.com/v2/weather"
-
-    strBeg <- paste0('/fields')
-    strCoord <- paste0('/',field_id)
-    strType <- paste0('/observations')
-
-    if(paste(allDates,sep = '',collapse ='') != '') {
-      strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
-
-      returnedAmount <- as.integer(difftime(lubridate::ymd(day_end_toUse),lubridate::ymd(day_start_toUse),units = 'days')) + 1L
-      if (returnedAmount > numObsReturned) {
-        returnedAmount <- numObsReturned
-      }
-      limitString <- paste0('?limit=',returnedAmount)
-
-    } else {
-      strDates <- ''
-      limitString <- paste0('?limit=',numObsReturned)
-    }
-
-    if (propertiesToInclude[1] != '') {
-      propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
-    } else {
-      propertiesString <- ''
-    }
-
-    url <- paste0(urlAddress, strBeg, strCoord, strType, strDates, limitString,propertiesString)
-
-    doWeatherGet <- TRUE
-
-    while (doWeatherGet == TRUE) {
-      postbody = ''
-      request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                           httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
-      a <- suppressMessages(httr::content(request, as = "text"))
-
-      doWeatherGet <- check_JSON(a,request)
-    }
-
-    #The JSONLITE Serializer properly handles the JSON conversion
-    x <- jsonlite::fromJSON(a, flatten = TRUE)
-
-    data <- data.table::as.data.table(x[[1]])
-
-    dataList[[i]] <- data
+    continueRequestingData <- FALSE
   }
 
-  data <- rbindlist(dataList)
+  data <- unique(rbindlist(dataList))
 
-  varNames <- colnames(data)
-
-  #This removes the non-data info returned with the JSON object
-  suppressWarnings(data[,grep('_links',varNames) := NULL])
-  suppressWarnings(data[,grep('.units',varNames) := NULL])
-  suppressWarnings(data[,grep('latitude',varNames) := NULL])
-  suppressWarnings(data[,grep('longitude',varNames) := NULL])
+  data <- removeUnnecessaryColumns(data)
 
   currentNames <- data.table::copy(colnames(data))
 
@@ -177,7 +195,7 @@ daily_observed_fields <- function(field_id
 
   checkDataReturn_daily(data,day_start,day_end)
 
-  return(as.data.frame(allWeath))
+  return(as.data.frame(data))
 }
 
 
@@ -227,8 +245,8 @@ daily_observed_fields <- function(field_id
 #' @examples
 #' \dontrun{daily_observed_latlng(latitude = 39.8282
 #'                                ,longitude = -98.5795
-#'                                ,day_start = '2018-04-28'
-#'                                ,day_end = '2018-05-01')}
+#'                                ,day_start = '2018-10-28'
+#'                                ,day_end = '2018-12-01')}
 
 #' @export
 
@@ -247,103 +265,129 @@ daily_observed_latlng <- function(latitude
   checkValidStartEndDates(day_start,day_end)
   checkPropertiesEndpoint('weather',propertiesToInclude)
 
-  ## Create Request
-  #Calculate number of loops needed if requesting more than 120 days
+  # Create Logic of API Request
   numObsReturned <- 120
-
-  if (day_end != '') {
-    numOfDays <- as.numeric(difftime(lubridate::ymd(day_end), lubridate::ymd(day_start), units = 'days'))
-    allDates <- seq(as.Date(lubridate::ymd(day_start)),as.Date(lubridate::ymd(day_end)), by="days")
-
-    loops <- ((length(allDates))) %/% numObsReturned
-    remainder <- ((length(allDates))) %% numObsReturned
-
-  } else {
-
-    numOfDays <- 1
-    allDates <- lubridate::ymd(day_start)
-    loops <- 1
-    remainder <- 0
-  }
-
-  if(remainder > 0) {
-    loops <- loops + 1
-  }
-
+  calculateAPIRequests <- TRUE
+  continueRequestingData <- TRUE
 
   dataList <- list()
 
   # loop through, making requests in chunks of size numObsReturned
+  while (continueRequestingData == TRUE | calculateAPIRequests == TRUE) {
 
-  for (i in 1:loops) {
+    #If this clause is triggered the progression of API calls will be
+    #calculated.  After each API call the return will be checked for an error
+    #indicating that the request was too large.  If that occurs this loop will
+    #be reenentered to calculate using the smaller return size
 
-    starting = numObsReturned*(i-1)+1
-    ending = numObsReturned*i
-    day_start_toUse <- allDates[starting]
-    day_end_toUse <- allDates[ending]
-    if(is.na(day_end_toUse)) {
-      tempDates <- allDates[c(starting:length(allDates))]
-      day_start_toUse <- tempDates[1]
-      day_end_toUse   <- tempDates[length(tempDates)]
+    ############################################################################
+    if (calculateAPIRequests == TRUE) {
+
+      calculateAPIRequests <- FALSE
+      temp <- plan_APICalls(day_start
+                            ,day_end
+                            ,numObsReturned)
+      allDates <- temp[[1]]
+      loops <- temp[[2]]
     }
 
+    #This for loop will make the API requests as calculated from above
+    ############################################################################
+    for (i in 1:loops) {
 
-    # Create query
+      starting = numObsReturned*(i-1)+1
+      ending = numObsReturned*i
+      day_start_toUse <- allDates[starting]
+      day_end_toUse <- allDates[ending]
 
-    urlAddress <- "https://api.awhere.com/v2/weather"
+      if(is.na(day_end_toUse)) {
+        tempDates <- allDates[c(starting:length(allDates))]
+        day_start_toUse <- tempDates[1]
+        day_end_toUse   <- tempDates[length(tempDates)]
+      }
 
-    strBeg <- paste0('/locations')
-    strCoord <- paste0('/',latitude,',',longitude)
-    strType <- paste0('/observations')
-    strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
+
+      # Create query
+      urlAddress <- "https://api.awhere.com/v2/weather"
+
+      strBeg <- paste0('/locations')
+      strCoord <- paste0('/',latitude,',',longitude)
+      strType <- paste0('/observations')
+      strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
 
 
-    returnedAmount <- as.integer(difftime(lubridate::ymd(day_end_toUse),lubridate::ymd(day_start_toUse),units = 'days')) + 1L
-    if (returnedAmount > numObsReturned) {
-      returnedAmount <- numObsReturned
+      returnedAmount <- as.integer(difftime(lubridate::ymd(day_end_toUse)
+                                            ,lubridate::ymd(day_start_toUse)
+                                            ,units = 'days')) + 1L
+
+      if (returnedAmount > numObsReturned) {
+        returnedAmount <- numObsReturned
+      }
+
+      limitString <- paste0('?limit=',returnedAmount)
+
+      if (propertiesToInclude[1] != '') {
+        propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
+      } else {
+        propertiesString <- ''
+      }
+
+      url <- paste0(urlAddress
+                    ,strBeg
+                    ,strCoord
+                    ,strType
+                    ,strDates
+                    ,limitString
+                    ,propertiesString)
+
+      doWeatherGet <- TRUE
+
+      #The reason for the while loop is that if the token has expired a new token
+      #will be automatically requsted and the query will be repeated
+      while (doWeatherGet == TRUE) {
+        postbody = ''
+        request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
+                             httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
+
+        # Make request
+        a <- suppressMessages(httr::content(request, as = "text"))
+
+        temp <- check_JSON(a,request)
+        doWeatherGet <- temp[[1]]
+
+        #The temp[[2]] will only not be NA when the limit param is too large.
+        if(!is.na(temp[[2]] == TRUE)) {
+          numObsReturned <- temp[[2]]
+          goodReturn <- FALSE
+
+          break
+        } else {
+          goodReturn <- TRUE
+        }
+
+        rm(temp)
+      }
+
+      if (goodReturn == TRUE) {
+        #The JSONLITE Serializer properly handles the JSON conversion
+        x <- jsonlite::fromJSON(a,flatten = TRUE)
+
+        data <- data.table::as.data.table(x[[1]])
+
+        dataList[[length(dataList) + 1]] <- data
+      } else {
+        #This will break out of the current loop of making API requests so that
+        #the logic of the API requests can be recalculated
+
+        calculateAPIRequests <- TRUE
+      }
     }
-    limitString <- paste0('?limit=',returnedAmount)
-
-    if (propertiesToInclude[1] != '') {
-      propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
-    } else {
-      propertiesString <- ''
-    }
-
-    url <- paste0(urlAddress, strBeg, strCoord, strType, strDates, limitString,propertiesString)
-
-    doWeatherGet <- TRUE
-
-    while (doWeatherGet == TRUE) {
-      postbody = ''
-      request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
-                           httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
-      # Make request
-
-      a <- suppressMessages(httr::content(request, as = "text"))
-
-      doWeatherGet <- check_JSON(a,request)
-    }
-
-    #The JSONLITE Serializer properly handles the JSON conversion
-    x <- jsonlite::fromJSON(a,flatten = TRUE)
-
-    data <- data.table::as.data.table(x[[1]])
-
-    dataList[[i]] <- data
-
+    continueRequestingData <- FALSE
   }
 
-  data <- rbindlist(dataList)
+  data <- unique(rbindlist(dataList))
 
-  varNames <- colnames(data)
-
-  #This removes the non-data info returned with the JSON object
-  suppressWarnings(data[,grep('_links',varNames) := NULL])
-  suppressWarnings(data[,grep('.units',varNames) := NULL])
-  suppressWarnings(data[,grep('latitude',varNames) := NULL])
-  suppressWarnings(data[,grep('longitude',varNames) := NULL])
+  data <- removeUnnecessaryColumns(data)
 
   currentNames <- data.table::copy(colnames(data))
 
@@ -354,7 +398,7 @@ daily_observed_latlng <- function(latitude
 
   checkDataReturn_daily(data,day_start,day_end)
 
-  return(as.data.frame(allWeath))
+  return(as.data.frame(data))
 }
 
 #' @title daily_observed_area

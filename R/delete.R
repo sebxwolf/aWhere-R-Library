@@ -43,7 +43,7 @@ delete_field <- function(field_id
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   cat(paste0('Operation Complete'))
@@ -92,7 +92,7 @@ delete_planting <- function(field_id
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   cat(paste0('Operation Complete'))

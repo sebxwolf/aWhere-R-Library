@@ -79,8 +79,8 @@ Note about dates: The system does not adjust for any difference in dates between
 }
 \examples{
 \dontrun{agronomic_values_fields(field_id = "field_test"
-                                 ,day_start = "2018-05-01"
-                                 ,day_end = "2018-05-31"
+                                 ,day_start = "2018-11-01"
+                                 ,day_end = "2018-11-30"
                                  ,gdd_method = "modifiedstandard"
                                  ,gdd_base_temp = 10
                                  ,gdd_min_boundary = 10

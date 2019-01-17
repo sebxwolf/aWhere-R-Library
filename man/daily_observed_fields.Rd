@@ -53,7 +53,7 @@ Note about dates: The system does not adjust for any difference in dates between
 \examples{
 \dontrun{daily_observed_fields(field_id = 'field_test'
                                ,day_start = '2018-04-28'
-                               ,day_end = '2018-05-01')}
+                               ,day_end = '2018-07-01')}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/observations

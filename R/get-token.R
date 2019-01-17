@@ -133,25 +133,36 @@ load_credentials <- function(path_to_credentials) {
 #' @return boolean for whether another query should be made
 
 check_JSON <- function(jsonObject, request) {
-  aWhereAPI:::checkStatusCode(request)
-  
+
+  #Parses JSON to see if tells us we made too large of a request
+  if (any(grepl('The maximum value for the limit parameter is',jsonObject))) {
+
+    #Non enterprise accounts are allowed to return 10 days of data at a time
+    #FALSE is returned because the logic of the API call will need to be
+    #adjusted due to the changed limit paramater
+    return(list(FALSE,10))
+  }
+
+  #Parses JSON to see if it tells us that we need a new token
   if (any(grepl('API Access Expired',jsonObject))) {
     if(exists("awhereEnv75247")) {
       if(tokenToUse == awhereEnv75247$token) {
         get_token(keyToUse,secretToUse)
         tokenToUse <- awhereEnv75247$token
 
-        doWeatherGet <- TRUE
+        #This boolean will cause the API request to be repeated
+        return(list(TRUE,NA))
       } else {
         stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
       }
     } else {
       stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
     }
-  } else {
-    doWeatherGet <- FALSE
   }
 
-  return(doWeatherGet)
+  #Finally check to see if there was a different problem with the query and if so return the message
+  aWhereAPI:::checkStatusCode(request)
+
+  return(list(FALSE,NA))
 }
 

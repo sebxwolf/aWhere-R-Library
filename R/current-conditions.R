@@ -69,7 +69,7 @@ current_conditions_fields <- function(field_id
     # Make request
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
@@ -77,11 +77,7 @@ current_conditions_fields <- function(field_id
 
   data <- data.table::as.data.table(data.frame(as.list(unlist(x)),stringsAsFactors = FALSE))
 
-  varNames <- colnames(data)
-
-  #This removes the non-data info returned with the JSON object
-  data[,grep('_links',varNames) := NULL]
-  data[,grep('.units',varNames) := NULL]
+  data <- removeUnnecessaryColumns(data)
 
   return(as.data.frame(data))
 }
@@ -158,7 +154,7 @@ current_conditions_latlng <- function(latitude
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
@@ -166,11 +162,7 @@ current_conditions_latlng <- function(latitude
 
   data <- data.table::as.data.table(data.frame(as.list(unlist(x)),stringsAsFactors = FALSE))
 
-  varNames <- colnames(data)
-
-  #This removes the non-data info returned with the JSON object
-  data[,grep('_links',varNames) := NULL]
-  data[,grep('.units',varNames) := NULL]
+  data <- removeUnnecessaryColumns(data)
 
   return(as.data.frame(data))
 }

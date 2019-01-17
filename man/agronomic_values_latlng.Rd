@@ -79,8 +79,8 @@ Note about dates: The system does not adjust for any difference in dates between
 \examples{
 \dontrun{agronomic_values_latlng(latitude = 39.8282
                                  ,longitude = -98.5795
-                                 ,day_start = '2018-05-01'
-                                 ,day_end = '2018-05-31')}
+                                 ,day_start = '2018-11-01'
+                                 ,day_end = '2018-11-30')}
 }
 \references{
 http://developer.awhere.com/api/reference/agronomics/values

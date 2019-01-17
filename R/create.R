@@ -86,7 +86,7 @@ create_field <- function(field_id
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   cat(paste0('Operation Complete \n'))
@@ -215,7 +215,7 @@ create_planting <- function(field_id
 
     a <- suppressMessages(httr::content(request))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   cat(paste0('Operation Complete \n Planting ID: ', a$id),'\n')
@@ -289,7 +289,7 @@ create_job <- function(api_requests
     request <- httr::POST(url, body=postbody, httr::content_type('application/json'),
                           httr::add_headers(Authorization = paste0("Bearer ", tokenToUse)))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   cat(paste0('Operation Complete \n Job ID: ',a$jobId,'\n'))

@@ -47,8 +47,12 @@
 #' @return data.frame of requested data for dates requested
 #'
 #' @examples
-#' \dontrun{forecasts_fields(field_id = 'field_test', day_start = as.character(Sys.Date()), block_size = 12)
-#'          forecasts_fields('field_test', day_start = as.character(Sys.Date()), day_end = as.character(Sys.Date() + 5))}
+#' \dontrun{forecasts_fields(field_id = 'field_test'
+#'                           ,day_start = as.character(Sys.Date())
+#'                           , block_size = 12)
+#'          forecasts_fields('field_test'
+#'                           ,day_start = as.character(Sys.Date())
+#'                           ,day_end = as.character(Sys.Date() + 5))}
 #' @export
 
 
@@ -94,7 +98,7 @@ forecasts_fields <- function(field_id
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
@@ -109,11 +113,7 @@ forecasts_fields <- function(field_id
 
   varNames <- colnames(data)
 
-  #This removes the non-data info returned with the JSON object
-  suppressWarnings(data[,grep('.units',varNames) := NULL])
-  suppressWarnings(data[,c('soilTemperatures','soilMoisture') := NULL])
-  suppressWarnings(data[,grep('latitude',varNames) := NULL])
-  suppressWarnings(data[,grep('longitude',varNames) := NULL])
+  data <- removeUnnecessaryColumns(data)
 
   currentNames <- data.table::copy(colnames(data))
   data[,field_id  := field_id]
@@ -177,8 +177,15 @@ forecasts_fields <- function(field_id
 #' @import jsonlite
 #'
 #' @examples
-#' \dontrun{forecasts_latlng(39.8282, -98.5795,as.character(Sys.Date()),as.character(Sys.Date() + 5), block_size = 12)
-#'          forecasts_latlng(19.328489, -99.145681, day_start = as.character(Sys.Date()), block_size = 4)}
+#' \dontrun{forecasts_latlng(latitude = 39.8282
+#'                           ,longitude =  -98.5795
+#'                           ,day_start = as.character(Sys.Date())
+#'                           ,day_end = as.character(Sys.Date() + 5)
+#'                           ,block_size = 12)
+#'          forecasts_latlng(latitude = 19.328489
+#'                           ,longitude = -99.145681
+#'                           ,day_start = as.character(Sys.Date())
+#'                           ,block_size = 4)}
 
 #' @export
 
@@ -219,7 +226,7 @@ forecasts_latlng <- function(latitude
     # Make forecast request
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
@@ -232,13 +239,7 @@ forecasts_latlng <- function(latitude
     data <- data.table::as.data.table(x[[3]])
   }
 
-  varNames <- colnames(data)
-
-  #This removes the non-data info returned with the JSON object
-  data[,grep('.units',varNames) := NULL]
-  data[,c('soilTemperatures','soilMoisture') := NULL]
-  suppressWarnings(data[,grep('latitude',varNames) := NULL])
-  suppressWarnings(data[,grep('longitude',varNames) := NULL])
+  data <- removeUnnecessaryColumns(data)
 
   currentNames <- data.table::copy(colnames(data))
 

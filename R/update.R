@@ -57,7 +57,7 @@ update_field <- function(field_id
     # Re formating the response recieved from API
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   cat(paste0('Operation Complete'))
@@ -204,7 +204,7 @@ update_planting <- function(field_id
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
   cat(paste0('Operation Complete'))
