@@ -43,19 +43,14 @@ recalculateAccumulations <- function(dataList) {
                              ,fixed = TRUE)
   
   for (x in 1:length(dataList)) {
-    lastValue.accumulatedColumns <- dataList[[x]][.N,accumulatedColumns,with = FALSE]
-    cat(paste0(x))
-    if (x == 1) {
-      next
-    } else {
+    if (x > 1) {
       for (y in 1:length(accumulatedColumns)) {
         eval(parse(text = paste0('dataList[[x]][,',accumulatedColumns[y],' := ',accumulatedColumns[y],' + lastValue.accumulatedColumns$',accumulatedColumns[y],']')))
       }  
     }
+    
+    lastValue.accumulatedColumns <- dataList[[x]][.N,accumulatedColumns,with = FALSE]
   }
   
   return(dataList)
 }
-
-
-

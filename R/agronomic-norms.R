@@ -166,7 +166,7 @@ agronomic_norms_fields <- function(field_id
       loops <- temp[[2]]
 
       #remove the years
-      allDates <-  gsub(pattern = yearPrefix,replacement = '',x = allDates,fixed = TRUE)
+      allDates <-  gsub(pattern = '20\\d\\d-',replacement = '',x = allDates)
     }
 
     #This for loop will make the API requests as calculated from above
@@ -196,15 +196,7 @@ agronomic_norms_fields <- function(field_id
 
       strMonthsDays <- paste0('/',monthday_start_toUse,',',monthday_end_toUse)
 
-      returnedAmount <- as.integer(difftime(lubridate::ymd(paste0(yearPrefix,monthday_end_toUse))
-                                            ,lubridate::ymd(paste0(yearPrefix,monthday_start_toUse))
-                                            ,units = 'days')) + 1L
-
-      if (returnedAmount > numObsReturned) {
-        returnedAmount <- numObsReturned
-      }
-
-      limitString <- paste0('?limit=',returnedAmount)
+      limitString <- paste0('?limit=',numObsReturned)
 
       if (length(exclude_years) != 0) {
         strexclude_years <- paste0('&excludeYears=',toString(exclude_years))
@@ -221,8 +213,11 @@ agronomic_norms_fields <- function(field_id
       strYearsType <- paste0('/years')
       strYears <- paste0('/',year_start,',',year_end)
 
-
-      if (accumulation_start_date != '') {
+      #Because of the fact that we have logic after the API calls for making
+      #right the accumulation information, we only use the user specified
+      #paramater on the first call.  This allows us to use the R function to
+      #request arbitrarily long date ranges
+      if (accumulation_start_date != ''  & i == 1) {
         strAccumulation <- paste0('&accumulationStartDay=',accumulation_start_date)
       } else {
         strAccumulation <- ''
@@ -233,21 +228,21 @@ agronomic_norms_fields <- function(field_id
       gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
       gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
 
-      url <- paste0(urlAddress
-                    ,strBeg
-                    ,strCoord
-                    ,strType
-                    ,strMonthsDays
-                    ,strYearsType
-                    ,strYears
-                    ,limitString
-                    ,gdd_methodString
-                    ,gdd_base_tempString
-                    ,gdd_min_boundaryString
-                    ,gdd_max_boundaryString
-                    ,strexclude_years
-                    ,strAccumulation
-                    ,propertiesString)
+      url <- URLencode(paste0(urlAddress
+                              ,strBeg
+                              ,strCoord
+                              ,strType
+                              ,strMonthsDays
+                              ,strYearsType
+                              ,strYears
+                              ,limitString
+                              ,gdd_methodString
+                              ,gdd_base_tempString
+                              ,gdd_min_boundaryString
+                              ,gdd_max_boundaryString
+                              ,strexclude_years
+                              ,strAccumulation
+                              ,propertiesString))
 
       doWeatherGet <- TRUE
       while (doWeatherGet == TRUE) {
@@ -296,6 +291,15 @@ agronomic_norms_fields <- function(field_id
     }
     continueRequestingData <- FALSE
   }
+  
+  ##############################################################################
+  #Because of the fact that the above code will allow the user to specify an arbitray
+  #date range and automatically figure out an API call plan, the accumulation information
+  #may not be properly returned.  Because it is calculatable based on other information returned
+  #we are going to do so here so that the function returns what the user would be expecting
+  
+  dataList <- recalculateAccumulations(dataList)
+  ##############################################################################
 
   data <- unique(rbindlist(dataList))
 
@@ -489,7 +493,7 @@ agronomic_norms_latlng <- function(latitude
       loops <- temp[[2]]
 
       #remove the years
-      allDates <-  gsub(pattern = yearPrefix,replacement = '',x = allDates,fixed = TRUE)
+      allDates <-  gsub(pattern = '20\\d\\d-',replacement = '',x = allDates)
     }
 
     #This for loop will make the API requests as calculated from above
@@ -519,15 +523,7 @@ agronomic_norms_latlng <- function(latitude
 
       strMonthsDays <- paste0('/',monthday_start_toUse,',',monthday_end_toUse)
 
-      returnedAmount <- as.integer(difftime(lubridate::ymd(paste0(yearPrefix,monthday_end_toUse))
-                                            ,lubridate::ymd(paste0(yearPrefix,monthday_start_toUse))
-                                            ,units = 'days')) + 1L
-
-      if (returnedAmount > numObsReturned) {
-        returnedAmount <- numObsReturned
-      }
-
-      limitString <- paste0('?limit=',returnedAmount)
+      limitString <- paste0('?limit=',numObsReturned)
 
       if (length(exclude_years) != 0) {
         strexclude_years <- paste0('&excludeYears=',toString(exclude_years))
@@ -544,8 +540,11 @@ agronomic_norms_latlng <- function(latitude
       strYearsType <- paste0('/years')
       strYears <- paste0('/',year_start,',',year_end)
 
-
-      if (accumulation_start_date != '') {
+      #Because of the fact that we have logic after the API calls for making
+      #right the accumulation information, we only use the user specified
+      #paramater on the first call.  This allows us to use the R function to
+      #request arbitrarily long date ranges
+      if (accumulation_start_date != ''  & i == 1) {
         strAccumulation <- paste0('&accumulationStartDay=',accumulation_start_date)
       } else {
         strAccumulation <- ''
@@ -556,21 +555,21 @@ agronomic_norms_latlng <- function(latitude
       gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
       gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
 
-      url <- paste0(urlAddress
-                    ,strBeg
-                    ,strCoord
-                    ,strType
-                    ,strMonthsDays
-                    ,strYearsType
-                    ,strYears
-                    ,limitString
-                    ,gdd_methodString
-                    ,gdd_base_tempString
-                    ,gdd_min_boundaryString
-                    ,gdd_max_boundaryString
-                    ,strexclude_years
-                    ,strAccumulation
-                    ,propertiesString)
+      url <- URLencode(paste0(urlAddress
+                              ,strBeg
+                              ,strCoord
+                              ,strType
+                              ,strMonthsDays
+                              ,strYearsType
+                              ,strYears
+                              ,limitString
+                              ,gdd_methodString
+                              ,gdd_base_tempString
+                              ,gdd_min_boundaryString
+                              ,gdd_max_boundaryString
+                              ,strexclude_years
+                              ,strAccumulation
+                              ,propertiesString))
 
       doWeatherGet <- TRUE
       while (doWeatherGet == TRUE) {
@@ -619,7 +618,14 @@ agronomic_norms_latlng <- function(latitude
     }
     continueRequestingData <- FALSE
   }
-
+  ##############################################################################
+  #Because of the fact that the above code will allow the user to specify an arbitray
+  #date range and automatically figure out an API call plan, the accumulation information
+  #may not be properly returned.  Because it is calculatable based on other information returned
+  #we are going to do so here so that the function returns what the user would be expecting
+  
+  dataList <- recalculateAccumulations(dataList)
+  ##############################################################################
   data <- unique(rbindlist(dataList))
 
   #Get rid of leap yearData

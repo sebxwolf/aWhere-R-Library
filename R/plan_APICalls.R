@@ -14,6 +14,11 @@ plan_APICalls <- function(day_start
                           ,day_end
                           ,numObsReturned) {
 
+  
+  if (day_end < day_start) {
+    day_end <- ymd(day_end) + 366 #gets to same dayOfYear 1 year later
+  }
+  
   numOfDays <- as.numeric(difftime(lubridate::ymd(day_end)
                                    ,lubridate::ymd(day_start)
                                    , units = 'days'))

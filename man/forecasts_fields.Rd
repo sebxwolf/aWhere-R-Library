@@ -58,8 +58,12 @@ Note about dates: The system does not adjust for any difference in dates between
           for whether a given date should be requested from the daily_observed functions or the forecast functions
 }
 \examples{
-\dontrun{forecasts_fields(field_id = 'field_test', day_start = as.character(Sys.Date()), block_size = 12)
-         forecasts_fields('field_test', day_start = as.character(Sys.Date()), day_end = as.character(Sys.Date() + 5))}
+\dontrun{forecasts_fields(field_id = 'field_test'
+                          ,day_start = as.character(Sys.Date())
+                          , block_size = 12)
+         forecasts_fields('field_test'
+                          ,day_start = as.character(Sys.Date())
+                          ,day_end = as.character(Sys.Date() + 5))}
 }
 \references{
 http://developer.awhere.com/api/forecast-weather-api

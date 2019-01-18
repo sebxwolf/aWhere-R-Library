@@ -60,8 +60,15 @@ Note about dates: The system does not adjust for any difference in dates between
           for whether a given date should be requested from the daily_observed functions or the forecast functions
 }
 \examples{
-\dontrun{forecasts_latlng(39.8282, -98.5795,as.character(Sys.Date()),as.character(Sys.Date() + 5), block_size = 12)
-         forecasts_latlng(19.328489, -99.145681, day_start = as.character(Sys.Date()), block_size = 4)}
+\dontrun{forecasts_latlng(latitude = 39.8282
+                          ,longitude =  -98.5795
+                          ,day_start = as.character(Sys.Date())
+                          ,day_end = as.character(Sys.Date() + 5)
+                          ,block_size = 12)
+         forecasts_latlng(latitude = 19.328489
+                          ,longitude = -99.145681
+                          ,day_start = as.character(Sys.Date())
+                          ,block_size = 4)}
 }
 \references{
 http://developer.awhere.com/api/reference/weather/forecasts/geolocation

@@ -114,19 +114,7 @@ daily_observed_fields <- function(field_id
       strCoord <- paste0('/',field_id)
       strType <- paste0('/observations')
 
-      if(paste(allDates,sep = '',collapse ='') != '') {
-        strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
-
-        returnedAmount <- as.integer(difftime(lubridate::ymd(day_end_toUse),lubridate::ymd(day_start_toUse),units = 'days')) + 1L
-        if (returnedAmount > numObsReturned) {
-          returnedAmount <- numObsReturned
-        }
-        limitString <- paste0('?limit=',returnedAmount)
-
-      } else {
-        strDates <- ''
-        limitString <- paste0('?limit=',numObsReturned)
-      }
+      limitString <- paste0('?limit=',numObsReturned)
 
       if (propertiesToInclude[1] != '') {
         propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
@@ -134,13 +122,13 @@ daily_observed_fields <- function(field_id
         propertiesString <- ''
       }
 
-      url <- paste0(urlAddress
-                    ,strBeg
-                    ,strCoord
-                    ,strType
-                    ,strDates
-                    ,limitString
-                    ,propertiesString)
+      url <- URLencode(paste0(urlAddress
+                              ,strBeg
+                              ,strCoord
+                              ,strType
+                              ,strDates
+                              ,limitString
+                              ,propertiesString))
 
       doWeatherGet <- TRUE
 
@@ -315,16 +303,7 @@ daily_observed_latlng <- function(latitude
       strType <- paste0('/observations')
       strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
 
-
-      returnedAmount <- as.integer(difftime(lubridate::ymd(day_end_toUse)
-                                            ,lubridate::ymd(day_start_toUse)
-                                            ,units = 'days')) + 1L
-
-      if (returnedAmount > numObsReturned) {
-        returnedAmount <- numObsReturned
-      }
-
-      limitString <- paste0('?limit=',returnedAmount)
+      limitString <- paste0('?limit=',numObsReturned)
 
       if (propertiesToInclude[1] != '') {
         propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
@@ -332,13 +311,13 @@ daily_observed_latlng <- function(latitude
         propertiesString <- ''
       }
 
-      url <- paste0(urlAddress
-                    ,strBeg
-                    ,strCoord
-                    ,strType
-                    ,strDates
-                    ,limitString
-                    ,propertiesString)
+      url <- URLencode(paste0(urlAddress
+                              ,strBeg
+                              ,strCoord
+                              ,strType
+                              ,strDates
+                              ,limitString
+                              ,propertiesString))
 
       doWeatherGet <- TRUE
 
