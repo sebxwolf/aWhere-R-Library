@@ -20,7 +20,9 @@ agronomic_values_latlng(latitude, longitude, day_start, day_end,
 
 \item{-}{day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD}
 
-\item{-}{propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)}
+\item{-}{propertiesToInclude: character vector of properties to retrieve from API.
+Valid values are accumulations, gdd, pet, ppet, accumulatedGdd,
+accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)}
 
 \item{-}{accumulation_start_date: Allows the user to start counting accumulations from
 before the specified start date (or before the

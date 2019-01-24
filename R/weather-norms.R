@@ -130,7 +130,7 @@ weather_norms_fields <- function(field_id
       loops <- temp[[2]]
 
       #remove the years
-      allDates <-  gsub(pattern = yearPrefix,replacement = '',x = allDates,fixed = TRUE)
+      allDates <-  gsub(pattern = '20\\d\\d-',replacement = '',x = allDates)
     }
 
     #This for loop will make the API requests as calculated from above
@@ -161,15 +161,7 @@ weather_norms_fields <- function(field_id
 
       strMonthsDays <- paste0('/',monthday_start_toUse,',',monthday_end_toUse)
 
-      returnedAmount <- as.integer(difftime(lubridate::ymd(paste0(yearPrefix,monthday_end_toUse))
-                                            ,lubridate::ymd(paste0(yearPrefix,monthday_start_toUse))
-                                            ,units = 'days')) + 1L
-
-      if (returnedAmount > numObsReturned) {
-        returnedAmount <- numObsReturned
-      }
-
-      limitString <- paste0('?limit=',returnedAmount)
+      limitString <- paste0('?limit=',numObsReturned)
 
       if (length(exclude_years) != 0) {
         strexclude_years <- paste0('&excludeYears=',toString(exclude_years))
@@ -186,16 +178,16 @@ weather_norms_fields <- function(field_id
       strYearsType <- paste0('/years')
       strYears <- paste0('/',year_start,',',year_end)
 
-      url <- paste0(urlAddress
-                    ,strBeg
-                    ,strCoord
-                    ,strType
-                    ,strMonthsDays
-                    ,strYearsType
-                    ,strYears
-                    ,limitString
-                    ,strexclude_years
-                    ,propertiesString)
+      url <- URLencode(paste0(urlAddress
+                              ,strBeg
+                              ,strCoord
+                              ,strType
+                              ,strMonthsDays
+                              ,strYearsType
+                              ,strYears
+                              ,limitString
+                              ,strexclude_years
+                              ,propertiesString))
 
       doWeatherGet <- TRUE
       while (doWeatherGet == TRUE) {
@@ -372,12 +364,12 @@ weather_norms_latlng <- function(latitude
 
       if (includesLeapYear == TRUE) {
 
-        yearPrefix <- paste0(yearsToInclude[is.leapyear(yearsToInclude)][1],'-')
+        yearPrefix       <- paste0(yearsToInclude[is.leapyear(yearsToInclude)][1],'-')
 
       } else {
 
-        yearPrefix <- paste0(yearsToInclude[1],'-')
-
+        yearPrefix       <- paste0(yearsToInclude[1],'-')
+        
       }
 
       day_start <- ymd(paste0(yearPrefix
@@ -394,7 +386,7 @@ weather_norms_latlng <- function(latitude
       loops <- temp[[2]]
 
       #remove the years
-      allDates <-  gsub(pattern = yearPrefix,replacement = '',x = allDates,fixed = TRUE)
+      allDates <-  gsub(pattern = '20\\d\\d-',replacement = '',x = allDates)
     }
 
     #This for loop will make the API requests as calculated from above
@@ -425,15 +417,7 @@ weather_norms_latlng <- function(latitude
 
       strMonthsDays <- paste0('/',monthday_start_toUse,',',monthday_end_toUse)
 
-      returnedAmount <- as.integer(difftime(lubridate::ymd(paste0(yearPrefix,monthday_end_toUse))
-                                            ,lubridate::ymd(paste0(yearPrefix,monthday_start_toUse))
-                                            ,units = 'days')) + 1L
-
-      if (returnedAmount > numObsReturned) {
-        returnedAmount <- numObsReturned
-      }
-
-      limitString <- paste0('?limit=',returnedAmount)
+      limitString <- paste0('?limit=',numObsReturned)
 
       if (length(exclude_years) != 0) {
         strexclude_years <- paste0('&excludeYears=',toString(exclude_years))
@@ -450,16 +434,16 @@ weather_norms_latlng <- function(latitude
       strYearsType <- paste0('/years')
       strYears <- paste0('/',year_start,',',year_end)
 
-      url <- paste0(urlAddress
-                    ,strBeg
-                    ,strCoord
-                    ,strType
-                    ,strMonthsDays
-                    ,strYearsType
-                    ,strYears
-                    ,limitString
-                    ,strexclude_years
-                    ,propertiesString)
+      url <- URLencode(paste0(urlAddress
+                              ,strBeg
+                              ,strCoord
+                              ,strType
+                              ,strMonthsDays
+                              ,strYearsType
+                              ,strYears
+                              ,limitString
+                              ,strexclude_years
+                              ,propertiesString))
 
       doWeatherGet <- TRUE
       while (doWeatherGet == TRUE) {
