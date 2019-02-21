@@ -301,7 +301,9 @@ agronomic_norms_fields <- function(field_id
   dataList <- recalculateAccumulations(dataList)
   ##############################################################################
 
-  data <- unique(rbindlist(dataList))
+  data <- unique(rbindlist(dataList
+                           ,use.names = TRUE
+                           ,fill = NA))
 
   #Get rid of leap yearData
   if (includeFeb29thData == FALSE) {
@@ -626,7 +628,9 @@ agronomic_norms_latlng <- function(latitude
   
   dataList <- recalculateAccumulations(dataList)
   ##############################################################################
-  data <- unique(rbindlist(dataList))
+  data <- unique(rbindlist(dataList
+                           ,use.names = TRUE
+                           ,fill = NA))
 
   #Get rid of leap yearData
   if (includeFeb29thData == FALSE) {

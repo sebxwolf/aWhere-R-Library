@@ -32,7 +32,7 @@ removeUnnecessaryColumns <- function(data) {
 
 recalculateAccumulations <- function(dataList) {
   accumulatedColumns <- grep(pattern = 'accumulated'
-                             ,x = colnames(dataList[[1]])
+                             ,x = unique(unlist(lapply(dataList,colnames)))
                              ,value = TRUE
                              ,fixed = TRUE)
   
@@ -41,15 +41,38 @@ recalculateAccumulations <- function(dataList) {
                              ,invert = TRUE
                              ,value = TRUE
                              ,fixed = TRUE)
+  #it is possible for certain columns to be returned from API because of all NULLs.  Need to remove those
+  columnsToRemove <- c('accumulatedPet'
+                       ,'accumulatedPrecipitation'
+                       ,'pet')
+  
+  accumulatedColumns <- setdiff(accumulatedColumns
+                                ,columnsToRemove)
+  
+  for (x in 1:length(dataList)) {
+    #Remove those unneccesary columns
+    suppressWarnings(dataList[[x]][,(columnsToRemove) := NULL])
+    
+    #if any accumulated columns should be present that aren't add them
+    suppressWarnings(dataList[[x]][,(setdiff(accumulatedColumns
+                                     ,colnames(dataList[[x]]))) := NA,])
+    
+  }
+  
   
   for (x in 1:length(dataList)) {
     if (x > 1) {
       for (y in 1:length(accumulatedColumns)) {
         eval(parse(text = paste0('dataList[[x]][,',accumulatedColumns[y],' := ',accumulatedColumns[y],' + lastValue.accumulatedColumns$',accumulatedColumns[y],']')))
+        #eval(parse(text = paste0('dataList[[x]][,',accumulatedColumns[y],' := sum(',accumulatedColumns[y],',lastValue.accumulatedColumns$',accumulatedColumns[y],')]')))
       }  
     }
     
     lastValue.accumulatedColumns <- dataList[[x]][.N,accumulatedColumns,with = FALSE]
+    
+    #keep NA's from propagating 
+    #lastValue.accumulatedColumns[is.na(lastValue.accumulatedColumns)] <- 0
+    
   }
   
   return(dataList)
