@@ -21,7 +21,7 @@ library(aWhereAPI)
 library(dplyr)
 
 # load credentials to access aWhere API
-aWhereAPI::load_credentials('/home/AWHERE/drewmarticorena/credentials/credentials.txt')
+aWhereAPI::load_credentials('credentials_trial.txt')
 ```
 
 
@@ -40,7 +40,7 @@ obs_enddate <- as.character(Sys.Date() - 1)
 obs_area <- aWhereAPI::daily_observed_area(polygon = polygon_wkt, 
                                            day_start = obs_startdate, 
                                            day_end = obs_enddate, 
-                                           numcores = 1, 
+                                           numcores = 4, 
                                            bypassNumCallCheck = TRUE)
 ```
 
