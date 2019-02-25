@@ -232,7 +232,9 @@ agronomic_values_fields <- function(field_id
   dataList <- recalculateAccumulations(dataList)
   ##############################################################################
 
-  data <- unique(rbindlist(dataList))
+  data <- unique(rbindlist(dataList
+                           ,use.names = TRUE
+                           ,fill = NA))
 
   data <- removeUnnecessaryColumns(data)
 
@@ -481,7 +483,9 @@ agronomic_values_latlng <- function(latitude
   dataList <- recalculateAccumulations(dataList)
   ##############################################################################
   
-  data <- unique(rbindlist(dataList))
+  data <- unique(rbindlist(dataList
+                           ,use.names = TRUE
+                           ,fill = TRUE))
 
   data <- removeUnnecessaryColumns(data)
 

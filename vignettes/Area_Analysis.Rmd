@@ -21,7 +21,7 @@ library(aWhereAPI)
 library(dplyr)
 
 # load credentials to access aWhere API
-aWhereAPI::load_credentials("credentials_trial.txt")
+aWhereAPI::load_credentials('credentials_trial.txt')
 ```
 
 
