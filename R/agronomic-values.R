@@ -234,7 +234,7 @@ agronomic_values_fields <- function(field_id
 
   data <- unique(rbindlist(dataList
                            ,use.names = TRUE
-                           ,fill = NA))
+                           ,fill = TRUE))
 
   data <- removeUnnecessaryColumns(data)
 
