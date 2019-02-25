@@ -303,7 +303,7 @@ agronomic_norms_fields <- function(field_id
 
   data <- unique(rbindlist(dataList
                            ,use.names = TRUE
-                           ,fill = NA))
+                           ,fill = TRUE))
 
   #Get rid of leap yearData
   if (includeFeb29thData == FALSE) {
@@ -630,7 +630,7 @@ agronomic_norms_latlng <- function(latitude
   ##############################################################################
   data <- unique(rbindlist(dataList
                            ,use.names = TRUE
-                           ,fill = NA))
+                           ,fill = TRUE))
 
   #Get rid of leap yearData
   if (includeFeb29thData == FALSE) {
