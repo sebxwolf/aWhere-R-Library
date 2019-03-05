@@ -113,6 +113,7 @@ daily_observed_fields <- function(field_id
       strBeg <- paste0('/fields')
       strCoord <- paste0('/',field_id)
       strType <- paste0('/observations')
+      strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
 
       limitString <- paste0('?limit=',numObsReturned)
 
