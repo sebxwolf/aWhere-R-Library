@@ -12,11 +12,17 @@
 
 plan_APICalls <- function(day_start
                           ,day_end
-                          ,numObsReturned) {
+                          ,numObsReturned
+                          ,includesLeapYear) {
 
   
+  #We need to make sure Feb 29th is included if appropriate
   if (day_end < day_start) {
-    day_end <- ymd(day_end) + 366 #gets to same dayOfYear 1 year later
+    if (includesLeapYear == TRUE & lubridate::yday(day_start) > 60) {
+      day_start <- ymd(day_start) - 366 #gets to same dayOfYear 1 year later
+    } else if (includesLeapYear == TRUE & lubridate::yday(day_start) <= 60) {
+      day_end <- ymd(day_end) + 366 #gets to same dayOfYear 1 year later
+    }
   }
   
   numOfDays <- as.numeric(difftime(lubridate::ymd(day_end)
