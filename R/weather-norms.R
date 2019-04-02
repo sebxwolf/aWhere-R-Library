@@ -125,7 +125,8 @@ weather_norms_fields <- function(field_id
 
       temp <- plan_APICalls(day_start
                             ,day_end
-                            ,numObsReturned)
+                            ,numObsReturned
+                            ,includesLeapYear)
       allDates <- temp[[1]]
       loops <- temp[[2]]
 
@@ -381,7 +382,8 @@ weather_norms_latlng <- function(latitude
 
       temp <- plan_APICalls(day_start
                             ,day_end
-                            ,numObsReturned)
+                            ,numObsReturned
+                            ,includesLeapYear)
       allDates <- temp[[1]]
       loops <- temp[[2]]
 
