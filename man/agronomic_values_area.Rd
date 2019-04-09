@@ -8,7 +8,8 @@ agronomic_values_area(polygon, day_start, day_end,
   propertiesToInclude = "", accumulation_start_date = "",
   gdd_method = "standard", gdd_base_temp = 10, gdd_min_boundary = 10,
   gdd_max_boundary = 30, numcores = 2, bypassNumCallCheck = FALSE,
-  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  returnSpatialData = FALSE, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }
 \arguments{
@@ -47,6 +48,8 @@ The default value of 10 will be used if none is specified. (optional)}
 If you receive an error regarding the speed you are making calls, reduce this number}
 
 \item{-}{bypassNumCallCheck: set to TRUE to avoid prompting the user to confirm that they want to begin making API calls}
+
+\item{-}{returnSpatialData: returns the data as a SpatialPoints object (sp package: optional)}
 
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
