@@ -76,7 +76,9 @@ If you receive an error regarding the speed you are making calls, reduce this nu
 
 \item{-}{bypassNumCallCheck: set to TRUE to avoid prompting the user to confirm that they want to begin making API calls}
 
-\item{-}{returnSpatialData: returns the data as a SpatialPoints object (sp package: optional)}
+\item{-}{returnSpatialData: returns the data as a SpatialPixels object.  Can be convered to raster with the command raster::stack
+NOTE: if multiple days worth of data is returned, it is necessary to subset to specific day for working with
+as spatial data (sp package: optional)}
 
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
