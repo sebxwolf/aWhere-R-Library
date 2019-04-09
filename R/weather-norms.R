@@ -558,7 +558,9 @@ weather_norms_latlng <- function(latitude
 #' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores().
 #'                    If you receive an error regarding the speed you are making calls, reduce this number
 #' @param - bypassNumCallCheck: set to TRUE to avoid prompting the user to confirm that they want to begin making API calls
-#' @param - returnSpatialData: returns the data as a SpatialPoints object (sp package: optional)
+#' @param - returnSpatialData: returns the data as a SpatialPixels object.  Can be convered to raster with the command raster::stack
+#'                             NOTE: if multiple days worth of data is returned, it is necessary to subset to specific day for working with
+#'                             as spatial data (sp package: optional)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -649,6 +651,9 @@ weather_norms_area <- function(polygon
   if (returnSpatialData == TRUE) {
     sp::coordinates(norms) <- ~longitude + latitude
     sp::proj4string(norms) <- sp::CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+    
+    sp::gridded(norms) <- TRUE
+    
     return(norms)
   }
   
