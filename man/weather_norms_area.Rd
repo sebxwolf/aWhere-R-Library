@@ -7,8 +7,8 @@
 weather_norms_area(polygon, monthday_start, monthday_end, year_start,
   year_end, propertiesToInclude = "", exclude_years = NULL,
   includeFeb29thData = TRUE, numcores = 2,
-  bypassNumCallCheck = FALSE, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret,
+  bypassNumCallCheck = FALSE, returnSpatialData = FALSE,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }
 \arguments{
@@ -42,6 +42,8 @@ to drop this data to avoid later problems (defaults to TRUE)}
 If you receive an error regarding the speed you are making calls, reduce this number}
 
 \item{-}{bypassNumCallCheck: set to TRUE to avoid prompting the user to confirm that they want to begin making API calls}
+
+\item{-}{returnSpatialData: returns the data as a SpatialPoints object (sp package: optional)}
 
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 
