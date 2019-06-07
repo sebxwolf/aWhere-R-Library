@@ -82,32 +82,32 @@ agronomic_values_fields <- function(field_id
                                     ,keyToUse = awhereEnv75247$uid
                                     ,secretToUse = awhereEnv75247$secret
                                     ,tokenToUse = awhereEnv75247$token) {
-
+  
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDatesAgronomics(day_start,day_end)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
   checkAccumulationStartDate(accumulation_start_date, day_start)
   checkPropertiesEndpoint('agronomics',propertiesToInclude)
-
+  
   # Create Logic of API Request
   numObsReturned <- 120
   calculateAPIRequests <- TRUE
   continueRequestingData <- TRUE
-
+  
   dataList <- list()
-
+  
   # loop through, making requests in chunks of size numObsReturned
   while (continueRequestingData == TRUE | calculateAPIRequests == TRUE) {
-
+    
     #If this clause is triggered the progression of API calls will be
     #calculated.  After each API call the return will be checked for an error
     #indicating that the request was too large.  If that occurs this loop will
     #be reenentered to calculate using the smaller return size
-
+    
     ############################################################################
     if (calculateAPIRequests == TRUE) {
-
+      
       calculateAPIRequests <- FALSE
       temp <- plan_APICalls(day_start
                             ,day_end
@@ -115,11 +115,11 @@ agronomic_values_fields <- function(field_id
       allDates <- temp[[1]]
       loops <- temp[[2]]
     }
-
+    
     #This for loop will make the API requests as calculated from above
     ############################################################################
     for (i in 1:loops) {
-
+      
       starting = numObsReturned*(i-1)+1
       ending = numObsReturned*i
       day_start_toUse <- allDates[starting]
@@ -129,14 +129,14 @@ agronomic_values_fields <- function(field_id
         day_start_toUse <- tempDates[1]
         day_end_toUse   <- tempDates[length(tempDates)]
       }
-
+      
       # Create query
       urlAddress <- "https://api.awhere.com/v2/agronomics"
-
+      
       strBeg <- paste0('/fields')
       strCoord <- paste0('/',field_id)
       strType <- paste0('/agronomicvalues')
-
+      
       strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
       
       limitString <- paste0('?limit=',numObsReturned)
@@ -150,18 +150,18 @@ agronomic_values_fields <- function(field_id
       } else {
         strAccumulation <- ''
       }
-
+      
       gdd_methodString       <- paste0('&gddMethod=',gdd_method)
       gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
       gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
       gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
-
+      
       if (propertiesToInclude[1] != '') {
         propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
       } else {
         propertiesString <- ''
       }
-
+      
       url <- URLencode(paste0(urlAddress
                               ,strBeg
                               ,strCoord
@@ -174,35 +174,35 @@ agronomic_values_fields <- function(field_id
                               ,gdd_max_boundaryString
                               ,strAccumulation
                               ,propertiesString))
-
+      
       doWeatherGet <- TRUE
       while (doWeatherGet == TRUE) {
         postbody = ''
         request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                              httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
+        
         a <- suppressMessages(httr::content(request, as = "text"))
-
+        
         temp <- check_JSON(a,request)
         doWeatherGet <- temp[[1]]
-
+        
         #The temp[[2]] will only not be NA when the limit param is too large.
         if(!is.na(temp[[2]] == TRUE)) {
           numObsReturned <- temp[[2]]
           goodReturn <- FALSE
-
+          
           break
         } else {
           goodReturn <- TRUE
         }
-
+        
         rm(temp)
       }
-
+      
       if (goodReturn == TRUE) {
         #The JSONLITE Serializer properly handles the JSON conversion
         x <- jsonlite::fromJSON(a,flatten = TRUE)
-
+        
         if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == FALSE) {
           data <- as.data.table(x[[1]])
         } else if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == TRUE) {
@@ -210,13 +210,13 @@ agronomic_values_fields <- function(field_id
         } else {
           data <- as.data.table(x[[3]])
         }
-
+        
         dataList[[length(dataList) + 1]] <- data
-
+        
       } else {
         #This will break out of the current loop of making API requests so that
         #the logic of the API requests can be recalculated
-
+        
         calculateAPIRequests <- TRUE
       }
     }
@@ -231,22 +231,22 @@ agronomic_values_fields <- function(field_id
   
   dataList <- recalculateAccumulations(dataList)
   ##############################################################################
-
+  
   data <- unique(rbindlist(dataList
                            ,use.names = TRUE
                            ,fill = TRUE))
-
+  
   data <- removeUnnecessaryColumns(data)
-
+  
   currentNames <- data.table::copy(colnames(data))
-
+  
   data[,field_id  := field_id]
   data.table::setcolorder(data,c('field_id',currentNames))
-
+  
   checkDataReturn_daily(data,day_start,day_end)
-
+  
   return(as.data.frame(data))
-  }
+}
 
 
 #' @title agronomic_values_latlng.
@@ -332,32 +332,32 @@ agronomic_values_latlng <- function(latitude
                                     ,keyToUse = awhereEnv75247$uid
                                     ,secretToUse = awhereEnv75247$secret
                                     ,tokenToUse = awhereEnv75247$token) {
-
+  
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidLatLong(latitude,longitude)
   checkValidStartEndDatesAgronomics(day_start,day_end)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
   checkAccumulationStartDate(accumulation_start_date, day_start)
   checkPropertiesEndpoint('agronomics',propertiesToInclude)
-
+  
   # Create Logic of API Request
   numObsReturned <- 120
   calculateAPIRequests <- TRUE
   continueRequestingData <- TRUE
-
+  
   dataList <- list()
-
+  
   # loop through, making requests in chunks of size numObsReturned
   while (continueRequestingData == TRUE | calculateAPIRequests == TRUE) {
-
+    
     #If this clause is triggered the progression of API calls will be
     #calculated.  After each API call the return will be checked for an error
     #indicating that the request was too large.  If that occurs this loop will
     #be reenentered to calculate using the smaller return size
-
+    
     ############################################################################
     if (calculateAPIRequests == TRUE) {
-
+      
       calculateAPIRequests <- FALSE
       temp <- plan_APICalls(day_start
                             ,day_end
@@ -365,11 +365,11 @@ agronomic_values_latlng <- function(latitude
       allDates <- temp[[1]]
       loops <- temp[[2]]
     }
-
+    
     #This for loop will make the API requests as calculated from above
     ############################################################################
     for (i in 1:loops) {
-
+      
       starting = numObsReturned*(i-1)+1
       ending = numObsReturned*i
       day_start_toUse <- allDates[starting]
@@ -379,10 +379,10 @@ agronomic_values_latlng <- function(latitude
         day_start_toUse <- tempDates[1]
         day_end_toUse   <- tempDates[length(tempDates)]
       }
-
+      
       # Create query
       urlAddress <- "https://api.awhere.com/v2/agronomics"
-
+      
       strBeg <- paste0('/locations')
       strCoord <- paste0('/',latitude,',',longitude)
       strType <- paste0('/agronomicvalues')
@@ -390,7 +390,7 @@ agronomic_values_latlng <- function(latitude
       strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
       
       limitString <- paste0('?limit=',numObsReturned)
-
+      
       
       #Because of the fact that we have logic after the API calls for making
       #right the accumulation information, we only use the user specified
@@ -401,18 +401,18 @@ agronomic_values_latlng <- function(latitude
       } else {
         strAccumulation <- ''
       }
-
+      
       gdd_methodString       <- paste0('&gddMethod=',gdd_method)
       gdd_base_tempString    <- paste0('&gddBaseTemp=',gdd_base_temp)
       gdd_min_boundaryString <- paste0('&gddMinBoundary=',gdd_min_boundary)
       gdd_max_boundaryString <- paste0('&gddMaxBoundary=',gdd_max_boundary)
-
+      
       if (propertiesToInclude[1] != '') {
         propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
       } else {
         propertiesString <- ''
       }
-
+      
       url <- URLencode(paste0(urlAddress
                               ,strBeg
                               ,strCoord
@@ -425,35 +425,35 @@ agronomic_values_latlng <- function(latitude
                               ,gdd_max_boundaryString
                               ,strAccumulation
                               ,propertiesString))
-
+      
       doWeatherGet <- TRUE
       while (doWeatherGet == TRUE) {
         postbody = ''
         request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                              httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
+        
         a <- suppressMessages(httr::content(request, as = "text"))
-
+        
         temp <- check_JSON(a,request)
         doWeatherGet <- temp[[1]]
-
+        
         #The temp[[2]] will only not be NA when the limit param is too large.
         if(!is.na(temp[[2]] == TRUE)) {
           numObsReturned <- temp[[2]]
           goodReturn <- FALSE
-
+          
           break
         } else {
           goodReturn <- TRUE
         }
-
+        
         rm(temp)
       }
-
+      
       if (goodReturn == TRUE) {
         #The JSONLITE Serializer properly handles the JSON conversion
         x <- jsonlite::fromJSON(a,flatten = TRUE)
-
+        
         if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == FALSE) {
           data <- as.data.table(x[[1]])
         } else if (propertiesToInclude[1] != '' & any(grepl('accumulated',propertiesToInclude,fixed = TRUE)) == TRUE) {
@@ -461,19 +461,19 @@ agronomic_values_latlng <- function(latitude
         } else {
           data <- as.data.table(x[[3]])
         }
-
+        
         dataList[[length(dataList) + 1]] <- data
-
+        
       } else {
         #This will break out of the current loop of making API requests so that
         #the logic of the API requests can be recalculated
-
+        
         calculateAPIRequests <- TRUE
       }
     }
     continueRequestingData <- FALSE
   }
-
+  
   ##############################################################################
   #Because of the fact that the above code will allow the user to specify an arbitray
   #date range and automatically figure out an API call plan, the accumulation information
@@ -486,18 +486,18 @@ agronomic_values_latlng <- function(latitude
   data <- unique(rbindlist(dataList
                            ,use.names = TRUE
                            ,fill = TRUE))
-
+  
   data <- removeUnnecessaryColumns(data)
-
+  
   currentNames <- data.table::copy(colnames(data))
-
+  
   data[,latitude  := latitude]
   data[,longitude := longitude]
-
+  
   data.table::setcolorder(data,c('latitude','longitude',currentNames))
-
+  
   checkDataReturn_daily(data,day_start,day_end)
-
+  
   return(as.data.frame(data))
 }
 
@@ -584,57 +584,64 @@ agronomic_values_latlng <- function(latitude
 
 
 agronomic_values_area <- function(polygon
-                                ,day_start
-                                ,day_end
-                                ,propertiesToInclude = ''
-                                ,accumulation_start_date = ''
-                                ,gdd_method = 'standard'
-                                ,gdd_base_temp = 10
-                                ,gdd_min_boundary = 10
-                                ,gdd_max_boundary = 30
-                                ,numcores = 2
-                                ,bypassNumCallCheck = FALSE
-                                ,returnSpatialData = FALSE
-                                ,keyToUse = awhereEnv75247$uid
-                                ,secretToUse = awhereEnv75247$secret
-                                ,tokenToUse = awhereEnv75247$token) {
-
+                                  ,day_start
+                                  ,day_end
+                                  ,propertiesToInclude = ''
+                                  ,accumulation_start_date = ''
+                                  ,gdd_method = 'standard'
+                                  ,gdd_base_temp = 10
+                                  ,gdd_min_boundary = 10
+                                  ,gdd_max_boundary = 30
+                                  ,numcores = 2
+                                  ,bypassNumCallCheck = FALSE
+                                  ,returnSpatialData = FALSE
+                                  ,keyToUse = awhereEnv75247$uid
+                                  ,secretToUse = awhereEnv75247$secret
+                                  ,tokenToUse = awhereEnv75247$token) {
+  
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDatesAgronomics(day_start,day_end)
   checkGDDParams(gdd_method,gdd_base_temp,gdd_min_boundary,gdd_max_boundary)
   checkAccumulationStartDate(accumulation_start_date)
   checkPropertiesEndpoint('agronomics',propertiesToInclude)
-
+  
   cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
   grid <- create_awhere_grid(polygon)
-
+  
   verify_api_calls(grid,bypassNumCallCheck)
-
+  
   cat(paste0('Requesting data using parallal API calls\n'))
+  
+  grid <- split(grid, (seq(nrow(grid))-1) %/% ceiling(nrow(grid) / numcores))
+  
   doParallel::registerDoParallel(cores=numcores)
-
-  observed <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
-
-    t <- agronomic_values_latlng(latitude = grid$lat[j]
-                                 ,longitude = grid$lon[j]
-                                 ,day_start = day_start
-                                 ,day_end = day_end
-                                 ,propertiesToInclude = propertiesToInclude
-                                 ,keyToUse = keyToUse
-                                 ,secretToUse = secretToUse
-                                 ,tokenToUse = tokenToUse)
-
-    currentNames <- colnames(t)
-
-    t$gridy <- grid$gridy[j]
-    t$gridx <- grid$gridx[j]
-
-    data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
-
-    return(t)
-
+  
+  observed <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
+    
+    dat <- data.frame()
+    for(i in 1:nrow(grid[[j]])) {
+      t <- agronomic_values_latlng(latitude = grid[[j]]$lat[i]
+                                   ,longitude = grid[[j]]$lon[i]
+                                   ,day_start = day_start
+                                   ,day_end = day_end
+                                   ,propertiesToInclude = propertiesToInclude
+                                   ,keyToUse = keyToUse
+                                   ,secretToUse = secretToUse
+                                   ,tokenToUse = tokenToUse)
+      
+      currentNames <- colnames(t)
+      
+      t$gridy <- grid$gridy[j]
+      t$gridx <- grid$gridx[j]
+      
+      data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
+      
+      dat <- rbind(dat, t)
+    }
+    return(dat)
+    
   }
-
+  
   observed <- data.table::rbindlist(observed)
   
   if (returnSpatialData == TRUE) {
