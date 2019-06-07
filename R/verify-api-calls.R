@@ -7,6 +7,11 @@
 #' @param - grid: data frame returned from create_awhere_grid
 
 verify_api_calls <- function(grid,bypassNumCallCheck) {
+  
+  if(nrow(grid) == 0) {
+    stop('Polygon is not large enough to contain the centroid of any aWhere Grid cell.  Please enlarge and try again\n')
+  }
+  
   if (bypassNumCallCheck == FALSE) {
     cat(paste0('This query will require data from ',nrow(grid),' locations \n'))
     makeAPICalls <- readline("Do you wish to proceed? Type yes to begin API calls: ")

@@ -684,6 +684,8 @@ agronomic_norms_latlng <- function(latitude
 #' @references http://developer.awhere.com/api/reference/weather/norms
 #'
 #' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
+#'                     If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
+#'                     by returning spatial data and using the %over% function from the sp package
 #' @param - month_day_start: character string of the first month and day for which you want to retrieve data,
 #'                          in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)
 #' @param - month_day_end: character string of the last month and day for which you want to retrieve data,
@@ -805,6 +807,7 @@ agronomic_norms_area <- function(polygon
   norms <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
     
     dat <- data.frame()
+    
     for(i in 1:nrow(grid[[j]])) {
       t <- agronomic_norms_latlng(latitude = grid[[j]]$lat[i]
                                   ,longitude = grid[[j]]$lon[i]
@@ -838,7 +841,7 @@ agronomic_norms_area <- function(polygon
     
   }
   
-  norms <- data.table::rbindlist(norms)
+  norms <- data.table::rbindlist(norms,use.names = TRUE,fill = TRUE)
   
   if (returnSpatialData == TRUE) {
     sp::coordinates(norms) <- ~longitude + latitude

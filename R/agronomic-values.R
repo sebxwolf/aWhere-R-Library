@@ -531,6 +531,8 @@ agronomic_values_latlng <- function(latitude
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'
 #' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
+#'                     If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
+#'                     by returning spatial data and using the %over% function from the sp package
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)
@@ -619,6 +621,7 @@ agronomic_values_area <- function(polygon
   observed <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
     
     dat <- data.frame()
+    
     for(i in 1:nrow(grid[[j]])) {
       t <- agronomic_values_latlng(latitude = grid[[j]]$lat[i]
                                    ,longitude = grid[[j]]$lon[i]
@@ -642,7 +645,7 @@ agronomic_values_area <- function(polygon
     
   }
   
-  observed <- data.table::rbindlist(observed)
+  observed <- data.table::rbindlist(observed,use.names = TRUE,fill = TRUE)
   
   if (returnSpatialData == TRUE) {
     sp::coordinates(observed) <- ~longitude + latitude

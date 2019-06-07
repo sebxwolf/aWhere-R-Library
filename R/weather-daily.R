@@ -326,7 +326,6 @@ daily_observed_latlng <- function(latitude
       #will be automatically requsted and the query will be repeated
       while (doWeatherGet == TRUE) {
         postbody = ''
-        print(url)
         request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                              httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
         
@@ -412,7 +411,9 @@ daily_observed_latlng <- function(latitude
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'
-#' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
+#' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package.
+#'                     If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
+#'                     by returning spatial data and using the %over% function from the sp package
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)
@@ -475,6 +476,7 @@ daily_observed_area <- function(polygon
   observed <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
     
     dat <- data.frame()
+    
     for(i in 1:nrow(grid[[j]])) {
       t <- daily_observed_latlng(latitude = grid[[j]]$lat[i]
                                  ,longitude = grid[[j]]$lon[i]
@@ -499,7 +501,7 @@ daily_observed_area <- function(polygon
     
   }
   
-  observed <- data.table::rbindlist(observed)
+  observed <- data.table::rbindlist(observed,use.names = TRUE,fill = TRUE)
   grid <- data.table::rbindlist(grid)
   
   if (returnSpatialData == TRUE) {
