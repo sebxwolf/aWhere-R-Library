@@ -14,7 +14,9 @@ agronomic_norms_area(polygon, month_day_start, month_day_end, year_start,
   tokenToUse = awhereEnv75247$token)
 }
 \arguments{
-\item{-}{polygon: either a SpatialPolygons object, well-known text string, or extent from raster package}
+\item{-}{polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
+If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
+by returning spatial data and using the %over% function from the sp package}
 
 \item{-}{month_day_start: character string of the first month and day for which you want to retrieve data,
 in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)}

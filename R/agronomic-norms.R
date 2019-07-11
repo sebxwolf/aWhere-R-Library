@@ -292,13 +292,13 @@ agronomic_norms_fields <- function(field_id
     }
     continueRequestingData <- FALSE
   }
-  
+
   ##############################################################################
   #Because of the fact that the above code will allow the user to specify an arbitray
   #date range and automatically figure out an API call plan, the accumulation information
   #may not be properly returned.  Because it is calculatable based on other information returned
   #we are going to do so here so that the function returns what the user would be expecting
-  
+
   dataList <- recalculateAccumulations(dataList)
   ##############################################################################
 
@@ -627,7 +627,7 @@ agronomic_norms_latlng <- function(latitude
   #date range and automatically figure out an API call plan, the accumulation information
   #may not be properly returned.  Because it is calculatable based on other information returned
   #we are going to do so here so that the function returns what the user would be expecting
-  
+
   dataList <- recalculateAccumulations(dataList)
   ##############################################################################
   data <- unique(rbindlist(dataList
@@ -684,6 +684,8 @@ agronomic_norms_latlng <- function(latitude
 #' @references http://developer.awhere.com/api/reference/weather/norms
 #'
 #' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
+#'                     If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
+#'                     by returning spatial data and using the %over% function from the sp package
 #' @param - month_day_start: character string of the first month and day for which you want to retrieve data,
 #'                          in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)
 #' @param - month_day_end: character string of the last month and day for which you want to retrieve data,
@@ -763,24 +765,24 @@ agronomic_norms_latlng <- function(latitude
 
 
 agronomic_norms_area <- function(polygon
-                                ,month_day_start
-                                ,month_day_end
-                                ,year_start
-                                ,year_end
-                                ,propertiesToInclude = ''
-                                ,exclude_years = NULL
-                                ,accumulation_start_date = ''
-                                ,gdd_method = 'standard'
-                                ,gdd_base_temp = 10
-                                ,gdd_min_boundary = 10
-                                ,gdd_max_boundary = 30
-                                ,includeFeb29thData = TRUE
-                                ,numcores = 2
-                                ,returnSpatialData = FALSE
-                                ,bypassNumCallCheck = FALSE
-                                ,keyToUse = awhereEnv75247$uid
-                                ,secretToUse = awhereEnv75247$secret
-                                ,tokenToUse = awhereEnv75247$token) {
+                                 ,month_day_start
+                                 ,month_day_end
+                                 ,year_start
+                                 ,year_end
+                                 ,propertiesToInclude = ''
+                                 ,exclude_years = NULL
+                                 ,accumulation_start_date = ''
+                                 ,gdd_method = 'standard'
+                                 ,gdd_base_temp = 10
+                                 ,gdd_min_boundary = 10
+                                 ,gdd_max_boundary = 30
+                                 ,includeFeb29thData = TRUE
+                                 ,numcores = 2
+                                 ,returnSpatialData = FALSE
+                                 ,bypassNumCallCheck = FALSE
+                                 ,keyToUse = awhereEnv75247$uid
+                                 ,secretToUse = awhereEnv75247$secret
+                                 ,tokenToUse = awhereEnv75247$token) {
 
   #Checking Input Parameters
   checkCredentials(keyToUse,secretToUse,tokenToUse)
@@ -797,49 +799,56 @@ agronomic_norms_area <- function(polygon
   verify_api_calls(grid,bypassNumCallCheck)
 
   cat(paste0('Requesting data using parallal API calls\n'))
+
+  grid <- split(grid, (seq(nrow(grid))-1) %/% ceiling(nrow(grid) / numcores))
+
   doParallel::registerDoParallel(cores=numcores)
 
-  norms <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
+  norms <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
 
+    dat <- data.frame()
 
-    t <- agronomic_norms_latlng(latitude = grid$lat[j]
-                                ,longitude = grid$lon[j]
-                                ,month_day_start = month_day_start
-                                ,month_day_end = month_day_end
-                                ,year_start = year_start
-                                ,year_end = year_end
-                                ,propertiesToInclude = propertiesToInclude
-                                ,exclude_years =  exclude_years
-                                ,accumulation_start_date = accumulation_start_date
-                                ,gdd_method = gdd_method
-                                ,gdd_base_temp = gdd_base_temp
-                                ,gdd_min_boundary = gdd_min_boundary
-                                ,gdd_max_boundary = gdd_max_boundary
-                                ,includeFeb29thData = includeFeb29thData
-                                ,keyToUse = keyToUse
-                                ,secretToUse = secretToUse
-                                ,tokenToUse = tokenToUse)
+    for(i in 1:nrow(grid[[j]])) {
+      t <- agronomic_norms_latlng(latitude = grid[[j]]$lat[i]
+                                  ,longitude = grid[[j]]$lon[i]
+                                  ,month_day_start = month_day_start
+                                  ,month_day_end = month_day_end
+                                  ,year_start = year_start
+                                  ,year_end = year_end
+                                  ,propertiesToInclude = propertiesToInclude
+                                  ,exclude_years =  exclude_years
+                                  ,accumulation_start_date = accumulation_start_date
+                                  ,gdd_method = gdd_method
+                                  ,gdd_base_temp = gdd_base_temp
+                                  ,gdd_min_boundary = gdd_min_boundary
+                                  ,gdd_max_boundary = gdd_max_boundary
+                                  ,includeFeb29thData = includeFeb29thData
+                                  ,keyToUse = keyToUse
+                                  ,secretToUse = secretToUse
+                                  ,tokenToUse = tokenToUse)
 
-    currentNames <- colnames(t)
+      currentNames <- colnames(t)
 
-    t$gridy <- grid$gridy[j]
-    t$gridx <- grid$gridx[j]
+      t$gridy <- grid[[j]]$gridy[i]
+      t$gridx <- grid[[j]]$gridx[i]
 
-    data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
+      data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
 
-    return(t)
+      dat <- rbind(dat, t)
+    }
+    return(dat)
 
 
   }
 
-  norms <- data.table::rbindlist(norms)
-  
+  norms <- data.table::rbindlist(norms,use.names = TRUE,fill = TRUE)
+
   if (returnSpatialData == TRUE) {
     sp::coordinates(norms) <- ~longitude + latitude
     sp::proj4string(norms) <- sp::CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-    
+
     sp::gridded(norms) <- TRUE
-    
+
     return(norms)
   }
 

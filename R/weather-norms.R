@@ -370,14 +370,14 @@ weather_norms_latlng <- function(latitude
       } else {
 
         yearPrefix       <- paste0(yearsToInclude[1],'-')
-        
+
       }
 
       day_start <- ymd(paste0(yearPrefix
-                             ,monthday_start))
+                              ,monthday_start))
 
       day_end <- ymd(paste0(yearPrefix
-                           ,monthday_end))
+                            ,monthday_end))
 
 
       temp <- plan_APICalls(day_start
@@ -538,6 +538,8 @@ weather_norms_latlng <- function(latitude
 #' @references http://developer.awhere.com/api/reference/weather/norms
 #'
 #' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
+#'                     If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
+#'                     by returning spatial data and using the %over% function from the sp package
 #' @param - monthday_start: character string of the first month and day for which you want to retrieve data,
 #'                          in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)
 #' @param - monthday_end: character string of the last month and day for which you want to retrieve data,
@@ -616,46 +618,53 @@ weather_norms_area <- function(polygon
   verify_api_calls(grid,bypassNumCallCheck)
 
   cat(paste0('Requesting data using parallal API calls\n'))
+
+  grid <- split(grid, (seq(nrow(grid))-1) %/% ceiling(nrow(grid) / numcores))
+
   doParallel::registerDoParallel(cores=numcores)
 
-  norms <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
+  norms <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
 
+    dat <- data.frame()
 
-    t <- weather_norms_latlng(latitude = grid$lat[j]
-                              ,longitude = grid$lon[j]
-                              ,monthday_start = monthday_start
-                              ,monthday_end = monthday_end
-                              ,year_start = year_start
-                              ,year_end = year_end
-                              ,propertiesToInclude = propertiesToInclude
-                              ,exclude_years =  exclude_years
-                              ,includeFeb29thData = includeFeb29thData
-                              ,keyToUse = keyToUse
-                              ,secretToUse = secretToUse
-                              ,tokenToUse = tokenToUse)
+    for(i in 1:nrow(grid[[j]])) {
+      t <- weather_norms_latlng(latitude = grid[[j]]$lat[i]
+                                ,longitude = grid[[j]]$lon[i]
+                                ,monthday_start = monthday_start
+                                ,monthday_end = monthday_end
+                                ,year_start = year_start
+                                ,year_end = year_end
+                                ,propertiesToInclude = propertiesToInclude
+                                ,exclude_years =  exclude_years
+                                ,includeFeb29thData = includeFeb29thData
+                                ,keyToUse = keyToUse
+                                ,secretToUse = secretToUse
+                                ,tokenToUse = tokenToUse)
 
-    currentNames <- colnames(t)
+      currentNames <- colnames(t)
 
-    t$gridy <- grid$gridy[j]
-    t$gridx <- grid$gridx[j]
+      t$gridy <- grid[[j]]$gridy[i]
+      t$gridx <- grid[[j]]$gridx[i]
 
-    data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
+      data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
 
-    return(t)
+      dat <- rbind(dat, t)
+    }
+    return(dat)
 
 
   }
 
-  norms <- data.table::rbindlist(norms)
+  norms <- data.table::rbindlist(norms,use.names = TRUE,fill = TRUE)
 
   if (returnSpatialData == TRUE) {
     sp::coordinates(norms) <- ~longitude + latitude
     sp::proj4string(norms) <- sp::CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-    
+
     sp::gridded(norms) <- TRUE
-    
+
     return(norms)
   }
-  
+
   return(as.data.frame(norms))
 }

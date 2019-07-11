@@ -138,9 +138,9 @@ agronomic_values_fields <- function(field_id
       strType <- paste0('/agronomicvalues')
 
       strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
-      
+
       limitString <- paste0('?limit=',numObsReturned)
-      
+
       #Because of the fact that we have logic after the API calls for making
       #right the accumulation information, we only use the user specified
       #paramater on the first call.  This allows us to use the R function to
@@ -222,13 +222,13 @@ agronomic_values_fields <- function(field_id
     }
     continueRequestingData <- FALSE
   }
-  
+
   ##############################################################################
   #Because of the fact that the above code will allow the user to specify an arbitray
   #date range and automatically figure out an API call plan, the accumulation information
   #may not be properly returned.  Because it is calculatable based on other information returned
   #we are going to do so here so that the function returns what the user would be expecting
-  
+
   dataList <- recalculateAccumulations(dataList)
   ##############################################################################
 
@@ -246,7 +246,7 @@ agronomic_values_fields <- function(field_id
   checkDataReturn_daily(data,day_start,day_end)
 
   return(as.data.frame(data))
-  }
+}
 
 
 #' @title agronomic_values_latlng.
@@ -386,12 +386,12 @@ agronomic_values_latlng <- function(latitude
       strBeg <- paste0('/locations')
       strCoord <- paste0('/',latitude,',',longitude)
       strType <- paste0('/agronomicvalues')
-      
+
       strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
-      
+
       limitString <- paste0('?limit=',numObsReturned)
 
-      
+
       #Because of the fact that we have logic after the API calls for making
       #right the accumulation information, we only use the user specified
       #paramater on the first call.  This allows us to use the R function to
@@ -479,10 +479,10 @@ agronomic_values_latlng <- function(latitude
   #date range and automatically figure out an API call plan, the accumulation information
   #may not be properly returned.  Because it is calculatable based on other information returned
   #we are going to do so here so that the function returns what the user would be expecting
-  
+
   dataList <- recalculateAccumulations(dataList)
   ##############################################################################
-  
+
   data <- unique(rbindlist(dataList
                            ,use.names = TRUE
                            ,fill = TRUE))
@@ -531,6 +531,8 @@ agronomic_values_latlng <- function(latitude
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'
 #' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
+#'                     If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
+#'                     by returning spatial data and using the %over% function from the sp package
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)
@@ -584,20 +586,20 @@ agronomic_values_latlng <- function(latitude
 
 
 agronomic_values_area <- function(polygon
-                                ,day_start
-                                ,day_end
-                                ,propertiesToInclude = ''
-                                ,accumulation_start_date = ''
-                                ,gdd_method = 'standard'
-                                ,gdd_base_temp = 10
-                                ,gdd_min_boundary = 10
-                                ,gdd_max_boundary = 30
-                                ,numcores = 2
-                                ,bypassNumCallCheck = FALSE
-                                ,returnSpatialData = FALSE
-                                ,keyToUse = awhereEnv75247$uid
-                                ,secretToUse = awhereEnv75247$secret
-                                ,tokenToUse = awhereEnv75247$token) {
+                                  ,day_start
+                                  ,day_end
+                                  ,propertiesToInclude = ''
+                                  ,accumulation_start_date = ''
+                                  ,gdd_method = 'standard'
+                                  ,gdd_base_temp = 10
+                                  ,gdd_min_boundary = 10
+                                  ,gdd_max_boundary = 30
+                                  ,numcores = 2
+                                  ,bypassNumCallCheck = FALSE
+                                  ,returnSpatialData = FALSE
+                                  ,keyToUse = awhereEnv75247$uid
+                                  ,secretToUse = awhereEnv75247$secret
+                                  ,tokenToUse = awhereEnv75247$token) {
 
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDatesAgronomics(day_start,day_end)
@@ -611,41 +613,49 @@ agronomic_values_area <- function(polygon
   verify_api_calls(grid,bypassNumCallCheck)
 
   cat(paste0('Requesting data using parallal API calls\n'))
+
+  grid <- split(grid, (seq(nrow(grid))-1) %/% ceiling(nrow(grid) / numcores))
+
   doParallel::registerDoParallel(cores=numcores)
 
-  observed <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
+  observed <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
 
-    t <- agronomic_values_latlng(latitude = grid$lat[j]
-                                 ,longitude = grid$lon[j]
-                                 ,day_start = day_start
-                                 ,day_end = day_end
-                                 ,propertiesToInclude = propertiesToInclude
-                                 ,keyToUse = keyToUse
-                                 ,secretToUse = secretToUse
-                                 ,tokenToUse = tokenToUse)
+    dat <- data.frame()
 
-    currentNames <- colnames(t)
+    for(i in 1:nrow(grid[[j]])) {
+      t <- agronomic_values_latlng(latitude = grid[[j]]$lat[i]
+                                   ,longitude = grid[[j]]$lon[i]
+                                   ,day_start = day_start
+                                   ,day_end = day_end
+                                   ,propertiesToInclude = propertiesToInclude
+                                   ,keyToUse = keyToUse
+                                   ,secretToUse = secretToUse
+                                   ,tokenToUse = tokenToUse)
 
-    t$gridy <- grid$gridy[j]
-    t$gridx <- grid$gridx[j]
+      currentNames <- colnames(t)
 
-    data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
+      t$gridy <- grid[[j]]$gridy[i]
+      t$gridx <- grid[[j]]$gridx[i]
 
-    return(t)
+      data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
+
+      dat <- rbind(dat, t)
+    }
+    return(dat)
 
   }
 
-  observed <- data.table::rbindlist(observed)
-  
+  observed <- data.table::rbindlist(observed,use.names = TRUE,fill = TRUE)
+
   if (returnSpatialData == TRUE) {
     sp::coordinates(observed) <- ~longitude + latitude
     sp::proj4string(observed) <- sp::CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-    
+
     sp::gridded(observed) <- TRUE
-    
+
     return(observed)
   }
-  
+
   return(as.data.frame(observed))
 }
 

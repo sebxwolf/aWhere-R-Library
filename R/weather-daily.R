@@ -54,31 +54,31 @@ daily_observed_fields <- function(field_id
                                   ,keyToUse = awhereEnv75247$uid
                                   ,secretToUse = awhereEnv75247$secret
                                   ,tokenToUse = awhereEnv75247$token) {
-
+  
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDates(day_start,day_end)
   checkPropertiesEndpoint('weather',propertiesToInclude)
-
-
+  
+  
   # Create Logic of API Request
   numObsReturned <- 120
   calculateAPIRequests <- TRUE
   continueRequestingData <- TRUE
-
+  
   dataList <- list()
-
+  
   # loop through, making requests in chunks of size numObsReturned
   while (continueRequestingData == TRUE | calculateAPIRequests == TRUE) {
-
+    
     #If this clause is triggered the progression of API calls will be
     #calculated.  After each API call the return will be checked for an error
     #indicating that the request was too large.  If that occurs this loop will
     #be reenentered to calculate using the smaller return size
-
+    
     ############################################################################
     if (calculateAPIRequests == TRUE) {
-
+      
       calculateAPIRequests <- FALSE
       temp <- plan_APICalls(day_start
                             ,day_end
@@ -86,15 +86,15 @@ daily_observed_fields <- function(field_id
       allDates <- temp[[1]]
       loops <- temp[[2]]
     }
-
+    
     #This for loop will make the API requests as calculated from above
     ############################################################################
-
+    
     for (i in 1:loops) {
-
+      
       starting = numObsReturned*(i-1)+1
       ending = numObsReturned*i
-
+      
       if(paste(allDates,sep = '',collapse ='') != '') {
         day_start_toUse <- allDates[starting]
         day_end_toUse <- allDates[ending]
@@ -104,25 +104,25 @@ daily_observed_fields <- function(field_id
           day_end_toUse <- tempDates[length(tempDates)]
         }
       }
-
-
+      
+      
       # Create query
-
+      
       urlAddress <- "https://api.awhere.com/v2/weather"
-
+      
       strBeg <- paste0('/fields')
       strCoord <- paste0('/',field_id)
       strType <- paste0('/observations')
       strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
-
+      
       limitString <- paste0('?limit=',numObsReturned)
-
+      
       if (propertiesToInclude[1] != '') {
         propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
       } else {
         propertiesString <- ''
       }
-
+      
       url <- URLencode(paste0(urlAddress
                               ,strBeg
                               ,strCoord
@@ -130,60 +130,60 @@ daily_observed_fields <- function(field_id
                               ,strDates
                               ,limitString
                               ,propertiesString))
-
+      
       doWeatherGet <- TRUE
-
+      
       while (doWeatherGet == TRUE) {
         postbody = ''
         request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                              httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
+        
         a <- suppressMessages(httr::content(request, as = "text"))
-
+        
         temp <- check_JSON(a,request)
         doWeatherGet <- temp[[1]]
-
+        
         #The temp[[2]] will only not be NA when the limit param is too large.
         if(!is.na(temp[[2]] == TRUE)) {
           numObsReturned <- temp[[2]]
           goodReturn <- FALSE
-
+          
           break
         } else {
           goodReturn <- TRUE
         }
-
+        
         rm(temp)
       }
-
+      
       if (goodReturn == TRUE) {
         #The JSONLITE Serializer properly handles the JSON conversion
         x <- jsonlite::fromJSON(a,flatten = TRUE)
-
+        
         data <- data.table::as.data.table(x[[1]])
-
+        
         dataList[[length(dataList) + 1]] <- data
       } else {
         #This will break out of the current loop of making API requests so that
         #the logic of the API requests can be recalculated
-
+        
         calculateAPIRequests <- TRUE
       }
     }
     continueRequestingData <- FALSE
   }
-
+  
   data <- unique(rbindlist(dataList))
-
+  
   data <- removeUnnecessaryColumns(data)
-
+  
   currentNames <- data.table::copy(colnames(data))
-
+  
   data[,field_id  := field_id]
   data.table::setcolorder(data,c('field_id',currentNames))
-
+  
   checkDataReturn_daily(data,day_start,day_end)
-
+  
   return(as.data.frame(data))
 }
 
@@ -248,70 +248,70 @@ daily_observed_latlng <- function(latitude
                                   ,keyToUse = awhereEnv75247$uid
                                   ,secretToUse = awhereEnv75247$secret
                                   ,tokenToUse = awhereEnv75247$token) {
-
-  checkCredentials(keyToUse,secretToUse,tokenToUse)
-  checkValidLatLong(latitude,longitude)
-  checkValidStartEndDates(day_start,day_end)
-  checkPropertiesEndpoint('weather',propertiesToInclude)
-
+  
+  aWhereAPI:::checkCredentials(keyToUse,secretToUse,tokenToUse)
+  aWhereAPI:::checkValidLatLong(latitude,longitude)
+  aWhereAPI:::checkValidStartEndDates(day_start,day_end)
+  aWhereAPI:::checkPropertiesEndpoint('weather',propertiesToInclude)
+  
   # Create Logic of API Request
   numObsReturned <- 120
   calculateAPIRequests <- TRUE
   continueRequestingData <- TRUE
-
+  
   dataList <- list()
-
+  
   # loop through, making requests in chunks of size numObsReturned
   while (continueRequestingData == TRUE | calculateAPIRequests == TRUE) {
-
+    
     #If this clause is triggered the progression of API calls will be
     #calculated.  After each API call the return will be checked for an error
     #indicating that the request was too large.  If that occurs this loop will
     #be reenentered to calculate using the smaller return size
-
+    
     ############################################################################
     if (calculateAPIRequests == TRUE) {
-
+      
       calculateAPIRequests <- FALSE
-      temp <- plan_APICalls(day_start
-                            ,day_end
-                            ,numObsReturned)
+      temp <- aWhereAPI:::plan_APICalls(day_start
+                                        ,day_end
+                                        ,numObsReturned)
       allDates <- temp[[1]]
       loops <- temp[[2]]
     }
-
+    
     #This for loop will make the API requests as calculated from above
     ############################################################################
     for (i in 1:loops) {
-
+      
       starting = numObsReturned*(i-1)+1
       ending = numObsReturned*i
       day_start_toUse <- allDates[starting]
       day_end_toUse <- allDates[ending]
-
+      
       if(is.na(day_end_toUse)) {
         tempDates <- allDates[c(starting:length(allDates))]
         day_start_toUse <- tempDates[1]
         day_end_toUse   <- tempDates[length(tempDates)]
       }
-
-
+      
+      
       # Create query
       urlAddress <- "https://api.awhere.com/v2/weather"
-
+      
       strBeg <- paste0('/locations')
       strCoord <- paste0('/',latitude,',',longitude)
       strType <- paste0('/observations')
       strDates <- paste0('/',day_start_toUse,',',day_end_toUse)
-
+      
       limitString <- paste0('?limit=',numObsReturned)
-
+      
       if (propertiesToInclude[1] != '') {
         propertiesString <- paste0('&properties=',paste0(propertiesToInclude,collapse = ','))
       } else {
         propertiesString <- ''
       }
-
+      
       url <- URLencode(paste0(urlAddress
                               ,strBeg
                               ,strCoord
@@ -319,65 +319,65 @@ daily_observed_latlng <- function(latitude
                               ,strDates
                               ,limitString
                               ,propertiesString))
-
+      
       doWeatherGet <- TRUE
-
+      
       #The reason for the while loop is that if the token has expired a new token
       #will be automatically requsted and the query will be repeated
       while (doWeatherGet == TRUE) {
         postbody = ''
         request <- httr::GET(url, body = postbody, httr::content_type('application/json'),
                              httr::add_headers(Authorization =paste0("Bearer ", tokenToUse)))
-
+        
         # Make request
         a <- suppressMessages(httr::content(request, as = "text"))
-
+        
         temp <- check_JSON(a,request)
         doWeatherGet <- temp[[1]]
-
+        
         #The temp[[2]] will only not be NA when the limit param is too large.
         if(!is.na(temp[[2]] == TRUE)) {
           numObsReturned <- temp[[2]]
           goodReturn <- FALSE
-
+          
           break
         } else {
           goodReturn <- TRUE
         }
-
+        
         rm(temp)
       }
-
+      
       if (goodReturn == TRUE) {
         #The JSONLITE Serializer properly handles the JSON conversion
         x <- jsonlite::fromJSON(a,flatten = TRUE)
-
+        
         data <- data.table::as.data.table(x[[1]])
-
+        
         dataList[[length(dataList) + 1]] <- data
       } else {
         #This will break out of the current loop of making API requests so that
         #the logic of the API requests can be recalculated
-
+        
         calculateAPIRequests <- TRUE
       }
     }
     continueRequestingData <- FALSE
   }
-
+  
   data <- unique(rbindlist(dataList))
-
+  
   data <- removeUnnecessaryColumns(data)
-
+  
   currentNames <- data.table::copy(colnames(data))
-
+  
   data[,latitude  := latitude]
   data[,longitude := longitude]
-
+  
   data.table::setcolorder(data,c('latitude','longitude',currentNames))
-
+  
   checkDataReturn_daily(data,day_start,day_end)
-
+  
   return(as.data.frame(data))
 }
 
@@ -411,7 +411,9 @@ daily_observed_latlng <- function(latitude
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'
-#' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
+#' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package.
+#'                     If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
+#'                     by returning spatial data and using the %over% function from the sp package
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)
@@ -456,41 +458,51 @@ daily_observed_area <- function(polygon
                                 ,keyToUse = awhereEnv75247$uid
                                 ,secretToUse = awhereEnv75247$secret
                                 ,tokenToUse = awhereEnv75247$token) {
-
+  
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDates(day_start,day_end)
-
+  
   cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
-  grid <- create_awhere_grid(polygon)
-
-  verify_api_calls(grid,bypassNumCallCheck)
-
+  grid <- aWhereAPI:::create_awhere_grid(polygon)
+  
+  aWhereAPI:::verify_api_calls(grid,bypassNumCallCheck)
+  
   cat(paste0('Requesting data using parallal API calls\n'))
+  
+  grid <- split(grid, (seq(nrow(grid))-1) %/% ceiling(nrow(grid) / numcores))
+  
   doParallel::registerDoParallel(cores=numcores)
-
-  observed <- foreach::foreach(j=c(1:nrow(grid)), .packages = c("aWhereAPI")) %dopar% {
-
-    t <- daily_observed_latlng(latitude = grid$lat[j]
-                               ,longitude = grid$lon[j]
-                               ,day_start = day_start
-                               ,day_end = day_end
-                               ,propertiesToInclude = propertiesToInclude
-                               ,keyToUse = keyToUse
-                               ,secretToUse = secretToUse
-                               ,tokenToUse = tokenToUse)
-
-    currentNames <- colnames(t)
-
-    t$gridy <- grid$gridy[j]
-    t$gridx <- grid$gridx[j]
-
-    data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
-
-    return(t)
-
+  
+  observed <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
+    
+    dat <- data.frame()
+    
+    for(i in 1:nrow(grid[[j]])) {
+      t <- daily_observed_latlng(latitude = grid[[j]]$lat[i]
+                                 ,longitude = grid[[j]]$lon[i]
+                                 ,day_start = day_start
+                                 ,day_end = day_end
+                                 ,propertiesToInclude = propertiesToInclude
+                                 ,keyToUse = keyToUse
+                                 ,secretToUse = secretToUse
+                                 ,tokenToUse = tokenToUse)
+      
+      
+      currentNames <- colnames(t)
+      
+      t$gridy <- grid[[j]]$gridy[i]
+      t$gridx <- grid[[j]]$gridx[i]
+      
+      data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
+      
+      dat <- rbind(dat, t)
+    }
+    return(dat)
+    
   }
-
-  observed <- data.table::rbindlist(observed)
+  
+  observed <- data.table::rbindlist(observed,use.names = TRUE,fill = TRUE)
+  grid <- data.table::rbindlist(grid)
   
   if (returnSpatialData == TRUE) {
     sp::coordinates(observed) <- ~longitude + latitude
