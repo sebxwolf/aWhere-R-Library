@@ -7,4 +7,4 @@ Meta
 *.rds
 /doc
 aWhere-R-Library_github.Rproj
-aWhereAPI.Rproj
+*.Rproj

@@ -162,6 +162,8 @@ daily_observed_fields <- function(field_id
         
         data <- data.table::as.data.table(x[[1]])
         
+        data <- removeUnnecessaryColumns(data)
+        
         dataList[[length(dataList) + 1]] <- data
       } else {
         #This will break out of the current loop of making API requests so that
@@ -174,8 +176,6 @@ daily_observed_fields <- function(field_id
   }
   
   data <- unique(rbindlist(dataList))
-  
-  data <- removeUnnecessaryColumns(data)
   
   currentNames <- data.table::copy(colnames(data))
   
@@ -354,6 +354,8 @@ daily_observed_latlng <- function(latitude
         
         data <- data.table::as.data.table(x[[1]])
         
+        data <- removeUnnecessaryColumns(data)
+        
         dataList[[length(dataList) + 1]] <- data
       } else {
         #This will break out of the current loop of making API requests so that
@@ -366,8 +368,6 @@ daily_observed_latlng <- function(latitude
   }
   
   data <- unique(rbindlist(dataList))
-  
-  data <- removeUnnecessaryColumns(data)
   
   currentNames <- data.table::copy(colnames(data))
   

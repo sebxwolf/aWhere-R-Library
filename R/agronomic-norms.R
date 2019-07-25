@@ -281,7 +281,9 @@ agronomic_norms_fields <- function(field_id
         } else {
           data <- as.data.table(x[[3]])
         }
-
+        
+        data <- removeUnnecessaryColumns(data)
+        
         dataList[[length(dataList) + 1]] <- data
       } else {
         #This will break out of the current loop of making API requests so that
@@ -310,9 +312,7 @@ agronomic_norms_fields <- function(field_id
   if (includeFeb29thData == FALSE) {
     data <- data[day != '02-29',]
   }
-
-  data <- removeUnnecessaryColumns(data)
-
+  
   currentNames <- data.table::copy(colnames(data))
 
   data[,field_id  := field_id]
@@ -611,7 +611,9 @@ agronomic_norms_latlng <- function(latitude
         } else {
           data <- as.data.table(x[[3]])
         }
-
+        
+        data <- removeUnnecessaryColumns(data)
+        
         dataList[[length(dataList) + 1]] <- data
       } else {
         #This will break out of the current loop of making API requests so that
@@ -638,8 +640,6 @@ agronomic_norms_latlng <- function(latitude
   if (includeFeb29thData == FALSE) {
     data <- data[day != '02-29',]
   }
-
-  data <- removeUnnecessaryColumns(data)
 
   currentNames <- data.table::copy(colnames(data))
 

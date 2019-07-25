@@ -210,6 +210,8 @@ agronomic_values_fields <- function(field_id
         } else {
           data <- as.data.table(x[[3]])
         }
+        
+        data <- removeUnnecessaryColumns(data)
 
         dataList[[length(dataList) + 1]] <- data
 
@@ -235,8 +237,6 @@ agronomic_values_fields <- function(field_id
   data <- unique(rbindlist(dataList
                            ,use.names = TRUE
                            ,fill = TRUE))
-
-  data <- removeUnnecessaryColumns(data)
 
   currentNames <- data.table::copy(colnames(data))
 
@@ -461,7 +461,9 @@ agronomic_values_latlng <- function(latitude
         } else {
           data <- as.data.table(x[[3]])
         }
-
+        
+        data <- removeUnnecessaryColumns(data)
+        
         dataList[[length(dataList) + 1]] <- data
 
       } else {
@@ -486,8 +488,6 @@ agronomic_values_latlng <- function(latitude
   data <- unique(rbindlist(dataList
                            ,use.names = TRUE
                            ,fill = TRUE))
-
-  data <- removeUnnecessaryColumns(data)
 
   currentNames <- data.table::copy(colnames(data))
 
