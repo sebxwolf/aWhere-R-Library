@@ -220,6 +220,8 @@ weather_norms_fields <- function(field_id
         
         data <- data.table::as.data.table(x[[1]])
         
+        data <- removeUnnecessaryColumns(data)
+        
         dataList[[length(dataList) + 1]] <- data
       } else {
         #This will break out of the current loop of making API requests so that
@@ -237,8 +239,6 @@ weather_norms_fields <- function(field_id
   if (includeFeb29thData == FALSE) {
     data <- data[day != '02-29',]
   }
-  
-  data <- removeUnnecessaryColumns(data)
   
   currentNames <- data.table::copy(colnames(data))
   
@@ -477,6 +477,8 @@ weather_norms_latlng <- function(latitude
         
         data <- data.table::as.data.table(x[[1]])
         
+        data <- removeUnnecessaryColumns(data)
+        
         dataList[[length(dataList) + 1]] <- data
       } else {
         #This will break out of the current loop of making API requests so that
@@ -494,8 +496,6 @@ weather_norms_latlng <- function(latitude
   if (includeFeb29thData == FALSE) {
     data <- data[day != '02-29',]
   }
-  
-  data <- removeUnnecessaryColumns(data)
   
   currentNames <- data.table::copy(colnames(data))
   
