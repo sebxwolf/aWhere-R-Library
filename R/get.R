@@ -108,7 +108,7 @@ get_fields <- function(field_id = ''
 #' for any given field in the platform. In this function by setting an Id you can retrieve the weather
 #' and agronomics for that location in all the other APIs.
 #'
-#' @param - field_id: a field ID to look within (string)
+#' @param - field_id: a field ID to look within (string - optional)
 #' @param - planting_id: a planting ID to look for (string - optional)
 #' @param - current: whether to just get current plantings(T) or include historical plantings(F).
 #'                   To get most recent planting record for a field, set current to TRUE and do not pass in a planting_id (boolean - optional)
@@ -132,9 +132,9 @@ get_fields <- function(field_id = ''
 #' get_planting(field_id='field_test', offset = '0', limit = '5')}
 #' @export
 
-get_planting <- function(field_id
+get_planting <- function(field_id = ''
                          ,planting_id = ''
-                         ,current = F
+                         ,current = FALSE
                          ,offset=""
                          ,limit=""
                          ,keyToUse = awhereEnv75247$uid
@@ -142,12 +142,12 @@ get_planting <- function(field_id
                          ,tokenToUse = awhereEnv75247$token) {
 
   checkCredentials(keyToUse,secretToUse,tokenToUse)
-  checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
 
   ## Create Request
   url <- "https://api.awhere.com/v2/agronomics/"
 
   if(field_id != "") {
+    checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
     url <- paste0(url, "fields/", field_id, "/plantings")
   } else {
     url <- paste0(url, "plantings")
@@ -170,6 +170,7 @@ get_planting <- function(field_id
       url <- paste0(url, "&limit=", limit)
     }
   }
+  
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
     request <- httr::GET(url,
@@ -184,8 +185,12 @@ get_planting <- function(field_id
 
   ## Create & fill data frame
   if(is.null(a$statusCode)) {
-    if(planting_id == "" & !current) {
+    
+    if((field_id != '' && planting_id == "" && current == FALSE) ||
+       (field_id == '' && current == TRUE)) {
+         
       data <- as.data.frame(do.call(rbind, lapply(a$plantings, rbind)))
+    
       # case if field has no plantings
       if (nrow(data) == 0) {
         stop(paste("field_id:", field_id, "has no planting.", a$detailedMessage))

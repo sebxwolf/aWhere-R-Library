@@ -8,14 +8,16 @@ agronomic_values_area(polygon, day_start, day_end,
   propertiesToInclude = "", accumulation_start_date = "",
   gdd_method = "standard", gdd_base_temp = 10, gdd_min_boundary = 10,
   gdd_max_boundary = 30, numcores = 2, bypassNumCallCheck = FALSE,
-  returnSpatialData = FALSE, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret,
+  returnSpatialData = FALSE, verbose = TRUE,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }
 \arguments{
-\item{-}{polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
-If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
-by returning spatial data and using the %over% function from the sp package}
+\item{-}{polygon: either a data.frame with column names lat/lon, SpatialPolygons object,
+well-known text string, or extent from raster package. If the object contains
+multiple polygons, the union of them is used.  Information from each individal
+polygon can be retrieved by returning spatial data and using
+the %over% function from the sp package}
 
 \item{-}{day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD}
 
@@ -65,7 +67,7 @@ as spatial data (sp package: optional)}
 data.frame of requested data for dates requested
 }
 \description{
-\code{agronomic_values_area} pulls agronomic data from aWhere's API based on spatial polygon or extent
+\code{agronomic_values_area} pulls agronomic data from aWhere's API based on a data.frame of lat/lon, polygon or extent
 }
 \details{
 This function returns agronomic data on GDDs, potential evapotranspiration (PET), Precipitation over
