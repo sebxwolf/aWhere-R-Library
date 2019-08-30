@@ -246,18 +246,23 @@ get_model_results <- function(field_id
   previousStages <- data.frame()
   if(class(a$previousStages) == "list" & length(a$previousStages) > 0) {
     previousStages <- as.data.frame(do.call(rbind, lapply(a$previousStages, rbind)))[, c(1:5)]
+    previousStages <- data.frame(lapply(previousStages, as.character), stringsAsFactors=FALSE)
     previousStages <- suppressWarnings(dplyr::mutate_at(previousStages, c("date"), as.Date))
+    previousStages <- suppressWarnings(dplyr::mutate_at(previousStages, c("gddThreshold"), as.integer))
   }
   
   currentStage <- data.frame()
   if(class(a$currentStage) == "list" & length(a$currentStage) > 0) {
     currentStage <- data.frame(rbind(a$currentStage))
+    currentStage <- data.frame(lapply(currentStage, as.character), stringsAsFactors=FALSE)
+    currentStage <- suppressWarnings(dplyr::mutate_at(currentStage, c("accumulatedGdds"), as.numeric))
     currentStage <- dplyr::mutate_at(currentStage, c("accumulatedGdds"), round, 2)
   }
   
   nextStage <- data.frame()
   if(class(a$nextStage) == "list" & length(a$nextStage) > 0) {
     nextStage <- as.data.frame(rbind(a$nextStage))
+    data.frame(lapply(stages, as.character), stringsAsFactors=FALSE)
   }
   
   stages <- list(previousStages = previousStages
