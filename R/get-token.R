@@ -161,7 +161,7 @@ check_JSON <- function(jsonObject, request) {
   }
 
   #Finally check to see if there was a different problem with the query and if so return the message
-  aWhereAPI:::checkStatusCode(request)
+  checkStatusCode(request)
 
   return(list(FALSE,NA))
 }

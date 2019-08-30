@@ -4,13 +4,13 @@
 \alias{get_planting}
 \title{Get Planting}
 \usage{
-get_planting(field_id, planting_id = "", current = F, offset = "",
-  limit = "", keyToUse = awhereEnv75247$uid,
+get_planting(field_id = "", planting_id = "", current = FALSE,
+  offset = "", limit = "", keyToUse = awhereEnv75247$uid,
   secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }
 \arguments{
-\item{-}{field_id: a field ID to look within (string)}
+\item{-}{field_id: a field ID to look within (string - optional)}
 
 \item{-}{planting_id: a planting ID to look for (string - optional)}
 
