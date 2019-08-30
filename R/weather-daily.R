@@ -25,7 +25,7 @@
 #' @references http://developer.awhere.com/api/reference/weather/observations
 #'
 #' @param - field_id: the field_id associated with the location for which you want to pull data.
-#' Field IDs are created using the create_field function.(string)
+#'          Field IDs are created using the create_field function.(string)
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD.
 #' @param - day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)
@@ -236,10 +236,8 @@ daily_observed_fields <- function(field_id
 #'                                ,longitude = -98.5795
 #'                                ,day_start = '2018-10-28'
 #'                                ,day_end = '2018-12-01')}
-
 #' @export
-
-
+#' 
 daily_observed_latlng <- function(latitude
                                   ,longitude
                                   ,day_start
@@ -412,10 +410,10 @@ daily_observed_latlng <- function(latitude
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'
 #' @param - polygon: either a data.frame with column names lat/lon, SpatialPolygons object,
-#'                   well-known text string, or extent from raster package. If the object contains
-#'                   multiple polygons, the union of them is used.  Information from each individal
-#'                   polygon can be retrieved by returning spatial data and using
-#'                   the %over% function from the sp package
+#'                  well-known text string, or extent from raster package. If the object contains
+#'                  multiple polygons, the union of them is used.  Information from each individal
+#'                  polygon can be retrieved by returning spatial data and using
+#'                  the %over% function from the sp package
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)
@@ -440,13 +438,12 @@ daily_observed_latlng <- function(latitude
 #'
 #' @return data.frame of requested data for dates requested
 #'
-#'
 #' @examples
 #' \dontrun{daily_observed_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T),
 #'                                ,day_start = '2018-04-28'
 #'                                ,day_end = '2018-05-01'
 #'                                ,numcores = 2)}
-
+#'                                
 #' @export
 
 

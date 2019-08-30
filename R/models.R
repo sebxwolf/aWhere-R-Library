@@ -203,7 +203,9 @@ get_model_details <- function(model_id
 #'
 #' @import httr
 #'
-#' @return - data.frame containing details about requested model
+#' @return - 3 element named list containing information on previous growth stages
+#'           that have completed (previousStages), the current growth stage (currentStage)
+#'           and the next growth stage(nextStage)
 #'
 #' @examples
 #' \dontrun{get_model_results('Field1', 'BarleyGenericMSU')
@@ -249,44 +251,38 @@ get_model_results <- function(field_id
     previousStages <- data.frame(lapply(previousStages, as.character), stringsAsFactors=FALSE)
     previousStages <- suppressWarnings(dplyr::mutate_at(previousStages, c("date"), as.Date))
     previousStages <- suppressWarnings(dplyr::mutate_at(previousStages, c("gddThreshold"), as.integer))
+    
+    previousStages <- dplyr::select(previousStages,c('date','stage','id','description','gddThreshold'))
   }
   
   currentStage <- data.frame()
   if(class(a$currentStage) == "list" & length(a$currentStage) > 0) {
     currentStage <- data.frame(rbind(a$currentStage))
     currentStage <- data.frame(lapply(currentStage, as.character), stringsAsFactors=FALSE)
-    currentStage <- suppressWarnings(dplyr::mutate_at(currentStage, c("accumulatedGdds"), as.numeric))
-    currentStage <- dplyr::mutate_at(currentStage, c("accumulatedGdds"), round, 2)
+    currentStage <- suppressWarnings(dplyr::mutate_at(currentStage, c("accumulatedGdds",'gddThreshold'), as.numeric))
+    currentStage <- dplyr::mutate_at(currentStage, c("accumulatedGdds",'gddThreshold'), round, 2)
+    
+    currentStage <- dplyr::select(currentStage,c('date','stage','id','description','gddThreshold'))
+    
   }
   
   nextStage <- data.frame()
   if(class(a$nextStage) == "list" & length(a$nextStage) > 0) {
     nextStage <- as.data.frame(rbind(a$nextStage))
-    data.frame(lapply(stages, as.character), stringsAsFactors=FALSE)
+    nextStage <- data.frame(lapply(nextStage, as.character), stringsAsFactors=FALSE)
+    nextStage <- suppressWarnings(dplyr::mutate_at(nextStage, c("gddRemaining",'gddThreshold'), as.numeric))
+    nextStage <- dplyr::mutate_at(nextStage, c("gddRemaining",'gddThreshold'), round, 2)
+    
+    nextStage <- dplyr::select(currentStage,c('stage','id','description','gddThreshold','gddThreshold'))
   }
   
   stages <- list(previousStages = previousStages
                  ,currentStage = currentStage
                  ,nextStage = nextStage)
   
-  #stages <- rbind(previousStages, currentStage, nextStage)
-  #stages <- data.frame(lapply(stages, as.character), stringsAsFactors=FALSE)
-  #stages <- stages[, c("date", "id", "stage", "description", "gddThreshold", "stageType", "accumulatedGdds", "gddRemaining")]
-  
-  #data <- cbind(data, stages)
-  #colnames(data) <- c("biofixDate", "gddUnits", "modelId", "latitude", "longitude", "fieldId", "plantingDate",
-  #                    "date", "id", "stage", "description", "gddThreshold", "stageType", "accumulatedGdds", "gddRemaining")
-  #rownames(data) <- c(1:nrow(data))
-  
-  #data <- dplyr::mutate_if(data, is.factor, as.character)
-  
-  data <- suppressWarnings(dplyr::mutate_at(data, c("biofixDate", "plantingDate", "date"), as.Date))
-  data <- suppressWarnings(dplyr::mutate_at(data, c("gddThreshold", "accumulatedGdds", "gddRemaining"), as.numeric))
-  data <- dplyr::mutate_at(data, c("accumulatedGdds", "gddRemaining"), round, 2)
-  
   if(nrow(data) == 0) {
     stop(a$simpleMessage)
   } else {
-    return(as.data.frame(data))
+    return(stages)
   }
 }
