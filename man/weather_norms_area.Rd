@@ -8,13 +8,16 @@ weather_norms_area(polygon, monthday_start, monthday_end, year_start,
   year_end, propertiesToInclude = "", exclude_years = NULL,
   includeFeb29thData = TRUE, numcores = 2,
   bypassNumCallCheck = FALSE, returnSpatialData = FALSE,
-  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
+  verbose = TRUE, keyToUse = awhereEnv75247$uid,
+  secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }
 \arguments{
-\item{-}{polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
-If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
-by returning spatial data and using the %over% function from the sp package}
+\item{-}{polygon: either a data.frame with column names lat/lon, SpatialPolygons object,
+well-known text string, or extent from raster package. If the object contains
+multiple polygons, the union of them is used.  Information from each individal
+polygon can be retrieved by returning spatial data and using
+the %over% function from the sp package}
 
 \item{-}{monthday_start: character string of the first month and day for which you want to retrieve data,
 in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)}
@@ -59,7 +62,7 @@ as spatial data (sp package: optional)}
 data.frame of requested data for dates requested
 }
 \description{
-\code{weather_norms_area} pulls long term norm weather data from aWhere's API based on spatial polygon or extent
+\code{weather_norms_area} pulls long term norm weather data from aWhere's API based on a data.frame of lat/lon, polygon or extentt
 }
 \details{
 This function allows you to calculate the averages for weather attributes

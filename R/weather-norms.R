@@ -513,7 +513,7 @@ weather_norms_latlng <- function(latitude
 #' @title weather_norms_area
 #'
 #' @description
-#' \code{weather_norms_area} pulls long term norm weather data from aWhere's API based on spatial polygon or extent
+#' \code{weather_norms_area} pulls long term norm weather data from aWhere's API based on a data.frame of lat/lon, polygon or extentt
 #'
 #' @details
 #' This function allows you to calculate the averages for weather attributes
@@ -537,9 +537,11 @@ weather_norms_latlng <- function(latitude
 #'
 #' @references http://developer.awhere.com/api/reference/weather/norms
 #'
-#' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
-#'                     If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
-#'                     by returning spatial data and using the %over% function from the sp package
+#' @param - polygon: either a data.frame with column names lat/lon, SpatialPolygons object,
+#'                   well-known text string, or extent from raster package. If the object contains
+#'                   multiple polygons, the union of them is used.  Information from each individal
+#'                   polygon can be retrieved by returning spatial data and using
+#'                   the %over% function from the sp package
 #' @param - monthday_start: character string of the first month and day for which you want to retrieve data,
 #'                          in the form: MM-DD.  This is the start of your date range. e.g. '07-01' (July 1) (required)
 #' @param - monthday_end: character string of the last month and day for which you want to retrieve data,
@@ -600,6 +602,7 @@ weather_norms_area <- function(polygon
                                ,numcores = 2
                                ,bypassNumCallCheck = FALSE
                                ,returnSpatialData = FALSE
+                               ,verbose = TRUE
                                ,keyToUse = awhereEnv75247$uid
                                ,secretToUse = awhereEnv75247$secret
                                ,tokenToUse = awhereEnv75247$token) {
@@ -612,12 +615,31 @@ weather_norms_area <- function(polygon
 
   ##############################################################################
 
-  cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
-  grid <- create_awhere_grid(polygon)
-
+  if (!(all(class(polygon) %in% c('data.frame','data.table')))) {
+    
+    if (verbose == TRUE) {
+      cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
+    }
+    
+    grid <- aWhereAPI:::create_awhere_grid(polygon)
+    
+  } else {
+    
+    if (!(all(colnames(polygon) %in% c('lat','lon')) & length(colnames(polygon)) == 2)) {
+      stop('Data.Frame of Lat/Lon coordinates improperly specified, please correct')
+    }
+    grid <-  polygon
+    
+    grid[,c('gridx'
+            ,'gridy') := list(aWhereAPI:::getGridX(longitude = lon)
+                              ,aWhereAPI:::getGridY(latitude = lat))]
+  }
+  
   verify_api_calls(grid,bypassNumCallCheck)
 
-  cat(paste0('Requesting data using parallal API calls\n'))
+  if (verbose == TRUE) {
+    cat(paste0('Requesting data using parallal API calls\n'))
+  }
 
   grid <- split(grid, (seq(nrow(grid))-1) %/% ceiling(nrow(grid) / numcores))
 
