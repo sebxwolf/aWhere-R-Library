@@ -249,10 +249,10 @@ daily_observed_latlng <- function(latitude
                                   ,secretToUse = awhereEnv75247$secret
                                   ,tokenToUse = awhereEnv75247$token) {
   
-  aWhereAPI:::checkCredentials(keyToUse,secretToUse,tokenToUse)
-  aWhereAPI:::checkValidLatLong(latitude,longitude)
-  aWhereAPI:::checkValidStartEndDates(day_start,day_end)
-  aWhereAPI:::checkPropertiesEndpoint('weather',propertiesToInclude)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidLatLong(latitude,longitude)
+  checkValidStartEndDates(day_start,day_end)
+  checkPropertiesEndpoint('weather',propertiesToInclude)
   
   # Create Logic of API Request
   numObsReturned <- 120
@@ -273,9 +273,9 @@ daily_observed_latlng <- function(latitude
     if (calculateAPIRequests == TRUE) {
       
       calculateAPIRequests <- FALSE
-      temp <- aWhereAPI:::plan_APICalls(day_start
-                                        ,day_end
-                                        ,numObsReturned)
+      temp <- plan_APICalls(day_start
+                            ,day_end
+                            ,numObsReturned)
       allDates <- temp[[1]]
       loops <- temp[[2]]
     }
@@ -471,7 +471,7 @@ daily_observed_area <- function(polygon
       cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
     }
     
-    grid <- aWhereAPI:::create_awhere_grid(polygon)
+    grid <- create_awhere_grid(polygon)
     
   } else {
     
@@ -481,11 +481,11 @@ daily_observed_area <- function(polygon
     grid <-  polygon
     
     grid[,c('gridx'
-           ,'gridy') := list(aWhereAPI:::getGridX(longitude = lon)
-                             ,aWhereAPI:::getGridY(latitude = lat))]
+           ,'gridy') := list(getGridX(longitude = lon)
+                             ,getGridY(latitude = lat))]
   }
   
-  aWhereAPI:::verify_api_calls(grid,bypassNumCallCheck)
+  verify_api_calls(grid,bypassNumCallCheck)
   
   if (verbose == TRUE) {
     cat(paste0('Requesting data using parallal API calls\n'))

@@ -350,7 +350,7 @@ forecasts_area <- function(polygon
       cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
     }
 
-    grid <- aWhereAPI:::create_awhere_grid(polygon)
+    grid <- create_awhere_grid(polygon)
     
   } else {
     
@@ -360,11 +360,11 @@ forecasts_area <- function(polygon
     grid <-  polygon
     
     grid[,c('gridx'
-            ,'gridy') := list(aWhereAPI:::getGridX(longitude = lon)
-                              ,aWhereAPI:::getGridY(latitude = lat))]
+            ,'gridy') := list(getGridX(longitude = lon)
+                              ,getGridY(latitude = lat))]
   }
   
-  aWhereAPI:::verify_api_calls(grid,bypassNumCallCheck)
+  verify_api_calls(grid,bypassNumCallCheck)
   
   if (verbose == TRUE) {
     cat(paste0('Requesting data using parallal API calls\n'))

@@ -616,7 +616,7 @@ agronomic_values_area <- function(polygon
       cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
     }
     
-    grid <- aWhereAPI:::create_awhere_grid(polygon)
+    grid <- create_awhere_grid(polygon)
     
   } else {
     
@@ -626,8 +626,8 @@ agronomic_values_area <- function(polygon
     grid <-  polygon
     
     grid[,c('gridx'
-            ,'gridy') := list(aWhereAPI:::getGridX(longitude = lon)
-                              ,aWhereAPI:::getGridY(latitude = lat))]
+            ,'gridy') := list(getGridX(longitude = lon)
+                              ,getGridY(latitude = lat))]
   }
 
   verify_api_calls(grid,bypassNumCallCheck)
