@@ -91,12 +91,6 @@ get_models <- function(model_id = ''
   }
 }
 
-
-
-
-
-
-
 #' @title Get Model Details
 #'
 #' @description
@@ -174,11 +168,6 @@ get_model_details <- function(model_id
   }
 }
 
-
-
-
-
-
 #' @title Get Model Results
 #'
 #' @description
@@ -244,7 +233,7 @@ get_model_results <- function(field_id
                      longitude = a$location$longitude, fieldId = a$location$fieldId, plantingDate = a$plantingDate)
   
   previousStages <- data.frame()
-  if(length(a$previousStages) > 0) {
+  if(is.na(a$previousStages[[1]][1]) == FALSE) {
     previousStages <- as.data.frame(do.call(rbind, lapply(a$previousStages, rbind)))[, c(1:5)]
     previousStages$stageType <- "previous"
     previousStages$accumulatedGdds <- NA
@@ -252,21 +241,21 @@ get_model_results <- function(field_id
   }
   
   currentStage <- data.frame()
-  if(length(a$currentStage) > 0) {
+  if(is.na(a$currentStage[[1]]) == FALSE) {
     currentStage <- as.data.frame(rbind(a$currentStage))
     currentStage$stageType <- "current"
     currentStage$gddRemaining <- NA
   }
   
   nextStage <- data.frame()
-  if(length(a$nextStage) > 0) {
+  if(is.na(a$nextStage[[1]]) == FALSE) {
     nextStage <- as.data.frame(rbind(a$nextStage))
     nextStage$date <- NA
     nextStage$stageType <- "next"
     nextStage$accumulatedGdds <- NA
   }
   
-  stages <- rbind(previousStages, currentStage, nextStage)
+  stages <- rbind(previousStages, currentStage, nextStage,use.names = TRUE,fill = TRUE)
   stages <- data.frame(lapply(stages, as.character), stringsAsFactors=FALSE)
   stages <- stages[, c("date", "id", "stage", "description", "gddThreshold", "stageType", "accumulatedGdds", "gddRemaining")]
   

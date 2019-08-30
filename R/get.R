@@ -143,11 +143,15 @@ get_planting <- function(field_id = ''
 
   checkCredentials(keyToUse,secretToUse,tokenToUse)
 
+  if (current == TRUE && planting_id != '') {
+    stop('Cannot specify planting_id and set current to TRUE.  Please revise query')
+  }
+  
   ## Create Request
   url <- "https://api.awhere.com/v2/agronomics/"
 
   if(field_id != "") {
-    checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
+   # checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
     url <- paste0(url, "fields/", field_id, "/plantings")
   } else {
     url <- paste0(url, "plantings")
@@ -186,8 +190,10 @@ get_planting <- function(field_id = ''
   ## Create & fill data frame
   if(is.null(a$statusCode)) {
     
+    #if((field_id != '' && planting_id == "" && current == FALSE) ||
+    #   (field_id == '' && current == TRUE)) {
     if((field_id != '' && planting_id == "" && current == FALSE) ||
-       (field_id == '' && current == TRUE)) {
+       (field_id == '')) {
          
       data <- as.data.frame(do.call(rbind, lapply(a$plantings, rbind)))
     
