@@ -53,7 +53,7 @@ get_models <- function(model_id = ''
     
     a <- suppressMessages(httr::content(request))
     
-    doWeatherGet <- aWhereAPI:::check_JSON(a,request)[[1]]
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
   
   ## Create & fill data frame
@@ -134,7 +134,7 @@ get_model_details <- function(model_id
     
     a <- suppressMessages(httr::content(request))
     
-    doWeatherGet <- aWhereAPI:::check_JSON(a,request)[[1]]
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
   
   
@@ -222,7 +222,7 @@ get_model_results <- function(field_id
     
     a <- suppressMessages(httr::content(request))
     
-    doWeatherGet <- aWhereAPI:::check_JSON(a,request)[[1]]
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
   
   

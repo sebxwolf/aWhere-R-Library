@@ -56,7 +56,7 @@ get_crops <- function(crop_id = ''
     
     a <- suppressMessages(httr::content(request))
     
-    doWeatherGet <- aWhereAPI:::check_JSON(a,request)[[1]]
+    doWeatherGet <- check_JSON(a,request)[[1]]
   }
   
   ## Create & fill data frame
