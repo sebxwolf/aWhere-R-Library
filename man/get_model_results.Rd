@@ -18,7 +18,9 @@ get_model_results(field_id, model_id, keyToUse = awhereEnv75247$uid,
 \item{-}{tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 }
 \value{
-- data.frame containing details about requested model
+- 3 element named list containing information on previous growth stages
+          that have completed (previousStages), the current growth stage (currentStage)
+          and the next growth stage(nextStage)
 }
 \description{
 \code{get_model_details} Calls Model Results endpoint of API
