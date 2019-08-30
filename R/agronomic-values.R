@@ -504,7 +504,7 @@ agronomic_values_latlng <- function(latitude
 #' @title agronomic_values_area
 #'
 #' @description
-#' \code{agronomic_values_area} pulls agronomic data from aWhere's API based on spatial polygon or extent
+#' \code{agronomic_values_area} pulls agronomic data from aWhere's API based on a data.frame of lat/lon, polygon or extent
 #'
 #' @details
 #' This function returns agronomic data on GDDs, potential evapotranspiration (PET), Precipitation over
@@ -530,9 +530,11 @@ agronomic_values_latlng <- function(latitude
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'
-#' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package
-#'                     If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
-#'                     by returning spatial data and using the %over% function from the sp package
+#' @param - polygon: either a data.frame with column names lat/lon, SpatialPolygons object,
+#'                   well-known text string, or extent from raster package. If the object contains
+#'                   multiple polygons, the union of them is used.  Information from each individal
+#'                   polygon can be retrieved by returning spatial data and using
+#'                   the %over% function from the sp package
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)
@@ -597,6 +599,7 @@ agronomic_values_area <- function(polygon
                                   ,numcores = 2
                                   ,bypassNumCallCheck = FALSE
                                   ,returnSpatialData = FALSE
+                                  ,verbose = TRUE
                                   ,keyToUse = awhereEnv75247$uid
                                   ,secretToUse = awhereEnv75247$secret
                                   ,tokenToUse = awhereEnv75247$token) {
@@ -607,12 +610,31 @@ agronomic_values_area <- function(polygon
   checkAccumulationStartDate(accumulation_start_date)
   checkPropertiesEndpoint('agronomics',propertiesToInclude)
 
-  cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
-  grid <- create_awhere_grid(polygon)
+  if (!(all(class(polygon) %in% c('data.frame','data.table')))) {
+
+    if (verbose == TRUE) {
+      cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
+    }
+    
+    grid <- create_awhere_grid(polygon)
+    
+  } else {
+    
+    if (!(all(colnames(polygon) %in% c('lat','lon')) & length(colnames(polygon)) == 2)) {
+      stop('Data.Frame of Lat/Lon coordinates improperly specified, please correct')
+    }
+    grid <-  polygon
+    
+    grid[,c('gridx'
+            ,'gridy') := list(getGridX(longitude = lon)
+                              ,getGridY(latitude = lat))]
+  }
 
   verify_api_calls(grid,bypassNumCallCheck)
 
-  cat(paste0('Requesting data using parallal API calls\n'))
+  if (verbose == TRUE) {
+    cat(paste0('Requesting data using parallal API calls\n'))
+  }
 
   grid <- split(grid, (seq(nrow(grid))-1) %/% ceiling(nrow(grid) / numcores))
 

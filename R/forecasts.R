@@ -257,3 +257,165 @@ forecasts_latlng <- function(latitude
   return(as.data.frame(data))
 }
 
+#' @title forecasts_area
+#'
+#' @description
+#' \code{forecasts_area} pulls historical weather data from aWhere's API based on a data.frame of lat/lon, polygon or extent
+#'
+#' @details
+#' This function returns today's forecast plus the forecast for up to 7 more days. Forecasts are available
+#' in many sizes of hourly blocks, from hourly to daily. The data this function returns is
+#' Min/Max Temperature, Precipitation Amount, Chance of Precipitation,
+#' Max Humidity, Relative Humidity, Solar Radiation, Average Wind Speed, Max Windspeed, Percentage
+#' of Sky Covered by Clouds, and Percentage of Clear Sky for the location specified by latitude and longitude.
+#' Default units are returned by the API. Latitude and longitude must be in decimal degrees.
+#'
+#' Note that when block_size = 1 the fields min/max relative humidity and min/max wind will be NA
+#'
+#' The Weather APIs provide access to aWhere's agriculture-specific Weather Terrain system,
+#' and allows retrieval and integration of data across all different time ranges long term normals,
+#' daily observed, current weather, and forecasts. These APIs are designed for efficiency,
+#' allowing you to customize the responses to return just the attributes you need.
+#'
+#' Note about dates: The system does not adjust for any difference in dates between the location of the user
+#'           and where data is being requested from.  It is the responsibility of the user to ensure a valid
+#'           date range is specified given any differences in timezone.  These differences can have implications
+#'           for whether a given date should be requested from the daily_observed functions or the forecast functions
+#'
+#' @references http://developer.awhere.com/api/reference/weather/forecasts/geolocation
+#'
+#' @param - polygon: either a data.frame with column names lat/lon, SpatialPolygons object,
+#'                   well-known text string, or extent from raster package. If the object contains
+#'                   multiple polygons, the union of them is used.  Information from each individal
+#'                   polygon can be retrieved by returning spatial data and using
+#'                   the %over% function from the sp package
+#' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
+#' @param - block_size: Integer value that corresponds to the number of hours to include in each time block.
+#'                     Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)
+#' @param - useLocalTime: whether the data specified is the date specified at the location where data is
+#'                        being requested from or at UTC = 0.  Default is TRUE
+#' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()
+#'                    If you receive an error regarding the speed you are making calls, reduce this number
+#' @param - bypassNumCallCheck: set to TRUE to avoid prompting the user to confirm that they want to begin making API calls
+#' @param - returnSpatialData: returns the data as a SpatialPixels object.  Can be convered to raster with the command raster::stack
+#'                             NOTE: if multiple days worth of data is returned, it is necessary to subset to specific day for working with
+#'                             as spatial data (sp package: optional)
+#' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
+#'
+#' @import httr
+#' @import data.table
+#' @import lubridate
+#' @import jsonlite
+#' @import foreach
+#' @import doParallel
+#' @import rgeos
+#' @import sp
+#'
+#' @return data.frame of requested data for dates requested
+#'
+#'
+#' @examples
+#' \dontrun{forecasts_area(polygon = raster::getData('GADM', country = "Gambia", level = 0, download = T),
+#'                         ,day_start = as.character(Sys.Date())
+#'                         ,day_end = as.character(Sys.Date() + 5)
+#'                         ,block_size = 12)
+#'                         ,numcores = 2)}
+#'                         
+#' @export
+
+
+forecasts_area <- function(polygon
+                           ,day_start = as.character(Sys.Date())
+                           ,day_end = ''
+                           ,block_size = 1
+                           ,useLocalTime = TRUE
+                           ,numcores = 2
+                           ,bypassNumCallCheck = FALSE
+                           ,returnSpatialData = FALSE
+                           ,verbose = TRUE
+                           ,keyToUse = awhereEnv75247$uid
+                           ,secretToUse = awhereEnv75247$secret
+                           ,tokenToUse = awhereEnv75247$token) {
+  
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidStartEndDatesForecast(day_start,day_end)
+  checkForecastParams(day_start,block_size)
+  
+  if (!(all(class(polygon) %in% c('data.frame','data.table')))) {
+    
+    if (verbose == TRUE) {
+      cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
+    }
+
+    grid <- create_awhere_grid(polygon)
+    
+  } else {
+    
+    if (!(all(colnames(polygon) %in% c('lat','lon')) & length(colnames(polygon)) == 2)) {
+      stop('Data.Frame of Lat/Lon coordinates improperly specified, please correct')
+    }
+    grid <-  polygon
+    
+    grid[,c('gridx'
+            ,'gridy') := list(getGridX(longitude = lon)
+                              ,getGridY(latitude = lat))]
+  }
+  
+  verify_api_calls(grid,bypassNumCallCheck)
+  
+  if (verbose == TRUE) {
+    cat(paste0('Requesting data using parallal API calls\n'))
+  }
+  
+  grid <- split(grid, (seq(nrow(grid))-1) %/% ceiling(nrow(grid) / numcores))
+  
+  doParallel::registerDoParallel(cores=numcores)
+  
+  forecasts <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
+    
+    dat <- data.frame()
+    
+    for(i in 1:nrow(grid[[j]])) {
+      t <- forecasts_latlng(latitude = grid[[j]]$lat[i]
+                           ,longitude = grid[[j]]$lon[i]
+                           ,day_start = day_start
+                           ,day_end = day_end
+                           ,block_size = block_size
+                           ,useLocalTime = useLocalTime
+                           ,keyToUse = keyToUse
+                           ,secretToUse = secretToUse
+                           ,tokenToUse = tokenToUse)
+      
+      
+      currentNames <- colnames(t)
+      
+      t$gridy <- grid[[j]]$gridy[i]
+      t$gridx <- grid[[j]]$gridx[i]
+      
+      data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
+      
+      dat <- rbind(dat, t)
+    }
+    return(dat)
+    
+  }
+  
+  forecasts <- data.table::rbindlist(forecasts,use.names = TRUE,fill = TRUE)
+  grid <- data.table::rbindlist(grid)
+  
+  if (returnSpatialData == TRUE) {
+    sp::coordinates(forecasts) <- ~longitude + latitude
+    sp::proj4string(forecasts) <- sp::CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+    
+    sp::gridded(forecasts) <- TRUE
+    
+    return(forecasts)
+  }
+  
+  return(as.data.frame(forecasts))
+}
+
+

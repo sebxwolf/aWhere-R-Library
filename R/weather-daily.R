@@ -249,10 +249,10 @@ daily_observed_latlng <- function(latitude
                                   ,secretToUse = awhereEnv75247$secret
                                   ,tokenToUse = awhereEnv75247$token) {
   
-  aWhereAPI:::checkCredentials(keyToUse,secretToUse,tokenToUse)
-  aWhereAPI:::checkValidLatLong(latitude,longitude)
-  aWhereAPI:::checkValidStartEndDates(day_start,day_end)
-  aWhereAPI:::checkPropertiesEndpoint('weather',propertiesToInclude)
+  checkCredentials(keyToUse,secretToUse,tokenToUse)
+  checkValidLatLong(latitude,longitude)
+  checkValidStartEndDates(day_start,day_end)
+  checkPropertiesEndpoint('weather',propertiesToInclude)
   
   # Create Logic of API Request
   numObsReturned <- 120
@@ -273,9 +273,9 @@ daily_observed_latlng <- function(latitude
     if (calculateAPIRequests == TRUE) {
       
       calculateAPIRequests <- FALSE
-      temp <- aWhereAPI:::plan_APICalls(day_start
-                                        ,day_end
-                                        ,numObsReturned)
+      temp <- plan_APICalls(day_start
+                            ,day_end
+                            ,numObsReturned)
       allDates <- temp[[1]]
       loops <- temp[[2]]
     }
@@ -384,7 +384,7 @@ daily_observed_latlng <- function(latitude
 #' @title daily_observed_area
 #'
 #' @description
-#' \code{daily_observed_area} pulls historical weather data from aWhere's API for a provided polygon or extent
+#' \code{daily_observed_area} pulls historical weather data from aWhere's API based on a data.frame of lat/lon, polygon or extent
 #'
 #' @details
 #' This function returns weather data on Min/Max Temperature, Precipitation,
@@ -411,9 +411,11 @@ daily_observed_latlng <- function(latitude
 #'
 #' @references http://developer.awhere.com/api/reference/weather/observations/geolocation
 #'
-#' @param - polygon: either a SpatialPolygons object, well-known text string, or extent from raster package.
-#'                     If the object contains multiple polygons, the union of them is used.  Information from each individal polygon can be retrieved
-#'                     by returning spatial data and using the %over% function from the sp package
+#' @param - polygon: either a data.frame with column names lat/lon, SpatialPolygons object,
+#'                   well-known text string, or extent from raster package. If the object contains
+#'                   multiple polygons, the union of them is used.  Information from each individal
+#'                   polygon can be retrieved by returning spatial data and using
+#'                   the %over% function from the sp package
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are temperatures, precipitation, solar, relativeHumidity, wind (optional)
@@ -455,6 +457,7 @@ daily_observed_area <- function(polygon
                                 ,numcores = 2
                                 ,bypassNumCallCheck = FALSE
                                 ,returnSpatialData = FALSE
+                                ,verbose = TRUE
                                 ,keyToUse = awhereEnv75247$uid
                                 ,secretToUse = awhereEnv75247$secret
                                 ,tokenToUse = awhereEnv75247$token) {
@@ -462,12 +465,32 @@ daily_observed_area <- function(polygon
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDates(day_start,day_end)
   
-  cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
-  grid <- aWhereAPI:::create_awhere_grid(polygon)
+  if (!(all(class(polygon) %in% c('data.frame','data.table')))) {
+    
+    if (verbose == TRUE) {
+      cat(paste0('Creating aWhere Raster Grid within Polygon\n'))
+    }
+    
+    grid <- create_awhere_grid(polygon)
+    
+  } else {
+    
+    if (!(all(colnames(polygon) %in% c('lat','lon')) & length(colnames(polygon)) == 2)) {
+      stop('Data.Frame of Lat/Lon coordinates improperly specified, please correct')
+    }
+    grid <-  polygon
+    
+    grid[,c('gridx'
+           ,'gridy') := list(getGridX(longitude = lon)
+                             ,getGridY(latitude = lat))]
+  }
   
-  aWhereAPI:::verify_api_calls(grid,bypassNumCallCheck)
+  verify_api_calls(grid,bypassNumCallCheck)
   
-  cat(paste0('Requesting data using parallal API calls\n'))
+  if (verbose == TRUE) {
+    cat(paste0('Requesting data using parallal API calls\n'))
+  }
+
   
   grid <- split(grid, (seq(nrow(grid))-1) %/% ceiling(nrow(grid) / numcores))
   
