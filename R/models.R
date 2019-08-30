@@ -244,7 +244,7 @@ get_model_results <- function(field_id
                      longitude = a$location$longitude, fieldId = a$location$fieldId, plantingDate = a$plantingDate)
   
   previousStages <- data.frame()
-  if(length(a$previousStages) > 0) {
+  if(class(a$previousStages) == "list" & length(a$previousStages) > 0) {
     previousStages <- as.data.frame(do.call(rbind, lapply(a$previousStages, rbind)))[, c(1:5)]
     previousStages$stageType <- "previous"
     previousStages$accumulatedGdds <- NA
@@ -252,14 +252,14 @@ get_model_results <- function(field_id
   }
   
   currentStage <- data.frame()
-  if(length(a$currentStage) > 0) {
+  if(class(a$currentStage) == "list" & length(a$currentStage) > 0) {
     currentStage <- as.data.frame(rbind(a$currentStage))
     currentStage$stageType <- "current"
     currentStage$gddRemaining <- NA
   }
   
   nextStage <- data.frame()
-  if(length(a$nextStage) > 0) {
+  if(class(a$nextStage) == "list" & length(a$nextStage) > 0) {
     nextStage <- as.data.frame(rbind(a$nextStage))
     nextStage$date <- NA
     nextStage$stageType <- "next"
