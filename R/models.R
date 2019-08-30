@@ -246,36 +246,34 @@ get_model_results <- function(field_id
   previousStages <- data.frame()
   if(class(a$previousStages) == "list" & length(a$previousStages) > 0) {
     previousStages <- as.data.frame(do.call(rbind, lapply(a$previousStages, rbind)))[, c(1:5)]
-    previousStages$stageType <- "previous"
-    previousStages$accumulatedGdds <- NA
-    previousStages$gddRemaining <- NA
+    previousStages <- suppressWarnings(dplyr::mutate_at(previousStages, c("date"), as.Date))
   }
   
   currentStage <- data.frame()
   if(class(a$currentStage) == "list" & length(a$currentStage) > 0) {
-    currentStage <- as.data.frame(rbind(a$currentStage))
-    currentStage$stageType <- "current"
-    currentStage$gddRemaining <- NA
+    currentStage <- data.frame(rbind(a$currentStage))
+    currentStage <- dplyr::mutate_at(currentStage, c("accumulatedGdds"), round, 2)
   }
   
   nextStage <- data.frame()
   if(class(a$nextStage) == "list" & length(a$nextStage) > 0) {
     nextStage <- as.data.frame(rbind(a$nextStage))
-    nextStage$date <- NA
-    nextStage$stageType <- "next"
-    nextStage$accumulatedGdds <- NA
   }
   
-  stages <- rbind(previousStages, currentStage, nextStage)
-  stages <- data.frame(lapply(stages, as.character), stringsAsFactors=FALSE)
-  stages <- stages[, c("date", "id", "stage", "description", "gddThreshold", "stageType", "accumulatedGdds", "gddRemaining")]
+  stages <- list(previousStages = previousStages
+                 ,currentStage = currentStage
+                 ,nextStage = nextStage)
   
-  data <- cbind(data, stages)
-  colnames(data) <- c("biofixDate", "gddUnits", "modelId", "latitude", "longitude", "fieldId", "plantingDate",
-                      "date", "id", "stage", "description", "gddThreshold", "stageType", "accumulatedGdds", "gddRemaining")
-  rownames(data) <- c(1:nrow(data))
+  #stages <- rbind(previousStages, currentStage, nextStage)
+  #stages <- data.frame(lapply(stages, as.character), stringsAsFactors=FALSE)
+  #stages <- stages[, c("date", "id", "stage", "description", "gddThreshold", "stageType", "accumulatedGdds", "gddRemaining")]
   
-  data <- dplyr::mutate_if(data, is.factor, as.character)
+  #data <- cbind(data, stages)
+  #colnames(data) <- c("biofixDate", "gddUnits", "modelId", "latitude", "longitude", "fieldId", "plantingDate",
+  #                    "date", "id", "stage", "description", "gddThreshold", "stageType", "accumulatedGdds", "gddRemaining")
+  #rownames(data) <- c(1:nrow(data))
+  
+  #data <- dplyr::mutate_if(data, is.factor, as.character)
   
   data <- suppressWarnings(dplyr::mutate_at(data, c("biofixDate", "plantingDate", "date"), as.Date))
   data <- suppressWarnings(dplyr::mutate_at(data, c("gddThreshold", "accumulatedGdds", "gddRemaining"), as.numeric))
