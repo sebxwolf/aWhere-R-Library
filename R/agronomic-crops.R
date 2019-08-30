@@ -65,6 +65,8 @@ get_crops <- function(crop_id = ''
     colnames(data) <- c("cropId", "name", "type", "variety", "isDefaultForCrop")
     rownames(data) <- c(1:nrow(data))
     
+    data <- data.frame(lapply(data, as.character), stringsAsFactors=FALSE)
+    
     data <- as.matrix(data)
     data[sapply(data, is.null)] <- NA
     data <- as.data.frame(data)
@@ -74,6 +76,8 @@ get_crops <- function(crop_id = ''
     colnames(data) <- c("cropId", "name", "type", "variety", "isDefaultForCrop")
     rownames(data) <- c(1:nrow(data))
   }
+  
+  data <- dplyr::mutate_if(data, is.factor, as.character)
   
   if(nrow(data) == 0) {
     stop(a$simpleMessage)

@@ -31,9 +31,9 @@
 #' @export
 
 get_models <- function(model_id = ''
-                      ,keyToUse = awhereEnv75247$uid
-                      ,secretToUse = awhereEnv75247$secret
-                      ,tokenToUse = awhereEnv75247$token) {
+                       ,keyToUse = awhereEnv75247$uid
+                       ,secretToUse = awhereEnv75247$secret
+                       ,tokenToUse = awhereEnv75247$token) {
   
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   
@@ -58,19 +58,31 @@ get_models <- function(model_id = ''
   
   ## Create & fill data frame
   if(model_id == "") {
+    
     data <- as.data.frame(do.call(rbind, lapply(a$models, rbind)))[, c(1:5)]
-    colnames(data) <- c("modelId", "name", "description", "type", "source")
+    source <- as.data.frame(do.call(rbind, lapply(data$source, rbind)))
+    data$source <- NULL
+    data <- cbind(data, source)
+    
+    colnames(data) <- c("modelId", "name", "description", "type", "sourceName", "sourceLink")
     rownames(data) <- c(1:nrow(data))
+    
+    data <- data.frame(lapply(data, as.character), stringsAsFactors=FALSE)
     
     data <- as.matrix(data)
     data[sapply(data, is.null)] <- NA
     data <- as.data.frame(data)
     
   } else {
-    data <- as.data.frame(rbind(a))[,c(1:5)]
-    colnames(data) <- c("modelId", "name", "description", "type", "source")
+    source <- as.data.frame(do.call(cbind, lapply(a$source, cbind)))
+    data <- as.data.frame(rbind(a))[,c(1:4)]
+    data <- cbind(data, source)
+    
+    colnames(data) <- c("modelId", "name", "description", "type", "sourceName", "sourceLink")
     rownames(data) <- c(1:nrow(data))
   }
+  
+  data <- dplyr::mutate_if(data, is.factor, as.character)
   
   if(nrow(data) == 0) {
     stop(a$simpleMessage)
@@ -113,9 +125,9 @@ get_models <- function(model_id = ''
 #' @export
 
 get_model_details <- function(model_id
-                      ,keyToUse = awhereEnv75247$uid
-                      ,secretToUse = awhereEnv75247$secret
-                      ,tokenToUse = awhereEnv75247$token) {
+                              ,keyToUse = awhereEnv75247$uid
+                              ,secretToUse = awhereEnv75247$secret
+                              ,tokenToUse = awhereEnv75247$token) {
   
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   
@@ -212,7 +224,7 @@ get_model_results <- function(field_id
   
   url <- paste0(url, field_id, "/models/", model_id, "/results")
   
-
+  
   doWeatherGet <- TRUE
   while (doWeatherGet == TRUE) {
     request <- httr::GET(url,
@@ -228,30 +240,46 @@ get_model_results <- function(field_id
   
   a[sapply(a, is.null)] <- NA
   
-  data <- data.frame(biofixDate = a$biofixDate, nextStage = as.character(a$nextStage), gddUnits = a$gddUnits, modelId = a$modelId, latitude = a$location$latitude,
+  data <- data.frame(biofixDate = a$biofixDate, gddUnits = a$gddUnits, modelId = a$modelId, latitude = a$location$latitude,
                      longitude = a$location$longitude, fieldId = a$location$fieldId, plantingDate = a$plantingDate)
   
-  previousStages <- as.data.frame(do.call(rbind, lapply(a$previousStages, rbind)))[, c(1:5)]
-  previousStages$current <- F
-  previousStages$accumulatedGdds <- NA
+  previousStages <- data.frame()
+  if(length(a$previousStages) > 0) {
+    previousStages <- as.data.frame(do.call(rbind, lapply(a$previousStages, rbind)))[, c(1:5)]
+    previousStages$stageType <- "previous"
+    previousStages$accumulatedGdds <- NA
+    previousStages$gddRemaining <- NA
+  }
   
-  currentStage <- as.data.frame(rbind(a$currentStage))
-  currentStage$current <- T
+  currentStage <- data.frame()
+  if(length(a$currentStage) > 0) {
+    currentStage <- as.data.frame(rbind(a$currentStage))
+    currentStage$stageType <- "current"
+    currentStage$gddRemaining <- NA
+  }
   
-  stages <- rbind(previousStages, currentStage)
+  nextStage <- data.frame()
+  if(length(a$nextStage) > 0) {
+    nextStage <- as.data.frame(rbind(a$nextStage))
+    nextStage$date <- NA
+    nextStage$stageType <- "next"
+    nextStage$accumulatedGdds <- NA
+  }
+  
+  stages <- rbind(previousStages, currentStage, nextStage)
   stages <- data.frame(lapply(stages, as.character), stringsAsFactors=FALSE)
+  stages <- stages[, c("date", "id", "stage", "description", "gddThreshold", "stageType", "accumulatedGdds", "gddRemaining")]
   
   data <- cbind(data, stages)
-  colnames(data) <- c("biofixDate", "nextStage", "gddUnits", "modelId", "latitude", "longitude", "fieldId", "plantingDate",
-                      "date", "id", "stage", "description", "gddThreshold", "currentStage", "accumulatedGdds")
+  colnames(data) <- c("biofixDate", "gddUnits", "modelId", "latitude", "longitude", "fieldId", "plantingDate",
+                      "date", "id", "stage", "description", "gddThreshold", "stageType", "accumulatedGdds", "gddRemaining")
   rownames(data) <- c(1:nrow(data))
   
   data <- dplyr::mutate_if(data, is.factor, as.character)
   
   data <- suppressWarnings(dplyr::mutate_at(data, c("biofixDate", "plantingDate", "date"), as.Date))
-  data <- suppressWarnings(dplyr::mutate_at(data, c("gddThreshold", "accumulatedGdds"), as.numeric))
-  data$current <- as.logical(data$current)
-  
+  data <- suppressWarnings(dplyr::mutate_at(data, c("gddThreshold", "accumulatedGdds", "gddRemaining"), as.numeric))
+  data <- dplyr::mutate_at(data, c("accumulatedGdds", "gddRemaining"), round, 2)
   
   if(nrow(data) == 0) {
     stop(a$simpleMessage)
