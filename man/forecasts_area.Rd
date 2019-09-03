@@ -16,7 +16,7 @@ forecasts_area(polygon, day_start = as.character(Sys.Date()),
 well-known text string, or extent from raster package. If the object contains
 multiple polygons, the union of them is used.  Information from each individal
 polygon can be retrieved by returning spatial data and using
-the %over% function from the sp package}
+the over function from the sp package}
 
 \item{-}{day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD}
 

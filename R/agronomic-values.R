@@ -534,7 +534,7 @@ agronomic_values_latlng <- function(latitude
 #'                   well-known text string, or extent from raster package. If the object contains
 #'                   multiple polygons, the union of them is used.  Information from each individal
 #'                   polygon can be retrieved by returning spatial data and using
-#'                   the %over% function from the sp package
+#'                   the over function from the sp package
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - day_end: character string of the last day for which you want to retrieve data, in the form: YYYY-MM-DD
 #' @param - propertiesToInclude: character vector of properties to retrieve from API.  Valid values are accumulations, gdd, pet, ppet, accumulatedGdd, accumulatedPrecipitation, accumulatedPet, accumulatedPpet (optional)
