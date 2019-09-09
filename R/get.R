@@ -20,6 +20,8 @@
 #' @param - field_id: Either a field id to retrieve information for that specific field
 #'                   or an empty string to retrieve information on all fields associated
 #'                   with the user's aWhere API account (string - optional)
+#' @param - offset: The number of objects to skip before returning objects. Used in conjunction with offset to paginate. (optional)
+#' @param - limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate. (optional)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -36,6 +38,8 @@
 #' @export
 
 get_fields <- function(field_id = ''
+                       ,offset=""
+                       ,limit=""
                        ,keyToUse = awhereEnv75247$uid
                        ,secretToUse = awhereEnv75247$secret
                        ,tokenToUse = awhereEnv75247$token) {
@@ -47,6 +51,16 @@ get_fields <- function(field_id = ''
 
   if(field_id != "") {
     url <- paste0(url, field_id)
+  }
+  
+  if(offset != "" || limit != "") {
+    url <- paste0(url, "?")
+    if(offset != "") {
+      url <- paste0(url, "&offset=", offset)
+    }
+    if(limit != "") {
+      url <- paste0(url, "&limit=", limit)
+    }
   }
 
   doWeatherGet <- TRUE
@@ -62,26 +76,39 @@ get_fields <- function(field_id = ''
   }
 
   ## Create & fill data frame
-  if(field_id == "") {
-    data <- as.data.frame(do.call(rbind, lapply(a$fields, rbind)))[, c(1:5)]
-    data <- cbind(data, do.call(rbind, lapply(data$centerPoint, rbind)))
-    data$centerPoint <- NULL
-    colnames(data) <- c("fieldName", "Acres", "farmId", "fieldId", "Latitude", "Longitude")
-
-    data <- as.matrix(data)
-    data[sapply(data, is.null)] <- NA
-    data <- as.data.frame(data)
-    for(i in 1:ncol(data)) {
-      data[,i] <- do.call(rbind, lapply(data[,i], rbind))[,1]
+  if(is.null(a$statusCode)) {
+    if(field_id == "") {
+      if (length(a$fields) > 0) {
+        data <- as.data.frame(do.call(rbind, lapply(a$fields, rbind)))[, c(1:5)]
+        data <- cbind(data, do.call(rbind, lapply(data$centerPoint, rbind)))
+        data$centerPoint <- NULL
+        colnames(data) <- c("fieldName", "Acres", "farmId", "fieldId", "Latitude", "Longitude")
+    
+        data <- as.matrix(data)
+        data[sapply(data, is.null)] <- NA
+        data <- as.data.frame(data)
+        for(i in 1:ncol(data)) {
+          data[,i] <- do.call(rbind, lapply(data[,i], rbind))[,1]
+        }
+      } else {
+        #Return empty data.frame if no fields have been made
+        data <-  data.frame(matrix(ncol = 6, nrow = 0))
+        colnames(data) <- c("fieldName", "Acres", "farmId", "fieldId", "Latitude", "Longitude")
+        
+        return(as.data.frame(data))
+      }
+    } else {
+      a[sapply(a, is.null)] <- NA
+      data <- data.frame(fieldName = unlist(a$name)
+                         ,Acres = unlist(a$acres)
+                         ,farmId = unlist(a$farmId)
+                         ,fieldId = unlist(a$id)
+                         ,Latitude = unlist(a$centerPoint$latitude)
+                         ,Longitude = unlist(a$centerPoint$longitude))
     }
-
-  } else {
-    a[sapply(a, is.null)] <- NA
-    data <- data.frame(fieldName = unlist(a$name), acres = unlist(a$acres), latitude = unlist(a$centerPoint$latitude),
-                       longitude = unlist(a$centerPoint$longitude), farmId = unlist(a$farmId), field_id = unlist(a$id))
   }
-
-  if(nrow(data) == 0) {
+  
+  if(!is.null(a$statusCode)) {
     stop(a$simpleMessage)
   } else {
     return(as.data.frame(data))
@@ -186,42 +213,63 @@ get_planting <- function(field_id = ''
   ## Create & fill data frame
   if(is.null(a$statusCode)) {
     
-    if((field_id != '' && planting_id == "" && current == FALSE) ||
-       (field_id == '' && current == TRUE)) {
-         
-      data <- as.data.frame(do.call(rbind, lapply(a$plantings, rbind)))
-    
-      # case if field has no plantings
-      if (nrow(data) == 0) {
-        stop(paste("field_id:", field_id, "has no planting.", a$detailedMessage))
+    if (length(a$plantings) > 0) {
+      
+      if((field_id != '' && planting_id == "" && current == FALSE) ||
+         (field_id == '' && current == TRUE)) {
+           
+        data <- as.data.frame(do.call(rbind, lapply(a$plantings, rbind)))
+      
+        # case if field has no plantings
+        if (nrow(data) == 0) {
+          stop(paste("field_id:", field_id, "has no planting.", a$detailedMessage))
+        }
+        data <- data[, c(1:7)]
+        data <- cbind(data, do.call(rbind, lapply(data$yield, rbind)))
+        data$yield <- NULL
+        data <- cbind(data, do.call(rbind, lapply(data$projections, rbind)))
+        data <- cbind(data, do.call(rbind, lapply(data$yield, rbind)))
+        data$yield <- NULL
+        data$projections <- NULL
+  
+        colnames(data) <- c("planting_id", "crop", "field_id", "plantingDate"
+                            ,"actualHarvestDate", "yieldAmount", "yieldUnits"
+                            ,"projectedHarvestDate", "projectedYieldAmount"
+                            ,"projectedYieldUnits")
+        
+        data <- as.matrix(data)
+        data[sapply(data, is.null)] <- NA
+        data <- as.data.frame(data)
+        for(i in 1:ncol(data)) {
+          data[,i] <- do.call(rbind, lapply(data[,i], rbind))[,1]
+        }
+  
+      } else {
+        a[sapply(a, is.null)] <- NA
+        a$yield[sapply(a$yield, is.null)] <- NA
+        a$projections$yield[sapply(a$projections$yield, is.null)] <- NA
+        a$projections$harvestDate[is.null(a$projections$harvestDate)] <- NA
+  
+        data <- data.frame(planting_id = unlist(a$id)
+                           ,crop = unlist(a$crop)
+                           ,field_id = unlist(a$field)
+                           ,plantingDate = unlist(a$plantingDate)
+                           ,actualHarvestDate = unlist(a$harvestDate)
+                           ,yieldAmount = unlist(a$yield$amount)
+                           ,yieldUnits = unlist(a$yield$units)
+                           ,projectedHarvestDate = unlist(a$projections$harvestDate)
+                           ,projectedYieldAmount = unlist(a$projections$yield$amount)
+                           ,projectedYieldUnits = unlist(a$projections$yield$units))
       }
-      data <- data[, c(1:7)]
-      data <- cbind(data, do.call(rbind, lapply(data$yield, rbind)))
-      data$yield <- NULL
-      data <- cbind(data, do.call(rbind, lapply(data$projections, rbind)))
-      data <- cbind(data, do.call(rbind, lapply(data$yield, rbind)))
-      data$yield <- NULL
-      data$projections <- NULL
-
-      colnames(data) <- c("planting_id", "crop", "field_id", "plantingDate", "actualHarvestDate", "yieldAmount", "yieldUnits",
-                          "projectedHarvestDate", "projectedYieldAmount", "projectedYieldUnits")
-      data <- as.matrix(data)
-      data[sapply(data, is.null)] <- NA
-      data <- as.data.frame(data)
-      for(i in 1:ncol(data)) {
-        data[,i] <- do.call(rbind, lapply(data[,i], rbind))[,1]
-      }
-
     } else {
-      a[sapply(a, is.null)] <- NA
-      a$yield[sapply(a$yield, is.null)] <- NA
-      a$projections$yield[sapply(a$projections$yield, is.null)] <- NA
-      a$projections$harvestDate[is.null(a$projections$harvestDate)] <- NA
-
-      data <- data.frame(planting_id = unlist(a$id), crop = unlist(a$crop), field_id = unlist(a$field),
-                         plantingDate = unlist(a$plantingDate), yieldAmount = unlist(a$yield$amount), yieldUnits = unlist(a$yield$units),
-                         actualHarvestDate = unlist(a$harvestDate), projectedYieldAmount = unlist(a$projections$yield$amount),
-                         projectedYieldUnits = unlist(a$projections$yield$units), projectedHarvestDate = unlist(a$projections$harvestDate))
+      #Return empty data.frame if no fields have been made
+      data <-  data.frame(matrix(ncol = 10, nrow = 0))
+      colnames(data) <- c("planting_id", "crop", "field_id", "plantingDate"
+                          ,"actualHarvestDate", "yieldAmount", "yieldUnits"
+                          ,"projectedHarvestDate", "projectedYieldAmount"
+                          ,"projectedYieldUnits")
+      
+      return(as.data.frame(data))
     }
   }
 

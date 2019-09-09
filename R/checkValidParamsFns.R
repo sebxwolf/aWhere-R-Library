@@ -30,8 +30,12 @@ checkValidField <- function(field_id
                             ,secretToUse
                             ,tokenToUse) {
 
-  currentFields <- get_fields(field_id,keyToUse,secretToUse,tokenToUse)
-  if ((field_id %in% currentFields$field_id) == FALSE) {
+  currentFields <- get_fields(field_id
+                              ,keyToUse = keyToUse
+                              ,secretToUse = secretToUse
+                              ,tokenToUse = tokenToUse)
+  
+  if ((field_id %in% currentFields$fieldId) == FALSE) {
     stop('The Provided field name is not a field currently associated with your account. \n
             Please create the field before proceeding. \n')
   }
