@@ -23,6 +23,7 @@
 #' @export
 
 delete_field <- function(field_id
+                         ,verbose = TRUE
                          ,keyToUse = awhereEnv75247$uid
                          ,secretToUse = awhereEnv75247$secret
                          ,tokenToUse = awhereEnv75247$token) {
@@ -46,7 +47,9 @@ delete_field <- function(field_id
     doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
-  cat(paste0('Operation Complete'))
+  if (verbose == TRUE) {
+    cat(paste0('Operation Complete'))
+  }
 }
 
 #' @title Delete Planting
@@ -76,6 +79,7 @@ delete_field <- function(field_id
 
 delete_planting <- function(field_id
                             ,planting_id
+                            ,verbose = TRUE
                             ,keyToUse = awhereEnv75247$uid
                             ,secretToUse = awhereEnv75247$secret
                             ,tokenToUse = awhereEnv75247$token) {
@@ -95,6 +99,8 @@ delete_planting <- function(field_id
     doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
-  cat(paste0('Operation Complete'))
+  if (verbose == TRUE) {
+    cat(paste0('Operation Complete'))
+  }
 }
 

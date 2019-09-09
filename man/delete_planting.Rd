@@ -4,8 +4,8 @@
 \alias{delete_planting}
 \title{Delete Planting}
 \usage{
-delete_planting(field_id, planting_id, keyToUse = awhereEnv75247$uid,
-  secretToUse = awhereEnv75247$secret,
+delete_planting(field_id, planting_id, verbose = TRUE,
+  keyToUse = awhereEnv75247$uid, secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }
 \arguments{

@@ -4,7 +4,7 @@
 \alias{delete_field}
 \title{Delete Field}
 \usage{
-delete_field(field_id, keyToUse = awhereEnv75247$uid,
+delete_field(field_id, verbose = TRUE, keyToUse = awhereEnv75247$uid,
   secretToUse = awhereEnv75247$secret,
   tokenToUse = awhereEnv75247$token)
 }

@@ -46,6 +46,7 @@ create_field <- function(field_id
                          ,farm_id
                          ,field_name = ""
                          ,acres = ""
+                         ,verbose = TRUE
                          ,keyToUse = awhereEnv75247$uid
                          ,secretToUse = awhereEnv75247$secret
                          ,tokenToUse = awhereEnv75247$token) {
@@ -88,8 +89,9 @@ create_field <- function(field_id
 
     doWeatherGet <- check_JSON(a,request)[[1]]
   }
-
-  cat(paste0('Operation Complete \n'))
+  if (verbose == TRUE) {
+    cat(paste0('Operation Complete \n'))
+  }
 }
 
 
@@ -159,6 +161,7 @@ create_planting <- function(field_id
                             ,yield_amount = ""
                             ,yield_units = ""
                             ,harvest_date = ""
+                            ,verbose = TRUE
                             ,keyToUse = awhereEnv75247$uid
                             ,secretToUse = awhereEnv75247$secret
                             ,tokenToUse = awhereEnv75247$token) {
@@ -218,7 +221,9 @@ create_planting <- function(field_id
     doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
-  cat(paste0('Operation Complete \n Planting ID: ', a$id),'\n')
+  if (verbose == TRUE) {
+    cat(paste0('Operation Complete \n Planting ID: ', a$id),'\n')
+  }
   return(a$id)
 }
 
@@ -267,7 +272,8 @@ create_planting <- function(field_id
 create_job <- function(api_requests
                        ,request_titles
                        ,job_title
-                       ,job_type="batch"
+                       ,job_type = "batch"
+                       ,verbose = TRUE
                        ,keyToUse = awhereEnv75247$uid
                        ,secretToUse = awhereEnv75247$secret
                        ,tokenToUse = awhereEnv75247$token) {
@@ -292,6 +298,8 @@ create_job <- function(api_requests
     doWeatherGet <- check_JSON(a,request)[[1]]
   }
 
-  cat(paste0('Operation Complete \n Job ID: ',a$jobId,'\n'))
+  if (verbose == TRUE) {
+    cat(paste0('Operation Complete \n Job ID: ',a$jobId,'\n'))
+  }
   return(a$jobId)
 }
