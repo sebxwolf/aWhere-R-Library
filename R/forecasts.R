@@ -374,7 +374,9 @@ forecasts_area <- function(polygon
   
   doParallel::registerDoParallel(cores=numcores)
   
-  forecasts <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
+  forecasts <- foreach::foreach(j=c(1:length(grid))
+                                ,.packages = c("aWhereAPI")
+                                ,.export = c('awhereEnv75247')) %dopar% {
     
     dat <- data.frame()
     
@@ -384,10 +386,7 @@ forecasts_area <- function(polygon
                            ,day_start = day_start
                            ,day_end = day_end
                            ,block_size = block_size
-                           ,useLocalTime = useLocalTime
-                           ,keyToUse = keyToUse
-                           ,secretToUse = secretToUse
-                           ,tokenToUse = tokenToUse)
+                           ,useLocalTime = useLocalTime)
       
       
       currentNames <- colnames(t)

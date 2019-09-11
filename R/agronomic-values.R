@@ -640,7 +640,9 @@ agronomic_values_area <- function(polygon
 
   doParallel::registerDoParallel(cores=numcores)
 
-  observed <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
+  observed <- foreach::foreach(j=c(1:length(grid))
+                               ,.packages = c("aWhereAPI")
+                               ,.export = c('awhereEnv75247')) %dopar% {
 
     dat <- data.frame()
 
@@ -649,10 +651,7 @@ agronomic_values_area <- function(polygon
                                    ,longitude = grid[[j]]$lon[i]
                                    ,day_start = day_start
                                    ,day_end = day_end
-                                   ,propertiesToInclude = propertiesToInclude
-                                   ,keyToUse = keyToUse
-                                   ,secretToUse = secretToUse
-                                   ,tokenToUse = tokenToUse)
+                                   ,propertiesToInclude = propertiesToInclude)
 
       currentNames <- colnames(t)
 

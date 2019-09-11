@@ -826,7 +826,9 @@ agronomic_norms_area <- function(polygon
 
   doParallel::registerDoParallel(cores=numcores)
 
-  norms <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
+  norms <- foreach::foreach(j=c(1:length(grid))
+                            ,.packages = c("aWhereAPI")
+                            ,.export = c('awhereEnv75247')) %dopar% {
 
     dat <- data.frame()
 
@@ -844,10 +846,7 @@ agronomic_norms_area <- function(polygon
                                   ,gdd_base_temp = gdd_base_temp
                                   ,gdd_min_boundary = gdd_min_boundary
                                   ,gdd_max_boundary = gdd_max_boundary
-                                  ,includeFeb29thData = includeFeb29thData
-                                  ,keyToUse = keyToUse
-                                  ,secretToUse = secretToUse
-                                  ,tokenToUse = tokenToUse)
+                                  ,includeFeb29thData = includeFeb29thData)
 
       currentNames <- colnames(t)
 

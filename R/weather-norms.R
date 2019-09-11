@@ -645,7 +645,9 @@ weather_norms_area <- function(polygon
 
   doParallel::registerDoParallel(cores=numcores)
 
-  norms <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
+  norms <- foreach::foreach(j=c(1:length(grid))
+                            ,.packages = c("aWhereAPI")
+                            ,.export = c('awhereEnv75247')) %dopar% {
 
     dat <- data.frame()
 
@@ -658,10 +660,7 @@ weather_norms_area <- function(polygon
                                 ,year_end = year_end
                                 ,propertiesToInclude = propertiesToInclude
                                 ,exclude_years =  exclude_years
-                                ,includeFeb29thData = includeFeb29thData
-                                ,keyToUse = keyToUse
-                                ,secretToUse = secretToUse
-                                ,tokenToUse = tokenToUse)
+                                ,includeFeb29thData = includeFeb29thData)
 
       currentNames <- colnames(t)
 

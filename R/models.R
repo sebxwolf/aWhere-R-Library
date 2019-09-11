@@ -91,12 +91,6 @@ get_models <- function(model_id = ''
   }
 }
 
-
-
-
-
-
-
 #' @title Get Model Details
 #'
 #' @description
@@ -173,11 +167,6 @@ get_model_details <- function(model_id
     return(as.data.frame(data))
   }
 }
-
-
-
-
-
 
 #' @title Get Model Results
 #'
