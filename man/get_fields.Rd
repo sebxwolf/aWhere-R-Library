@@ -19,7 +19,7 @@ with the user's aWhere API account (string - optional)}
 \item{-}{limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate. (optional)}
 
 \item{-}{requestAllFields: Causes function to execute logic to return all of a users fields using the minimum number of API calls 
-based on the limit parameter.  If used, offset must be set to default value}
+based on the limit parameter.  If used, offset must be set to default value (optional)}
 
 \item{-}{keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)}
 

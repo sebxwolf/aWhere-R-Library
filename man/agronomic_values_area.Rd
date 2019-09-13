@@ -47,8 +47,10 @@ The behavior of this value is different depending on the equation you're using
 The default value of 10 will be used if none is specified. (optional)}
 
 \item{-}{gdd_max_boundary: The max boundary to use in the selected GDD equation. The
-      behavior of this value is different depending on the equation you're using.
-      The default value of 30 will be used if none is specified. (optional)#' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()
+behavior of this value is different depending on the equation you're using.
+The default value of 30 will be used if none is specified. (optional)}
+
+\item{-}{numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()
 If you receive an error regarding the speed you are making calls, reduce this number}
 
 \item{-}{bypassNumCallCheck: set to TRUE to avoid prompting the user to confirm that they want to begin making API calls}
