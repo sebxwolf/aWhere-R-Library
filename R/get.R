@@ -99,16 +99,16 @@ get_fields <- function(field_id = ""
         url <- paste0("https://api.awhere.com",a[['_links']][['next']][['href']])
         doWeatherGet <- TRUE
        
-        if (exists('temp') == TRUE) {
-          temp$fields <- c(temp$fields,a$fields)
+        if (exists('tempReturn') == TRUE) {
+          tempReturn$fields <- c(tempReturn$fields,a$fields)
         } else {
-          temp <- copy(a)
+          tempReturn <- copy(a)
         }
       #If API says no more fields, take appended list of fields and return it
       } else {
         
-        if (exists('temp') == TRUE) {
-          a$fields <- c(temp$fields,a$fields)
+        if (exists('tempReturn') == TRUE) {
+          a$fields <- c(tempReturn$fields,a$fields)
         }
       }
     }
@@ -212,7 +212,7 @@ get_planting <- function(field_id = ""
 
   checkCredentials(keyToUse,secretToUse,tokenToUse)
 
-  if (requestAllFields == TRUE & offset != '') {
+  if (requestAllPlantings == TRUE & offset != '') {
     stop('Cannot specify both offset parameter and have requestAllFields == TRUE')
   }
   
@@ -273,16 +273,16 @@ get_planting <- function(field_id = ""
         url <- paste0("https://api.awhere.com",a[['_links']][['next']][['href']])
         doWeatherGet <- TRUE
         
-        if (exists('temp') == TRUE) {
-          temp$plantings <- c(temp$plantings,a$plantings)
+        if (exists('tempReturn') == TRUE) {
+          tempReturn$plantings <- c(tempReturn$plantings,a$plantings)
         } else {
-          temp <- copy(a)
+          tempReturn <- copy(a)
         }
         #If API says no more fields, take appended list of fields and return it
       } else {
         
-        if (exists('temp') == TRUE) {
-          a$plantings <- c(temp$plantings,a$plantings)
+        if (exists('tempReturn') == TRUE) {
+          a$plantings <- c(tempReturn$plantings,a$plantings)
         }
       }
     }
