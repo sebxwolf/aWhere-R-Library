@@ -69,7 +69,16 @@ current_conditions_fields <- function(field_id
     # Make request
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
@@ -154,7 +163,16 @@ current_conditions_latlng <- function(latitude
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion

@@ -22,6 +22,8 @@
 #'                   with the user's aWhere API account (string - optional)
 #' @param - offset: The number of objects to skip before returning objects. Used in conjunction with offset to paginate. (optional)
 #' @param - limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate. (optional)
+#' @param - requestAllFields: Causes function to execute logic to return all of a users fields using the minimum number of API calls 
+#'                            based on the limit parameter.  If used, offset must be set to default value (optional)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -37,15 +39,20 @@
 
 #' @export
 
-get_fields <- function(field_id = ''
-                       ,offset=""
-                       ,limit=""
+get_fields <- function(field_id = ""
+                       ,offset = ""
+                       ,limit = 50
+                       ,requestAllFields = TRUE
                        ,keyToUse = awhereEnv75247$uid
                        ,secretToUse = awhereEnv75247$secret
                        ,tokenToUse = awhereEnv75247$token) {
 
   checkCredentials(keyToUse,secretToUse,tokenToUse)
 
+  if (requestAllFields == TRUE & offset != '') {
+    stop('Cannot specify both offset parameter and have requestAllFields == TRUE')
+  }
+  
   ## Create Request
   url <- "https://api.awhere.com/v2/fields/"
 
@@ -72,7 +79,39 @@ get_fields <- function(field_id = ''
 
     a <- suppressMessages(httr::content(request))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
+    
+    #If the above query worked but user wants all fields, check if their is more fields to 
+    #get and if so use the info it contains to request and append together
+    if (requestAllFields == TRUE & doWeatherGet == FALSE & field_id == ''){
+      #If the API indicates more fields to get, use URL it gives to get them
+      if (c('next') %in% names(a[['_links']])) {
+        
+        url <- paste0("https://api.awhere.com",a[['_links']][['next']][['href']])
+        doWeatherGet <- TRUE
+       
+        if (exists('temp') == TRUE) {
+          temp$fields <- c(temp$fields,a$fields)
+        } else {
+          temp <- copy(a)
+        }
+      #If API says no more fields, take appended list of fields and return it
+      } else {
+        
+        if (exists('temp') == TRUE) {
+          a$fields <- c(temp$fields,a$fields)
+        }
+      }
+    }
   }
 
   ## Create & fill data frame
@@ -141,6 +180,8 @@ get_fields <- function(field_id = ''
 #'                   To get most recent planting record for a field, set current to TRUE and do not pass in a planting_id (boolean - optional)
 #' @param - offset: The number of objects to skip before returning objects. Used in conjunction with offset to paginate. (optional)
 #' @param - limit: The number of results to include on each of page of listed fields. Used in conjunction with offset to paginate. (optional)
+#' @param - requestAllPlantings: Causes function to execute logic to return all of a users plantins using the minimum number of API calls 
+#'                            based on the limit parameter and the value of current.  If used, offset must be set to default value (optional)
 #' @param - keyToUse: aWhere API key to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - secretToUse: aWhere API secret to use.  For advanced use only.  Most users will not need to use this parameter (optional)
 #' @param - tokenToUse: aWhere API token to use.  For advanced use only.  Most users will not need to use this parameter (optional)
@@ -159,17 +200,22 @@ get_fields <- function(field_id = ''
 #' get_planting(field_id='field_test', offset = '0', limit = '5')}
 #' @export
 
-get_planting <- function(field_id = ''
-                         ,planting_id = ''
+get_planting <- function(field_id = ""
+                         ,planting_id = ""
                          ,current = FALSE
-                         ,offset=""
-                         ,limit=""
+                         ,offset = ""
+                         ,limit = 50
+                         ,requestAllPlantings = TRUE
                          ,keyToUse = awhereEnv75247$uid
                          ,secretToUse = awhereEnv75247$secret
                          ,tokenToUse = awhereEnv75247$token) {
 
   checkCredentials(keyToUse,secretToUse,tokenToUse)
 
+  if (requestAllFields == TRUE & offset != '') {
+    stop('Cannot specify both offset parameter and have requestAllFields == TRUE')
+  }
+  
   ## Create Request
   url <- "https://api.awhere.com/v2/agronomics/"
 
@@ -207,12 +253,45 @@ get_planting <- function(field_id = ''
 
     a <- suppressMessages(httr::content(request))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
+    
+    #If the above query worked but user wants all fields, check if their is more fields to 
+    #get and if so use the info it contains to request and append together
+    if (requestAllPlantings == TRUE & doWeatherGet == FALSE & field_id == ''){
+      #If the API indicates more fields to get, use URL it gives to get them
+      if (c('next') %in% names(a[['_links']])) {
+        
+        url <- paste0("https://api.awhere.com",a[['_links']][['next']][['href']])
+        doWeatherGet <- TRUE
+        
+        if (exists('temp') == TRUE) {
+          temp$plantings <- c(temp$plantings,a$plantings)
+        } else {
+          temp <- copy(a)
+        }
+        #If API says no more fields, take appended list of fields and return it
+      } else {
+        
+        if (exists('temp') == TRUE) {
+          a$plantings <- c(temp$plantings,a$plantings)
+        }
+      }
+    }
   }
 
   ## Create & fill data frame
   if(is.null(a$statusCode)) {
     
+ #   if (c('plantings') %in% names(a)) {
     if (length(a$plantings) > 0) {
       
       if((field_id != '' && planting_id == "" && current == FALSE) ||

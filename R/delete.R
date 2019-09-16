@@ -44,7 +44,16 @@ delete_field <- function(field_id
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
 
   if (verbose == TRUE) {
@@ -96,7 +105,16 @@ delete_planting <- function(field_id
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
 
   if (verbose == TRUE) {

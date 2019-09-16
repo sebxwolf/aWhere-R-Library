@@ -53,7 +53,16 @@ get_models <- function(model_id = ''
     
     a <- suppressMessages(httr::content(request))
     
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
   
   ## Create & fill data frame
@@ -140,7 +149,16 @@ get_model_details <- function(model_id
     
     a <- suppressMessages(httr::content(request))
     
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
   
   
@@ -225,7 +243,16 @@ get_model_results <- function(field_id
     
     a <- suppressMessages(httr::content(request))
     
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
   
   

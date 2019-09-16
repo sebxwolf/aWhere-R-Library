@@ -87,7 +87,16 @@ create_field <- function(field_id
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
   if (verbose == TRUE) {
     cat(paste0('Operation Complete \n'))
@@ -218,7 +227,16 @@ create_planting <- function(field_id
 
     a <- suppressMessages(httr::content(request))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
 
   if (verbose == TRUE) {
@@ -295,7 +313,16 @@ create_job <- function(api_requests
     request <- httr::POST(url, body=postbody, httr::content_type('application/json'),
                           httr::add_headers(Authorization = paste0("Bearer ", tokenToUse)))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
 
   if (verbose == TRUE) {

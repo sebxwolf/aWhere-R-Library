@@ -130,9 +130,18 @@ load_credentials <- function(path_to_credentials) {
 #' Checks that aWhere API didn't return an error code and that the token used in query hasn't expired
 #'
 #' @param - JSON object returned from aWhere API
+#' @param - keyToUse: aWhere API key to use. 
+#' @param - request: the returned request code
+#' @param - secretToUse: aWhere API secret to use. 
+#' @param - tokenToUse: aWhere API token to use. 
+#' 
 #' @return boolean for whether another query should be made
 
-check_JSON <- function(jsonObject, request) {
+check_JSON <- function(jsonObject
+                       ,request
+                       ,keyToUse 
+                       ,secretToUse 
+                       ,tokenToUse) {
 
   #Parses JSON to see if tells us we made too large of a request
   if (any(grepl('The maximum value for the limit parameter is',jsonObject))) {
@@ -163,6 +172,6 @@ check_JSON <- function(jsonObject, request) {
   #Finally check to see if there was a different problem with the query and if so return the message
   checkStatusCode(request)
 
-  return(list(FALSE,NA))
+  return(list(FALSE,NA,tokenToUse))
 }
 
