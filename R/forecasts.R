@@ -68,7 +68,7 @@ forecasts_fields <- function(field_id
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDatesForecast(day_start,day_end)
-  checkForecastParams(day_start,block_size)
+  checkForecastParams(block_size)
 
   #Create Query
   urlAddress <- "https://api.awhere.com/v2/weather"
@@ -212,7 +212,7 @@ forecasts_latlng <- function(latitude
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidLatLong(latitude,longitude)
   checkValidStartEndDatesForecast(day_start,day_end)
-  checkForecastParams(day_start,block_size)
+  checkForecastParams(block_size)
 
   #Create Query
   urlAddress <- "https://api.awhere.com/v2/weather"
@@ -360,7 +360,7 @@ forecasts_area <- function(polygon
   
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDatesForecast(day_start,day_end)
-  checkForecastParams(day_start,block_size)
+  checkForecastParams(block_size)
   
   if (!(all(class(polygon) %in% c('data.frame','data.table')))) {
     
