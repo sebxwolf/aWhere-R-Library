@@ -346,8 +346,8 @@ checkForecastParams <- function(day_start,block_size) {
             Use the GetWeatherObservationsHist function to request data from yesterday backwards.\n')
   }
 
-  if (lubridate::ymd(day_start) > lubridate::ymd(Sys.Date()) + lubridate::days(15)) {
-    stop('By default, the aWhere APIs only allows forecast to be retrieved less than 8 days into the future. \n')
+  if (lubridate::ymd(day_start) > lubridate::ymd(Sys.Date()) + lubridate::days(14)) {
+    stop('By default, the aWhere APIs only allows forecast to be retrieved less than 15 days into the future. \n')
   }
 
   if ((24 %% block_size) != 0){
