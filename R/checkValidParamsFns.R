@@ -124,8 +124,8 @@ checkValidStartEndDatesAgronomics <- function(day_start,day_end) {
   if (day_end != '') {
     if (lubridate::ymd(day_start) > lubridate::ymd(day_end)) {
       stop('The endDate must come after the startDate. Please correct\n')
-    } else if ((lubridate::ymd(day_end) - lubridate::ymd(Sys.Date())) > 7) {
-      stop('Forecast data only availabe 7 days into future\n')
+    } else if ((lubridate::ymd(day_end) - lubridate::ymd(Sys.Date())) > 15) {
+      stop('Forecast data only availabe 15 days into future\n')
     }
   }
 
@@ -161,8 +161,8 @@ checkValidStartEndDatesForecast <- function(day_start,day_end) {
   if (day_end != '') {
     if (lubridate::ymd(day_start) > lubridate::ymd(day_end)) {
       stop('The endDate must come after the startDate. Please correct\n')
-    } else if ((lubridate::ymd(day_end) - lubridate::ymd(day_start)) > 8) {
-      stop('Forecast data only availabe 8 days into future\n')
+    } else if ((lubridate::ymd(day_end) - lubridate::ymd(day_start)) > 15) {
+      stop('Forecast data only availabe 15 days into future\n')
     }
   }
 
@@ -346,7 +346,7 @@ checkForecastParams <- function(day_start,block_size) {
             Use the GetWeatherObservationsHist function to request data from yesterday backwards.\n')
   }
 
-  if (lubridate::ymd(day_start) > lubridate::ymd(Sys.Date()) + lubridate::days(8)) {
+  if (lubridate::ymd(day_start) > lubridate::ymd(Sys.Date()) + lubridate::days(15)) {
     stop('By default, the aWhere APIs only allows forecast to be retrieved less than 8 days into the future. \n')
   }
 

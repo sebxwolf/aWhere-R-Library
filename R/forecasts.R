@@ -30,7 +30,7 @@
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #'                    Defaults to system date if left blank. (optional)
 #' @param - day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD
-#'                  Defaults to system date + 7 if left blank. (optional)
+#'                  Defaults to system date + 7 if left blank. Up to 15 days forecast can be retrieved (optional)
 #' @param - block_size: Integer value that corresponds to the number of hours to include in each time block.
 #'                     Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)
 #' @param - useLocalTime: whether the data specified is the date specified at the location where data is
