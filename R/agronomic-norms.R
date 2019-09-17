@@ -253,8 +253,16 @@ agronomic_norms_fields <- function(field_id
 
         a <- suppressMessages(httr::content(request, as = "text"))
 
-        temp <- check_JSON(a,request)
+        temp <- check_JSON(a
+                           ,request
+                           ,keyToUse
+                           ,secretToUse
+                           ,tokenToUse)
+        
         doWeatherGet <- temp[[1]]
+        
+        #if the token was updated, this will cause it to be used through function
+        tokenToUse <- temp[[3]]
 
         #The temp[[2]] will only not be NA when the limit param is too large.
         if(!is.na(temp[[2]] == TRUE)) {
@@ -583,8 +591,16 @@ agronomic_norms_latlng <- function(latitude
 
         a <- suppressMessages(httr::content(request, as = "text"))
 
-        temp <- check_JSON(a,request)
+        temp <- check_JSON(a
+                           ,request
+                           ,keyToUse
+                           ,secretToUse
+                           ,tokenToUse)
+        
         doWeatherGet <- temp[[1]]
+        
+        #if the token was updated, this will cause it to be used through function
+        tokenToUse <- temp[[3]]
 
         #The temp[[2]] will only not be NA when the limit param is too large.
         if(!is.na(temp[[2]] == TRUE)) {
@@ -826,7 +842,9 @@ agronomic_norms_area <- function(polygon
 
   doParallel::registerDoParallel(cores=numcores)
 
-  norms <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
+  norms <- foreach::foreach(j=c(1:length(grid))
+                            ,.packages = c("aWhereAPI")
+                            ,.export = c('awhereEnv75247')) %dopar% {
 
     dat <- data.frame()
 
@@ -844,10 +862,7 @@ agronomic_norms_area <- function(polygon
                                   ,gdd_base_temp = gdd_base_temp
                                   ,gdd_min_boundary = gdd_min_boundary
                                   ,gdd_max_boundary = gdd_max_boundary
-                                  ,includeFeb29thData = includeFeb29thData
-                                  ,keyToUse = keyToUse
-                                  ,secretToUse = secretToUse
-                                  ,tokenToUse = tokenToUse)
+                                  ,includeFeb29thData = includeFeb29thData)
 
       currentNames <- colnames(t)
 

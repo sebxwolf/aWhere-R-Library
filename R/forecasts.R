@@ -30,7 +30,7 @@
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #'                    Defaults to system date if left blank. (optional)
 #' @param - day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD
-#'                  Defaults to system date + 7 if left blank. (optional)
+#'                  Defaults to system date + 7 if left blank. Up to 15 days forecast can be retrieved (optional)
 #' @param - block_size: Integer value that corresponds to the number of hours to include in each time block.
 #'                     Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)
 #' @param - useLocalTime: whether the data specified is the date specified at the location where data is
@@ -68,7 +68,7 @@ forecasts_fields <- function(field_id
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDatesForecast(day_start,day_end)
-  checkForecastParams(day_start,block_size)
+  checkForecastParams(block_size)
 
   #Create Query
   urlAddress <- "https://api.awhere.com/v2/weather"
@@ -98,7 +98,16 @@ forecasts_fields <- function(field_id
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
@@ -203,7 +212,7 @@ forecasts_latlng <- function(latitude
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidLatLong(latitude,longitude)
   checkValidStartEndDatesForecast(day_start,day_end)
-  checkForecastParams(day_start,block_size)
+  checkForecastParams(block_size)
 
   #Create Query
   urlAddress <- "https://api.awhere.com/v2/weather"
@@ -226,7 +235,16 @@ forecasts_latlng <- function(latitude
     # Make forecast request
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
 
   #The JSONLITE Serializer properly handles the JSON conversion
@@ -342,7 +360,7 @@ forecasts_area <- function(polygon
   
   checkCredentials(keyToUse,secretToUse,tokenToUse)
   checkValidStartEndDatesForecast(day_start,day_end)
-  checkForecastParams(day_start,block_size)
+  checkForecastParams(block_size)
   
   if (!(all(class(polygon) %in% c('data.frame','data.table')))) {
     
@@ -374,7 +392,9 @@ forecasts_area <- function(polygon
   
   doParallel::registerDoParallel(cores=numcores)
   
-  forecasts <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
+  forecasts <- foreach::foreach(j=c(1:length(grid))
+                                ,.packages = c("aWhereAPI")
+                                ,.export = c('awhereEnv75247')) %dopar% {
     
     dat <- data.frame()
     
@@ -384,10 +404,7 @@ forecasts_area <- function(polygon
                            ,day_start = day_start
                            ,day_end = day_end
                            ,block_size = block_size
-                           ,useLocalTime = useLocalTime
-                           ,keyToUse = keyToUse
-                           ,secretToUse = secretToUse
-                           ,tokenToUse = tokenToUse)
+                           ,useLocalTime = useLocalTime)
       
       
       currentNames <- colnames(t)

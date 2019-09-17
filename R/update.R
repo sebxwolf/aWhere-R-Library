@@ -57,7 +57,16 @@ update_field <- function(field_id
     # Re formating the response recieved from API
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
 
   cat(paste0('Operation Complete'))
@@ -204,7 +213,16 @@ update_planting <- function(field_id
 
     a <- suppressMessages(httr::content(request, as = "text"))
 
-    doWeatherGet <- check_JSON(a,request)[[1]]
+    temp <- check_JSON(a
+                       ,request
+                       ,keyToUse
+                       ,secretToUse
+                       ,tokenToUse)
+    
+    doWeatherGet <- temp[[1]]
+    
+    #if the token was updated, this will cause it to be used through function
+    tokenToUse <- temp[[3]]
   }
 
   cat(paste0('Operation Complete'))

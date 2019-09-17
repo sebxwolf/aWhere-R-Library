@@ -183,8 +183,16 @@ agronomic_values_fields <- function(field_id
 
         a <- suppressMessages(httr::content(request, as = "text"))
 
-        temp <- check_JSON(a,request)
+        temp <- check_JSON(a
+                           ,request
+                           ,keyToUse
+                           ,secretToUse
+                           ,tokenToUse)
+        
         doWeatherGet <- temp[[1]]
+        
+        #if the token was updated, this will cause it to be used through function
+        tokenToUse <- temp[[3]]
 
         #The temp[[2]] will only not be NA when the limit param is too large.
         if(!is.na(temp[[2]] == TRUE)) {
@@ -434,8 +442,16 @@ agronomic_values_latlng <- function(latitude
 
         a <- suppressMessages(httr::content(request, as = "text"))
 
-        temp <- check_JSON(a,request)
+        temp <- check_JSON(a
+                           ,request
+                           ,keyToUse
+                           ,secretToUse
+                           ,tokenToUse)
+        
         doWeatherGet <- temp[[1]]
+        
+        #if the token was updated, this will cause it to be used through function
+        tokenToUse <- temp[[3]]
 
         #The temp[[2]] will only not be NA when the limit param is too large.
         if(!is.na(temp[[2]] == TRUE)) {
@@ -557,7 +573,8 @@ agronomic_values_latlng <- function(latitude
 #'                           The default value of 10 will be used if none is specified. (optional)
 #' @param - gdd_max_boundary: The max boundary to use in the selected GDD equation. The
 #'                          behavior of this value is different depending on the equation you're using.
-#'                          The default value of 30 will be used if none is specified. (optional)#' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()
+#'                          The default value of 30 will be used if none is specified. (optional)
+#' @param - numcores: number of cores to use in parallel loop. To check number of available cores: parallel::detectCores()
 #'                    If you receive an error regarding the speed you are making calls, reduce this number
 #' @param - bypassNumCallCheck: set to TRUE to avoid prompting the user to confirm that they want to begin making API calls
 #' @param - returnSpatialData: returns the data as a SpatialPixels object.  Can be convered to raster with the command raster::stack
@@ -640,7 +657,9 @@ agronomic_values_area <- function(polygon
 
   doParallel::registerDoParallel(cores=numcores)
 
-  observed <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
+  observed <- foreach::foreach(j=c(1:length(grid))
+                               ,.packages = c("aWhereAPI")
+                               ,.export = c('awhereEnv75247')) %dopar% {
 
     dat <- data.frame()
 
@@ -649,10 +668,7 @@ agronomic_values_area <- function(polygon
                                    ,longitude = grid[[j]]$lon[i]
                                    ,day_start = day_start
                                    ,day_end = day_end
-                                   ,propertiesToInclude = propertiesToInclude
-                                   ,keyToUse = keyToUse
-                                   ,secretToUse = secretToUse
-                                   ,tokenToUse = tokenToUse)
+                                   ,propertiesToInclude = propertiesToInclude)
 
       currentNames <- colnames(t)
 

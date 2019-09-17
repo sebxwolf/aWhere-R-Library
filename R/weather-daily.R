@@ -140,8 +140,16 @@ daily_observed_fields <- function(field_id
         
         a <- suppressMessages(httr::content(request, as = "text"))
         
-        temp <- check_JSON(a,request)
+        temp <- check_JSON(a
+                           ,request
+                           ,keyToUse
+                           ,secretToUse
+                           ,tokenToUse)
+        
         doWeatherGet <- temp[[1]]
+        
+        #if the token was updated, this will cause it to be used through function
+        tokenToUse <- temp[[3]]
         
         #The temp[[2]] will only not be NA when the limit param is too large.
         if(!is.na(temp[[2]] == TRUE)) {
@@ -330,8 +338,16 @@ daily_observed_latlng <- function(latitude
         # Make request
         a <- suppressMessages(httr::content(request, as = "text"))
         
-        temp <- check_JSON(a,request)
+        temp <- check_JSON(a
+                           ,request
+                           ,keyToUse
+                           ,secretToUse
+                           ,tokenToUse)
+        
         doWeatherGet <- temp[[1]]
+        
+        #if the token was updated, this will cause it to be used through function
+        tokenToUse <- temp[[3]]
         
         #The temp[[2]] will only not be NA when the limit param is too large.
         if(!is.na(temp[[2]] == TRUE)) {
@@ -493,7 +509,9 @@ daily_observed_area <- function(polygon
   
   doParallel::registerDoParallel(cores=numcores)
   
-  observed <- foreach::foreach(j=c(1:length(grid)), .packages = c("aWhereAPI")) %dopar% {
+  observed <- foreach::foreach(j=c(1:length(grid))
+                               ,.packages = c("aWhereAPI")
+                               ,.export = c('awhereEnv75247')) %dopar% {
     
     dat <- data.frame()
     
@@ -502,10 +520,7 @@ daily_observed_area <- function(polygon
                                  ,longitude = grid[[j]]$lon[i]
                                  ,day_start = day_start
                                  ,day_end = day_end
-                                 ,propertiesToInclude = propertiesToInclude
-                                 ,keyToUse = keyToUse
-                                 ,secretToUse = secretToUse
-                                 ,tokenToUse = tokenToUse)
+                                 ,propertiesToInclude = propertiesToInclude)
       
       
       currentNames <- colnames(t)
