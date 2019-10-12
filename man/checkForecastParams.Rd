@@ -4,7 +4,7 @@
 \alias{checkForecastParams}
 \title{Check Forecast Parameters}
 \usage{
-checkForecastParams(day_start, block_size)
+checkForecastParams(block_size)
 }
 \arguments{
 \item{-}{day_start: character string of start date in form: YYYY-MM-DD}
