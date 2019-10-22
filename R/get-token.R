@@ -149,7 +149,7 @@ check_JSON <- function(jsonObject
     #Non enterprise accounts are allowed to return 10 days of data at a time
     #FALSE is returned because the logic of the API call will need to be
     #adjusted due to the changed limit paramater
-    return(list(FALSE,10))
+    return(list(FALSE,10,tokenToUse))
   }
 
   #Parses JSON to see if it tells us that we need a new token
@@ -160,7 +160,7 @@ check_JSON <- function(jsonObject
         tokenToUse <- awhereEnv75247$token
 
         #This boolean will cause the API request to be repeated
-        return(list(TRUE,NA))
+        return(list(TRUE,NA,tokenToUse))
       } else {
         stop("The token you passed in has expired. Please request a new one and retry your function call with the new token.")
       }
