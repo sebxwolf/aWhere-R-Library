@@ -149,7 +149,9 @@ daily_observed_fields <- function(field_id
         doWeatherGet <- temp[[1]]
         
         #if the token was updated, this will cause it to be used through function
-        tokenToUse <- temp[[3]]
+        if(length(temp) > 2) {
+          tokenToUse <- temp[[3]]
+        }
         
         #The temp[[2]] will only not be NA when the limit param is too large.
         if(!is.na(temp[[2]] == TRUE)) {
@@ -347,7 +349,9 @@ daily_observed_latlng <- function(latitude
         doWeatherGet <- temp[[1]]
         
         #if the token was updated, this will cause it to be used through function
-        tokenToUse <- temp[[3]]
+        if(length(temp) > 2) {
+          tokenToUse <- temp[[3]]
+        }
         
         #The temp[[2]] will only not be NA when the limit param is too large.
         if(!is.na(temp[[2]] == TRUE)) {
