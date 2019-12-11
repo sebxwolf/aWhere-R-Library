@@ -1,6 +1,6 @@
 Package: aWhereAPI
 Title: API calls for aWhere API
-Version: 0.5.19
+Version: 0.5.20
 Authors@R: 
     c(person("Technical", "Support", ,"technicalsupport@awhere.com", role = c("aut","cre","ctb")))
 Description: 
@@ -21,6 +21,7 @@ Imports:
     httr (>= 0.6.1),
     jsonlite,
     lubridate,
+    lutz,
     raster,
     rgeos,
     sp,
