@@ -292,7 +292,7 @@ get_planting <- function(field_id = ""
   if(is.null(a$statusCode)) {
     
  #   if (c('plantings') %in% names(a)) {
-    if (length(a$plantings) > 0) {
+    if (length(a$plantings) > 0 | length(a$id) > 0) {
       
       if((field_id != '' && planting_id == "" && current == FALSE) ||
          (field_id == '' && current == TRUE)) {
