@@ -17,7 +17,7 @@ Field IDs are created using the create_field function. (string)}
 Defaults to system date if left blank. (optional)}
 
 \item{-}{day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD
-Defaults to system date + 7 if left blank. Up to 15 days forecast can be retrieved (optional)}
+Returns all available forecast if left blank. (optional)}
 
 \item{-}{block_size: Integer value that corresponds to the number of hours to include in each time block.
 Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)}

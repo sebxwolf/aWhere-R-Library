@@ -30,7 +30,7 @@
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #'                    Defaults to system date if left blank. (optional)
 #' @param - day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD
-#'                  Defaults to system date + 7 if left blank. Up to 15 days forecast can be retrieved (optional)
+#'                 Returns all available forecast if left blank. (optional)
 #' @param - block_size: Integer value that corresponds to the number of hours to include in each time block.
 #'                     Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)
 #' @param - useLocalTime: whether the data specified is the date specified at the location where data is
@@ -43,7 +43,8 @@
 #' @import data.table
 #' @import lubridate
 #' @import jsonlite
-#'
+#' @import lutz
+#' 
 #' @return data.frame of requested data for dates requested
 #'
 #' @examples
@@ -70,6 +71,31 @@ forecasts_fields <- function(field_id
   #checkValidStartEndDatesForecast(day_start,day_end)
   checkForecastParams(block_size)
 
+  fieldInfo <- get_fields('field_id')
+  
+  #Checks if dates need to be adjusted.  This only applies when someone is request
+  tz_request <- lutz::tz_lookup_coords(fieldInfo$Latitude
+                                       ,fieldInfo$Longitude
+                                       ,method = 'fast'
+                                       ,warn = FALSE)
+  
+  currentTime <- ymd_hms(Sys.time(), tz = Sys.timezone())
+  timeAtRequestSite <- with_tz(currentTime, tz_request)
+  
+  if (substr(currentTime,1,10) != substr(timeAtRequestSite,1,10) & useLocalTime == TRUE) {
+    if (day_start == Sys.Date()) {
+      cat(paste0('Adjusted the startDate of query to one day later because the location data being requested for has a different date\n'))
+      day_start <- as.character(lubridate::ymd(day_start) + 1)
+    } 
+    
+    if (day_end != '') {
+      if (day_end == Sys.Date() + 15) {
+        cat(paste0('Adjusted the endDate of query to one day earlier because the location data being requested for has a different date\n'))
+        day_end <- as.character(lubridate::ymd(day_end) - 1)
+      }
+    }
+  }
+  
   #Create Query
   urlAddress <- "https://api.awhere.com/v2/weather"
 
@@ -169,7 +195,7 @@ forecasts_fields <- function(field_id
 #' @param - day_start: character string of the first day for which you want to retrieve data, in the form: YYYY-MM-DD
 #'                    Defaults to system date if left blank. (optional)
 #' @param - day_end: character string of the last day for which you want to retrieve data, in form: YYYY-MM-DD
-#'                  Defaults to system date + 7 if left blank. (optional)
+#'                  Returns all available forecast if left blank. (optional)
 #' @param - block_size: Integer value that corresponds to the number of hours to include in each time block.
 #'                     Defaults to a 1 hour block.  This value must divide evenly into 24. (integer - optional)
 #' @param - useLocalTime: whether the data specified is the date specified at the location where data is
@@ -184,6 +210,7 @@ forecasts_fields <- function(field_id
 #' @import data.table
 #' @import lubridate
 #' @import jsonlite
+#' @import lutz
 #'
 #' @examples
 #' \dontrun{forecasts_latlng(latitude = 39.8282
@@ -214,6 +241,30 @@ forecasts_latlng <- function(latitude
 #  checkValidStartEndDatesForecast(day_start,day_end)
   checkForecastParams(block_size)
 
+  #Checks if dates need to be adjusted.  This only applies when someone is request
+  tz_request <- lutz::tz_lookup_coords(latitude
+                                       ,longitude
+                                       ,method = 'fast'
+                                       ,warn = FALSE)
+  
+  currentTime <- ymd_hms(Sys.time(), tz = Sys.timezone())
+  timeAtRequestSite <- with_tz(currentTime, tz_request)
+  
+  if (substr(currentTime,1,10) != substr(timeAtRequestSite,1,10) & useLocalTime == TRUE) {
+    if (day_start == Sys.Date()) {
+      cat(paste0('Adjusted the startDate of query to one day later because the location data being requested for has a different date\n'))
+      day_start <- as.character(lubridate::ymd(day_start) + 1)
+    } 
+    
+    if (day_end != '') {
+      if (day_end == Sys.Date() + 15) {
+        cat(paste0('Adjusted the endDate of query to one day earlier because the location data being requested for has a different date\n'))
+        day_end <- as.character(lubridate::ymd(day_end) - 1)
+      }
+    }
+  }
+  
+  
   #Create Query
   urlAddress <- "https://api.awhere.com/v2/weather"
 
