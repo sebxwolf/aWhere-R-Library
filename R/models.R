@@ -275,6 +275,7 @@ get_model_results <- function(field_id
   if(class(a$currentStage) == "list" & length(a$currentStage) > 0) {
     currentStage <- data.frame(rbind(a$currentStage))
     currentStage <- data.frame(lapply(currentStage, as.character), stringsAsFactors=FALSE)
+    currentStage <- suppressWarnings(dplyr::mutate_at(currentStage, c("date"), as.Date))
     currentStage <- suppressWarnings(dplyr::mutate_at(currentStage, c("accumulatedGdds",'gddThreshold'), as.numeric))
     currentStage <- dplyr::mutate_at(currentStage, c("accumulatedGdds",'gddThreshold'), round, 2)
     
