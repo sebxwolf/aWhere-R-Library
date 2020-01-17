@@ -439,7 +439,7 @@ forecasts_area <- function(polygon
     cat(paste0('Requesting data using parallal API calls\n'))
   }
   
-  grid <- split(grid, (seq(nrow(grid))-1) %/% ceiling(nrow(grid) / numcores))
+  grid <- split(grid, seq(1,nrow(grid),1))
   
   doParallel::registerDoParallel(cores=numcores)
   
@@ -447,11 +447,8 @@ forecasts_area <- function(polygon
                                 ,.packages = c("aWhereAPI")
                                 ,.export = c('awhereEnv75247')) %dopar% {
     
-    dat <- data.frame()
-    
-    for(i in 1:nrow(grid[[j]])) {
-      t <- forecasts_latlng(latitude = grid[[j]]$lat[i]
-                           ,longitude = grid[[j]]$lon[i]
+      t <- forecasts_latlng(latitude = grid[[j]]$lat
+                           ,longitude = grid[[j]]$lon
                            ,day_start = day_start
                            ,day_end = day_end
                            ,block_size = block_size
@@ -464,15 +461,28 @@ forecasts_area <- function(polygon
       t$gridx <- grid[[j]]$gridx[i]
       
       data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
-      
-      dat <- rbind(dat, t)
-    }
-    return(dat)
+
+      return(t)
     
   }
   
+  indexToRemove <- c()
+  for (x in 1:length(forecasts)) {
+    if (any(class(forecasts[[x]]) == 'simpleError')) {
+      indexToRemove <- c(indexToRemove,x)
+    }
+    grid <- data.table::rbindlist(grid)
+    
+    warning(paste0('The following locations returned errors and have been removed from the output.  Please investigate by running manually:\n'
+                   ,paste0(grid[indexToRemove,paste0('(',lat,', ',lon,')')],collapse = ', ')
+                   ,'\n'))
+    
+    grid <- grid[!indexToRemove]  
+    
+    forecasts[indexToRemove] <- NULL
+  }
+  
   forecasts <- data.table::rbindlist(forecasts,use.names = TRUE,fill = TRUE)
-  grid <- data.table::rbindlist(grid)
   
   if (returnSpatialData == TRUE) {
     sp::coordinates(forecasts) <- ~longitude + latitude

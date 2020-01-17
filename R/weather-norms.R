@@ -657,7 +657,7 @@ weather_norms_area <- function(polygon
     cat(paste0('Requesting data using parallal API calls\n'))
   }
 
-  grid <- split(grid, (seq(nrow(grid))-1) %/% ceiling(nrow(grid) / numcores))
+  grid <- split(grid, seq(1,nrow(grid),1))
 
   doParallel::registerDoParallel(cores=numcores)
 
@@ -665,31 +665,40 @@ weather_norms_area <- function(polygon
                             ,.packages = c("aWhereAPI")
                             ,.export = c('awhereEnv75247')) %dopar% {
 
-    dat <- data.frame()
+    t <- weather_norms_latlng(latitude = grid[[j]]$lat
+                              ,longitude = grid[[j]]$lon
+                              ,monthday_start = monthday_start
+                              ,monthday_end = monthday_end
+                              ,year_start = year_start
+                              ,year_end = year_end
+                              ,propertiesToInclude = propertiesToInclude
+                              ,exclude_years =  exclude_years
+                              ,includeFeb29thData = includeFeb29thData)
 
-    for(i in 1:nrow(grid[[j]])) {
-      t <- weather_norms_latlng(latitude = grid[[j]]$lat[i]
-                                ,longitude = grid[[j]]$lon[i]
-                                ,monthday_start = monthday_start
-                                ,monthday_end = monthday_end
-                                ,year_start = year_start
-                                ,year_end = year_end
-                                ,propertiesToInclude = propertiesToInclude
-                                ,exclude_years =  exclude_years
-                                ,includeFeb29thData = includeFeb29thData)
+    currentNames <- colnames(t)
 
-      currentNames <- colnames(t)
+    t$gridy <- grid[[j]]$gridy[i]
+    t$gridx <- grid[[j]]$gridx[i]
 
-      t$gridy <- grid[[j]]$gridy[i]
-      t$gridx <- grid[[j]]$gridx[i]
+    data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
 
-      data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
-
-      dat <- rbind(dat, t)
+    return(t)
+  }
+  
+  indexToRemove <- c()
+  for (x in 1:length(norms)) {
+    if (any(class(norms[[x]]) == 'simpleError')) {
+      indexToRemove <- c(indexToRemove,x)
     }
-    return(dat)
-
-
+    grid <- data.table::rbindlist(grid)
+    
+    warning(paste0('The following locations returned errors and have been removed from the output.  Please investigate by running manually:\n'
+                   ,paste0(grid[indexToRemove,paste0('(',lat,', ',lon,')')],collapse = ', ')
+                   ,'\n'))
+    
+    grid <- grid[!indexToRemove]  
+    
+    norms[indexToRemove] <- NULL
   }
 
   norms <- data.table::rbindlist(norms,use.names = TRUE,fill = TRUE)

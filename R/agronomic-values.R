@@ -652,8 +652,8 @@ agronomic_values_area <- function(polygon
   if (verbose == TRUE) {
     cat(paste0('Requesting data using parallal API calls\n'))
   }
-
-  grid <- split(grid, (seq(nrow(grid))-1) %/% ceiling(nrow(grid) / numcores))
+  
+  grid <- split(grid, seq(1,nrow(grid),1))
 
   doParallel::registerDoParallel(cores=numcores)
 
@@ -661,28 +661,38 @@ agronomic_values_area <- function(polygon
                                ,.packages = c("aWhereAPI")
                                ,.export = c('awhereEnv75247')) %dopar% {
 
-    dat <- data.frame()
+    t <- agronomic_values_latlng(latitude = grid[[j]]$lat
+                                 ,longitude = grid[[j]]$lon
+                                 ,day_start = day_start
+                                 ,day_end = day_end
+                                 ,propertiesToInclude = propertiesToInclude)
 
-    for(i in 1:nrow(grid[[j]])) {
-      t <- agronomic_values_latlng(latitude = grid[[j]]$lat[i]
-                                   ,longitude = grid[[j]]$lon[i]
-                                   ,day_start = day_start
-                                   ,day_end = day_end
-                                   ,propertiesToInclude = propertiesToInclude)
+    currentNames <- colnames(t)
 
-      currentNames <- colnames(t)
+    t$gridy <- grid[[j]]$gridy[i]
+    t$gridx <- grid[[j]]$gridx[i]
 
-      t$gridy <- grid[[j]]$gridy[i]
-      t$gridx <- grid[[j]]$gridx[i]
+    data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
 
-      data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
-
-      dat <- rbind(dat, t)
-    }
-    return(dat)
-
+    return(t)
   }
 
+  indexToRemove <- c()
+  for (x in 1:length(observed)) {
+    if (any(class(observed[[x]]) == 'simpleError')) {
+      indexToRemove <- c(indexToRemove,x)
+    }
+    grid <- data.table::rbindlist(grid)
+    
+    warning(paste0('The following locations returned errors and have been removed from the output.  Please investigate by running manually:\n'
+                   ,paste0(grid[indexToRemove,paste0('(',lat,', ',lon,')')],collapse = ', ')
+                   ,'\n'))
+    
+    grid <- grid[!indexToRemove]  
+    
+    observed[indexToRemove] <- NULL
+  }
+  
   observed <- data.table::rbindlist(observed,use.names = TRUE,fill = TRUE)
 
   if (returnSpatialData == TRUE) {
