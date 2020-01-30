@@ -89,7 +89,10 @@ forecasts_fields <- function(field_id
     } 
     
     if (day_end != '') {
-      if (day_end == Sys.Date() + 15) {
+      if (day_end == Sys.Date()) {
+        cat(paste0('Adjusted the endDate of query to one day later because the location data being requested for has a different date\n'))
+        day_end <- as.character(lubridate::ymd(day_end) + 1)
+      } else if (day_end == Sys.Date() + 15) {
         cat(paste0('Adjusted the endDate of query to one day earlier because the location data being requested for has a different date\n'))
         day_end <- as.character(lubridate::ymd(day_end) - 1)
       }
@@ -257,7 +260,10 @@ forecasts_latlng <- function(latitude
     } 
     
     if (day_end != '') {
-      if (day_end == Sys.Date() + 15) {
+      if (day_end == Sys.Date()) {
+        cat(paste0('Adjusted the endDate of query to one day later because the location data being requested for has a different date\n'))
+        day_end <- as.character(lubridate::ymd(day_end) + 1)
+      } else if (day_end == Sys.Date() + 15) {
         cat(paste0('Adjusted the endDate of query to one day earlier because the location data being requested for has a different date\n'))
         day_end <- as.character(lubridate::ymd(day_end) - 1)
       }
