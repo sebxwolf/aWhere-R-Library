@@ -677,8 +677,8 @@ weather_norms_area <- function(polygon
 
     currentNames <- colnames(t)
 
-    t$gridy <- grid[[j]]$gridy[i]
-    t$gridx <- grid[[j]]$gridx[i]
+    t$gridy <- grid[[j]]$gridy
+    t$gridx <- grid[[j]]$gridx
 
     data.table::setcolorder(t, c(currentNames[c(1:2)], "gridy", "gridx", currentNames[c(3:length(currentNames))]))
 
