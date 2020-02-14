@@ -54,7 +54,7 @@ get_fields <- function(field_id = ""
   }
   
   ## Create Request
-  url <- "https://api.awhere.com/v2/fields/"
+  url <- paste0(awhereEnv75247$apiAddress, "/fields/")
 
   if(field_id != "") {
     url <- paste0(url, field_id)
@@ -217,7 +217,7 @@ get_planting <- function(field_id = ""
   }
   
   ## Create Request
-  url <- "https://api.awhere.com/v2/agronomics/"
+  url <- paste0(awhereEnv75247$apiAddress, "/agronomics/")
 
   if(field_id != "") {
     checkValidField(field_id,keyToUse,secretToUse,tokenToUse)
@@ -396,7 +396,7 @@ get_job <- function(job_id
   checkCredentials(keyToUse,secretToUse,tokenToUse)
 
   ## Create Request
-  url <- "https://api.awhere.com/v2/jobs/"
+  url <- paste0(awhereEnv75247$apiAddress, "/jobs/")
 
   if(is.na(job_id)) {
     stop("must specify job_id")
