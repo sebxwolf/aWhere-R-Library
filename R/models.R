@@ -136,6 +136,7 @@ get_model_details <- function(model_id
   
   ## Create Request
   url <- paste0(awhereEnv75247$apiAddress, "/agronomics/models/")
+  
   url <- paste0(url, model_id, "/details")
   
   
