@@ -94,7 +94,8 @@ get_token <- function(uid, secret, use_environment = TRUE, apiAddress = "api.awh
   
   return(list(error = error
               ,error_message = error_message
-              ,token = token))
+              ,token = token
+              ,apiAddress = apiAddress))
 }
 
 #' @title Load Credentials.
@@ -119,13 +120,15 @@ get_token <- function(uid, secret, use_environment = TRUE, apiAddress = "api.awh
 #'
 #' @export
 
-load_credentials <- function(path_to_credentials) {
+load_credentials <- function(path_to_credentials,apiAddress = "api.awhere.com") {
   credentials <- readLines(path_to_credentials)
   
   uid <- credentials[1]
   secret <- credentials[2]
   
-  get_token(uid, secret)
+  get_token(uid = uid
+            ,secret = secret
+            ,apiAddress = apiAddress)
 }
 
 #' @title Check JSON Object
@@ -163,7 +166,9 @@ check_JSON <- function(jsonObject
   if (any(grepl('API Access Expired',jsonObject))) {
     if(exists("awhereEnv75247")) {
       if(tokenToUse == awhereEnv75247$token) {
-        get_token(keyToUse,secretToUse)
+        get_token(uid = keyToUse
+                  ,secret = secretToUse
+                  ,apiAddress = awhereEnv75247$apiAddress)
         tokenToUse <- awhereEnv75247$token
         
         #This boolean will cause the API request to be repeated
