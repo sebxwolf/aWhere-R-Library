@@ -158,10 +158,12 @@ forecasts_fields <- function(field_id
   data.table::setcolorder(data,c('field_id',currentNames))
 
   if(block_size == 1) {
-    data[,c("relativeHumidity.max", "relativeHumidity.min", "wind.max", "wind.min") := NULL]
+    suppressWarnings(data[,c("relativeHumidity.max", "relativeHumidity.min", "wind.max", "wind.min") := NULL])
   }
 
-  checkDataReturn_forecasts(data,day_start,day_end,block_size)
+  if (returnOnlySoilVars == FALSE) {
+    checkDataReturn_forecasts(data,day_start,day_end,block_size)
+  }
 
   return(as.data.frame(data))
 }
@@ -235,6 +237,7 @@ forecasts_latlng <- function(latitude
                              ,day_end = ''
                              ,block_size = 1
                              ,useLocalTime = TRUE
+                             ,returnOnlySoilVars = FALSE
                              ,keyToUse = awhereEnv75247$uid
                              ,secretToUse = awhereEnv75247$secret
                              ,tokenToUse = awhereEnv75247$token) {
@@ -314,7 +317,8 @@ forecasts_latlng <- function(latitude
     data <- data.table::as.data.table(x[[3]])
   }
 
-  data <- removeUnnecessaryColumns(data)
+  data <- removeUnnecessaryColumns(data
+                                   ,returnOnlySoilVars)
 
   currentNames <- data.table::copy(colnames(data))
 
@@ -324,10 +328,12 @@ forecasts_latlng <- function(latitude
   data.table::setcolorder(data,c('latitude','longitude',currentNames))
 
   if(block_size == 1) {
-    data[,c("relativeHumidity.max", "relativeHumidity.min", "wind.max", "wind.min") := NULL]
+    suppressWarnings(data[,c("relativeHumidity.max", "relativeHumidity.min", "wind.max", "wind.min") := NULL])
   }
 
-  checkDataReturn_forecasts(data,day_start,day_end,block_size)
+  if (returnOnlySoilVars == FALSE) {
+    checkDataReturn_forecasts(data,day_start,day_end,block_size)
+  }
 
   return(as.data.frame(data))
 }
@@ -335,10 +341,10 @@ forecasts_latlng <- function(latitude
 #' @title forecasts_area
 #'
 #' @description
-#' \code{forecasts_area} pulls historical weather data from aWhere's API based on a data.frame of lat/lon, polygon or extent
+#' \code{forecasts_area} pulls forecasted weather data from aWhere's API based on a data.frame of lat/lon, polygon or extent
 #'
 #' @details
-#' This function returns today's forecast plus the forecast for up to 7 more days. Forecasts are available
+#' This function returns today's forecast plus the forecast for up to 15 more days. Forecasts are available
 #' in many sizes of hourly blocks, from hourly to daily. The data this function returns is
 #' Min/Max Temperature, Precipitation Amount, Chance of Precipitation,
 #' Max Humidity, Relative Humidity, Solar Radiation, Average Wind Speed, Max Windspeed, Percentage
@@ -411,6 +417,7 @@ forecasts_area <- function(polygon
                            ,bypassNumCallCheck = FALSE
                            ,returnSpatialData = FALSE
                            ,verbose = TRUE
+                           ,returnOnlySoilVars = FALSE
                            ,keyToUse = awhereEnv75247$uid
                            ,secretToUse = awhereEnv75247$secret
                            ,tokenToUse = awhereEnv75247$token) {
@@ -503,5 +510,4 @@ forecasts_area <- function(polygon
   
   return(as.data.frame(forecasts))
 }
-
 
