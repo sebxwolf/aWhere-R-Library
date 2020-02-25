@@ -168,7 +168,9 @@ check_JSON <- function(jsonObject
       if(tokenToUse == awhereEnv75247$token) {
         get_token(uid = keyToUse
                   ,secret = secretToUse
-                  ,apiAddress = awhereEnv75247$apiAddress)
+                  ,apiAddress = gsub(pattern = 'https://|/v2'
+                                     ,replacement = ''
+                                     ,x = awhereEnv75247$apiAddress))
         tokenToUse <- awhereEnv75247$token
         
         #This boolean will cause the API request to be repeated
