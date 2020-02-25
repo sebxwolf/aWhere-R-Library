@@ -62,6 +62,7 @@ forecasts_fields <- function(field_id
                              ,day_end = ''
                              ,block_size = 1
                              ,useLocalTime = TRUE
+                             ,returnOnlySoilVars = FALSE
                              ,keyToUse = awhereEnv75247$uid
                              ,secretToUse = awhereEnv75247$secret
                              ,tokenToUse = awhereEnv75247$token) {
@@ -151,7 +152,8 @@ forecasts_fields <- function(field_id
 
   varNames <- colnames(data)
 
-  data <- removeUnnecessaryColumns(data)
+  data <- removeUnnecessaryColumns(data
+                                   ,returnOnlySoilVars)
 
   currentNames <- data.table::copy(colnames(data))
   data[,field_id  := field_id]
