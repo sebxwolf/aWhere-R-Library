@@ -25,7 +25,9 @@ Imports:
     raster,
     rgeos,
     sp,
-    doParallel
+    doParallel,
+    magrittr,
+    tidyr (>= 1.0.0)
 Suggests: 
     testthat, 
     knitr, 
