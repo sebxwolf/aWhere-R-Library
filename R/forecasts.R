@@ -467,7 +467,8 @@ forecasts_area <- function(polygon
                            ,day_start = day_start
                            ,day_end = day_end
                            ,block_size = block_size
-                           ,useLocalTime = useLocalTime)
+                           ,useLocalTime = useLocalTime
+                           ,returnOnlySoilVars = returnOnlySoilVars)
       
       
       currentNames <- colnames(t)
